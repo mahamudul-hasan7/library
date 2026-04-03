@@ -1,0 +1,554 @@
+﻿<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BrainRoot Architectural Library - Explore</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hover-lift {
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(45, 52, 53, 0.12);
+        }
+        .group.cursor-pointer,
+        .space-y-4 > div,
+        button {
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease, color 180ms ease, opacity 180ms ease;
+        }
+        .group.cursor-pointer:hover,
+        .space-y-4 > div:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 40px rgba(45, 52, 53, 0.12);
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-tertiary-container": "#4a4f69",
+                        "primary-dim": "#00539a",
+                        "tertiary-fixed": "#dadefe",
+                        "primary": "#005faf",
+                        "on-surface-variant": "#596061",
+                        "inverse-primary": "#4e9af9",
+                        "error": "#9f403d",
+                        "surface-container-high": "#e4e9ea",
+                        "on-secondary-container": "#46545d",
+                        "surface": "#f9f9f9",
+                        "on-secondary": "#f4faff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#383c55",
+                        "primary-fixed-dim": "#bdd6ff",
+                        "inverse-on-surface": "#9c9d9d",
+                        "on-tertiary-fixed-variant": "#545873",
+                        "surface-container-low": "#f2f4f4",
+                        "secondary-container": "#d6e5ef",
+                        "background": "#f9f9f9",
+                        "on-surface": "#2d3435",
+                        "tertiary-dim": "#4d526c",
+                        "surface-dim": "#d3dbdd",
+                        "secondary-dim": "#47555e",
+                        "primary-container": "#d4e3ff",
+                        "outline-variant": "#acb3b4",
+                        "tertiary": "#595e78",
+                        "surface-bright": "#f9f9f9",
+                        "secondary-fixed-dim": "#c8d6e1",
+                        "on-primary-fixed": "#004079",
+                        "on-primary-container": "#005299",
+                        "secondary": "#53616a",
+                        "surface-variant": "#dde4e5",
+                        "tertiary-container": "#dadefe",
+                        "error-container": "#fe8983",
+                        "on-tertiary": "#faf8ff",
+                        "on-background": "#2d3435",
+                        "on-error-container": "#752121",
+                        "inverse-surface": "#0c0f0f",
+                        "surface-container": "#ebeeef",
+                        "surface-tint": "#005faf",
+                        "on-secondary-fixed": "#33414a",
+                        "outline": "#757c7d",
+                        "on-error": "#fff7f6",
+                        "secondary-fixed": "#d6e5ef",
+                        "tertiary-fixed-dim": "#ccd0ef",
+                        "on-secondary-fixed-variant": "#4f5d67",
+                        "error-dim": "#4e0309",
+                        "on-primary-fixed-variant": "#005caa",
+                        "on-primary": "#f6f7ff",
+                        "surface-container-highest": "#dde4e5",
+                        "primary-fixed": "#d4e3ff"
+                    },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-[#f9f9f9]/95 backdrop-blur-md border-b border-outline-variant/15">
+<div class="flex justify-between items-center px-12 py-4 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center gap-12">
+<span class="text-xl font-bold tracking-tight text-[#2d3435]"><a href="../index/index.html" style="color: inherit; text-decoration: none;">BrainRoot</a></span>
+<div class="hidden md:flex gap-8 items-center text-[0.875rem] font-medium">
+<a class="text-[#2d3435] hover:text-[#005faf] transition-colors" href="../index/index.html" data-auth="public">Home</a>
+<a class="text-[#005faf] border-b-2 border-[#005faf] pb-1" href="../explore/explore.html" data-auth="public">Explore</a>
+<a class="text-[#2d3435] hover:text-[#005faf] transition-colors" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+<a class="text-[#2d3435] hover:text-[#005faf] transition-colors" href="../collections/collections.html" data-auth="private">Collections</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative flex items-center bg-surface-container-lowest border border-outline-variant/15 px-4 py-2 w-64">
+<span class="material-symbols-outlined text-outline text-sm mr-2">search</span>
+<input class="bg-transparent border-none p-0 focus:ring-0 text-sm w-full" placeholder="Search the archive..." type="text"/>
+</div>
+<a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435] hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
+<a href="../profile/profile.html" data-auth="profile" class="material-symbols-outlined p-2 hover:bg-surface-container-low transition-all active:scale-95" title="Profile" style="display: none;">person</a>
+</div>
+</div>
+</nav>
+<main class="pt-24 pb-20 max-w-[1440px] mx-auto px-12">
+<!-- Hero Recommendation Section -->
+<section class="mt-12 mb-24">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-0 bg-surface-container-lowest hover-lift">
+<div class="md:col-span-7 p-12 flex flex-col justify-center">
+<span class="text-[0.75rem] font-semibold uppercase tracking-widest text-primary mb-6">Recommended for You</span>
+<div class="mb-4">
+<span class="inline-block text-[0.65rem] font-bold uppercase tracking-widest px-3 py-1 bg-primary text-on-primary">Premium Book</span>
+</div>
+<h1 class="text-[2.75rem] font-bold leading-tight mb-6">The Geometry of Silence: Minimalist Spatial Design</h1>
+<p class="text-on-surface-variant body-md max-w-lg mb-10 leading-relaxed">
+                        An exhaustive survey of architectural void as a functional element. This week's curated selection explores how absence defines presence in contemporary structural planning.
+                    </p>
+<div class="flex items-center gap-6">
+<button class="bg-primary text-on-primary px-8 py-3 text-sm font-semibold hover:opacity-90 transition-all hover:scale-[1.02] active:scale-95">Reserve Copy</button>
+<button class="text-on-surface text-sm font-semibold flex items-center gap-2 hover:underline transition-all hover:translate-x-1">
+                            View Details <span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="md:col-span-5 h-[500px] bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Modern architectural structure with clean white lines, large glass windows, and minimalist interior showing a quiet reading space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCAjZ6cOk-WteMR4J--Q71aGBVGKybZIZbyHY-SR3xN9X8b12EGyKWT3VWeRWGHYe-aq8CKxL9ZPO5UMVITHiKo3dMjC3BKO2L488Ykg0lI40XSe1hRbrihSbjMKewvTSMYm22hNBcKo_ePGRHLbglcqkwZdxkfBppABFzUHO4DJ3mix8CbLyh1qdhpNJizCyHZbqSw91Bfz-D_Z3NYeVSM9RyRgt2FWGoABmIWu_it5juB9Ste988WHjpp08c1TlLq_QI1cGUlPE"/>
+</div>
+</div>
+</section>
+<!-- Trending Books -->
+<section class="mb-20">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="text-xl font-semibold tracking-tight">Trending Books</h2>
+<div class="h-1 w-12 bg-primary mt-2"></div>
+</div>
+<a class="text-sm font-medium text-primary hover:underline" href="#">View All</a>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-8 pb-4">
+<!-- Book Card 1 -->
+<div class="flex-none w-64 group cursor-pointer hover-lift" onclick="openBookModal('Concrete Poetry', 'Tadao Ando', 'An exploration of minimalist design principles and spiritual minimalism in contemporary architecture. This seminal work examines how Tadao Ando revolutionized modern architecture through the use of concrete, light, and empty space. A profound meditation on materiality and form.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAkM-aR9rwBiPMmR1eFV0sdTiEvbJ57aYp919zaK5t7PXdGEHUDt4fxNKsPzETppgMRj-OxDlYyYAlm0kK720ytAv7kdueKMx6tgG3isGyxemS1OgC6eUy5-Hn9FT7NxH1Gs43RYtDKxU0HRgEFzM942yK8icWrNa8FGYZHaNGvSxNuuCebPVONICnYHO7cZm7NW3YTa28l5BkkZOeSZ3eyGNDwfZcfJOalRsQ0I1hb8Jmgejj317tk26gbg65LXZ4rvNvFvbBk5BA')">
+<div class="aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Minimalist book cover featuring a stark black and white architectural photograph and bold sans-serif typography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkM-aR9rwBiPMmR1eFV0sdTiEvbJ57aYp919zaK5t7PXdGEHUDt4fxNKsPzETppgMRj-OxDlYyYAlm0kK720ytAv7kdueKMx6tgG3isGyxemS1OgC6eUy5-Hn9FT7NxH1Gs43RYtDKxU0HRgEFzM942yK8icWrNa8FGYZHaNGvSxNuuCebPVONICnYHO7cZm7NW3YTa28l5BkkZOeSZ3eyGNDwfZcfJOalRsQ0I1hb8Jmgejj317tk26gbg65LXZ4rvNvFvbBk5BA"/>
+</div>
+<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">
+<h3 class="text-sm font-semibold mb-1 truncate">Concrete Poetry</h3>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Tadao Ando</p>
+<span class="inline-block mt-2 text-[0.6rem] font-bold uppercase tracking-widest px-2 py-1 bg-primary text-on-primary">Premium Book</span>
+</div>
+</div>
+<!-- Book Card 2 -->
+<div class="flex-none w-64 group cursor-pointer hover-lift" onclick="openBookModal('Structure &amp; Light', 'Louis Kahn', 'The definitive study of Louis Kahn\'s revolutionary approach to architecture through light and structural form. Explores his philosophy of design and the spiritual dimensions of built space. Essential reading for understanding modern architecture\'s greatest visionary.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAuYYgWRa7zpoBIFs2k8tY222LUw0mG4VKU5BPEXFQxd5A1La8wi0wHXsHOYEE-u_TQ4K6HDWkhvlsmjxFlezP1hNLN4JwgbCWsLQnvsFjvtwQCvkTN8C7wYOxC0QsSjgNOlfGSQz0ws5__AHYSS1tJacaXYF2nGzWKH4yDQbzWlTaqe4mSfbtO2pADem1FzJMiZcjd4ypf1Y3MuQkMGf2RGWQdp3XLr3VBFJrdkKt92QlXq0O1BvHVT4WVQYCDZpQ1LrE49elHiuE')">
+<div class="aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Classic hardcover book with textured grey fabric and debossed silver lettering sitting on a marble table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuYYgWRa7zpoBIFs2k8tY222LUw0mG4VKU5BPEXFQxd5A1La8wi0wHXsHOYEE-u_TQ4K6HDWkhvlsmjxFlezP1hNLN4JwgbCWsLQnvsFjvtwQCvkTN8C7wYOxC0QsSjgNOlfGSQz0ws5__AHYSS1tJacaXYF2nGzWKH4yDQbzWlTaqe4mSfbtO2pADem1FzJMiZcjd4ypf1Y3MuQkMGf2RGWQdp3XLr3VBFJrdkKt92QlXq0O1BvHVT4WVQYCDZpQ1LrE49elHiuE"/>
+</div>
+<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">
+<h3 class="text-sm font-semibold mb-1 truncate">Structure &amp; Light</h3>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Louis Kahn</p>
+<span class="inline-block mt-2 text-[0.6rem] font-bold uppercase tracking-widest px-2 py-1 border border-primary text-primary">Free Book</span>
+</div>
+</div>
+<!-- Book Card 3 -->
+<div class="flex-none w-64 group cursor-pointer hover-lift" onclick="openBookModal('Urban Metabolism', 'Kenzo Tange', 'A groundbreaking exploration of mega-structure design and urban renewal principles. Kenzo Tange\'s visionary approach to city planning and architectural megastructures that adapt and grow over time. Influential work on the relationship between architecture and urban ecology.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCMwtY1PcedjzXjUthZ6eKRmDKDVQhtjcxlXyOmUbWP618xvj__HkiMvvWB3rIe2eTPa-TxPod2oM9Syj8JIBpHN3o1soLNN5X-bDqv95Bd-uZp4JVItMt2YNwNMfCtabKJMJLg6eO9zGPsxcw_KzMuXT3DWcwrIW_hh-xes7oQNhtfMFKiScgU2O5M0fe5MOMUipQqfuKC-alXbRKNZ0hkq0A_agvixl5Fw4_TknaXM9znuRnl3tqNYeszJHxbKo0q2gAyrSWBpC8')">
+<div class="aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Vibrant orange book cover with abstract white geometric patterns and modern architectural sketches" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMwtY1PcedjzXjUthZ6eKRmDKDVQhtjcxlXyOmUbWP618xvj__HkiMvvWB3rIe2eTPa-TxPod2oM9Syj8JIBpHN3o1soLNN5X-bDqv95Bd-uZp4JVItMt2YNwNMfCtabKJMJLg6eO9zGPsxcw_KzMuXT3DWcwrIW_hh-xes7oQNhtfMFKiScgU2O5M0fe5MOMUipQqfuKC-alXbRKNZ0hkq0A_agvixl5Fw4_TknaXM9znuRnl3tqNYeszJHxbKo0q2gAyrSWBpC8"/>
+</div>
+<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">
+<h3 class="text-sm font-semibold mb-1 truncate">Urban Metabolism</h3>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Kenzo Tange</p>
+</div>
+</div>
+<!-- Book Card 4 -->
+<div class="flex-none w-64 group cursor-pointer hover-lift" onclick="openBookModal('The Modular Man', 'Le Corbusier', 'A comprehensive guide to Le Corbusier\'s Modular system - the proportional system based on human body dimensions that revolutionized modern design. Explores how this universal measurement system influences architecture and design. A foundational text for contemporary practice.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuD1IFmk4YJE_moKcvALJatTeiM8hNAxnq5Y4_AJGD2moL34N4zpvkw00cxdTZ0plyhA8ZIyzG2L4fEoR4qlhE1LM7upfQKPJcvCwrj-YEljWkuGizoAAUxNoY02xi0oFa8G3RUe6ZQRucyaou3gkJLgEyjiUXgoQEq_icNLR0e78KDC8aKupr-Z5w45joaqn6ehDCavrGL3YXlkgdadGUvxrpbySfIQzXCOJPN5uoASAnDjISWOW3BR-8TlRZN40K0YzAT5YKenFmU')">
+<div class="aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Close up of an open book showing detailed architectural blueprints and delicate line drawings on cream paper" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1IFmk4YJE_moKcvALJatTeiM8hNAxnq5Y4_AJGD2moL34N4zpvkw00cxdTZ0plyhA8ZIyzG2L4fEoR4qlhE1LM7upfQKPJcvCwrj-YEljWkuGizoAAUxNoY02xi0oFa8G3RUe6ZQRucyaou3gkJLgEyjiUXgoQEq_icNLR0e78KDC8aKupr-Z5w45joaqn6ehDCavrGL3YXlkgdadGUvxrpbySfIQzXCOJPN5uoASAnDjISWOW3BR-8TlRZN40K0YzAT5YKenFmU"/>
+</div>
+<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">
+<h3 class="text-sm font-semibold mb-1 truncate">The Modular Man</h3>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Le Corbusier</p>
+</div>
+</div>
+<!-- Book Card 5 -->
+<div class="flex-none w-64 group cursor-pointer hover-lift" onclick="openBookModal('Nordic Pavilions', 'Alvar Aalto', 'A detailed study of Alvar Aalto\'s architectural philosophy and his iconic pavilion designs across the Nordic region. Explores the integration of organic forms with functionalism and the influence of natural landscapes on design. Essential for understanding humanistic modernism.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBU7qa0-P3Kbc3ht4Hvud0A3N-O0qo8gxp7lsW6Ud7hLZ42o9vxgjl8wvIcEifjqt42Dbo8GFRxtOL0ATvJRddGZ1pVwndL3q7ZS0RbOM7jLMpGWT2bFwgVWdoJUcvlKjpkvNVLBm8qvPeuo8wkw9Qs3g21Wx5vNCF9V4etjg4xirLhqdpqbzchkw6jLmfjdbuT0APJfJcJUl1M_LxwxxmuloRM3rv-AKswNETegvRR--evXwC341Q0fMwsFQQdwaXAmyK9bcfeSYw')">
+<div class="aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Stack of minimalist art books with pristine white spines and clean black lettering in a sunlit studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBU7qa0-P3Kbc3ht4Hvud0A3N-O0qo8gxp7lsW6Ud7hLZ42o9vxgjl8wvIcEifjqt42Dbo8GFRxtOL0ATvJRddGZ1pVwndL3q7ZS0RbOM7jLMpGWT2bFwgVWdoJUcvlKjpkvNVLBm8qvPeuo8wkw9Qs3g21Wx5vNCF9V4etjg4xirLhqdpqbzchkw6jLmfjdbuT0APJfJcJUl1M_LxwxxmuloRM3rv-AKswNETegvRR--evXwC341Q0fMwsFQQdwaXAmyK9bcfeSYw"/>
+</div>
+<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">
+<h3 class="text-sm font-semibold mb-1 truncate">Nordic Pavilions</h3>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Alvar Aalto</p>
+</div>
+</div>
+<!-- Book Card 6 -->
+<div class="flex-none w-64 group cursor-pointer hover-lift" onclick="openBookModal('The Kite Runner', 'Khaled Hosseini', 'A powerful story of friendship, guilt, and redemption set across Afghanistan and the United States. Follow two boys from Kabul whose lives change forever when a terrible event forces Amir to flee his homeland, only to return years later to confront his past.', 'Available', 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80')">
+<div class="aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Book cover for a drama title" src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80"/>
+</div>
+<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">
+<h3 class="text-sm font-semibold mb-1 truncate">The Kite Runner</h3>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Khaled Hosseini</p>
+<span class="inline-block mt-2 text-[0.6rem] font-bold uppercase tracking-widest px-2 py-1 bg-primary text-on-primary">Drama</span>
+</div>
+</div>
+<!-- Book Card 7 -->
+<div class="flex-none w-64 group cursor-pointer hover-lift" onclick="openBookModal('Dune', 'Frank Herbert', 'A legendary science fiction novel of politics, ecology, and power on the desert planet Arrakis. Paul Atreides inherits the title of Duke and must navigate treacherous political landscapes while discovering his true potential as a leader in this epic tale.', 'Available', 'https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=600&q=80')">
+<div class="aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" data-alt="Book cover for a science fiction title" src="https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=600&q=80"/>
+</div>
+<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">
+<h3 class="text-sm font-semibold mb-1 truncate">Dune</h3>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Frank Herbert</p>
+<span class="inline-block mt-2 text-[0.6rem] font-bold uppercase tracking-widest px-2 py-1 border border-primary text-primary">Sci-Fi</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Top Reading & Most Liked (Side by Side) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
+<!-- Top Reading Section -->
+<section>
+<div class="flex justify-between items-end mb-8">
+<h2 class="text-xl font-semibold tracking-tight">Top Reading</h2>
+<a class="text-sm font-medium text-primary hover:underline" href="#">Full List</a>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-6 pb-4">
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Spatial Dialectics', 'Unknown Author', 'An exploration of spatial relationships and architectural theory through phenomenological lenses. This work investigates the dialectics between designed space and human perception.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuAbSU_gDoqLtdWBJfPEYZTv8M14R4nNeLzjI0W95kceALhoXXGag6-UVj6uQeDdycsqA8zxPmDBzC0zvrtxiE7iuUy9TEPQCI7ZPH552yVRsLdN5FFDMmg40Zk9gTAz-gku0oNVncDDDTUw0zXMv-V-1hFZWiW-hy2B_gPD4eKWbbgchOGOdhnkPDZSyvUFtarrc8J7VNSU_zakBZBmBbNOSajmNi-rYBpKLYatKy2JMIwkZo9oAKwd6pYX2AC_DfWbI3UiQwYeMmc')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Dark navy book cover with minimal gold geometric lines representing a floor plan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbSU_gDoqLtdWBJfPEYZTv8M14R4nNeLzjI0W95kceALhoXXGag6-UVj6uQeDdycsqA8zxPmDBzC0zvrtxiE7iuUy9TEPQCI7ZPH552yVRsLdN5FFDMmg40Zk9gTAz-gku0oNVncDDDTUw0zXMv-V-1hFZWiW-hy2B_gPD4eKWbbgchOGOdhnkPDZSyvUFtarrc8J7VNSU_zakBZBmBbNOSajmNi-rYBpKLYatKy2JMIwkZo9oAKwd6pYX2AC_DfWbI3UiQwYeMmc"/>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Spatial Dialectics</h3>
+<div class="w-full h-[2px] bg-surface-container-highest mt-2">
+<div class="w-3/4 h-full bg-primary"></div>
+</div>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Bauhaus Theory', 'Unknown Author', 'The definitive guide to Bauhaus movement principles and design philosophy. Covers the revolutionary approach to art, architecture, and industrial design that shaped the modern world.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBrfFFwGjY8yZdtI8tiPrqDHavC1r2F8kKC-JNcxVVjvujiB-VJSmBw85eiBTxiwoSS7z1ESpXRW-ZYMbSuYc31sgB9RX9B_vEimXHz4h5jZHUOosocoCiGZsoN1CkSY8FPpOmb7GGkRdr7v_cYVrZWPrPLlEfBWq53BdLObq7bbwWqt-CbnTEN0JW2Z3Xz3geAjv6_X4jEE9atphQ1W7-swmfjpjz8ypYEzMFi_vjkak3GKvIMvqnZWU4-HW1SYqGQvoh3FCeM8Zg')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Light grey book cover with a single red circle and sharp black vertical text" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrfFFwGjY8yZdtI8tiPrqDHavC1r2F8kKC-JNcxVVjvujiB-VJSmBw85eiBTxiwoSS7z1ESpXRW-ZYMbSuYc31sgB9RX9B_vEimXHz4h5jZHUOosocoCiGZsoN1CkSY8FPpOmb7GGkRdr7v_cYVrZWPrPLlEfBWq53BdLObq7bbwWqt-CbnTEN0JW2Z3Xz3geAjv6_X4jEE9atphQ1W7-swmfjpjz8ypYEzMFi_vjkak3GKvIMvqnZWU4-HW1SYqGQvoh3FCeM8Zg"/>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Bauhaus Theory</h3>
+<div class="w-full h-[2px] bg-surface-container-highest mt-2">
+<div class="w-1/4 h-full bg-primary"></div>
+</div>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Organic Forms', 'Unknown Author', 'Explores the principles of biomorphic design and how natural forms influence contemporary architecture and interior spaces. A study of organic shape language in modern design.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuBpPSX695zZOfQxjtcObLgERrRoWnGiJztNLeg4UIzvgjCxv3VyPzBJQgUZRrEkIbd8O3AmBRndJpedb9orTzxXqDoYSJnqK34OgIGEvg4t_-tO9X3YXz4auGSdc7gKiLk1DWsB_wGSFfcxk_m7H3yL4FiiTfUBmVrecLVrJhbFW87x0rSHpahF_g6Q-zjzuYgiMAhK8C4iPWeySppfthq4-2xcnLbHOum_Ycgmdb4RXcBRMInnSMGCy8Dv7uryAC_yC1CTVldDd-4')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Muted green book cover with an embossed leaf pattern and simple white text" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpPSX695zZOfQxjtcObLgERrRoWnGiJztNLeg4UIzvgjCxv3VyPzBJQgUZRrEkIbd8O3AmBRndJpedb9orTzxXqDoYSJnqK34OgIGEvg4t_-tO9X3YXz4auGSdc7gKiLk1DWsB_wGSFfcxk_m7H3yL4FiiTfUBmVrecLVrJhbFW87x0rSHpahF_g6Q-zjzuYgiMAhK8C4iPWeySppfthq4-2xcnLbHOum_Ycgmdb4RXcBRMInnSMGCy8Dv7uryAC_yC1CTVldDd-4"/>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Organic Forms</h3>
+<div class="w-full h-[2px] bg-surface-container-highest mt-2">
+<div class="w-1/2 h-full bg-primary"></div>
+</div>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Atomic Habits', 'James Clear', 'Transform your life through tiny changes. This bestselling book reveals how small habits compound into remarkable results. Learn the science of habit formation and practical strategies to build good habits and break bad ones.', 'Available', 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Book cover of a motivational title" src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80"/>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Atomic Habits</h3>
+<div class="w-full h-[2px] bg-surface-container-highest mt-2">
+<div class="w-2/3 h-full bg-primary"></div>
+</div>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('The Silent Patient', 'Alex Michaelides', 'A shocking psychological thriller about a woman who shoots her husband five times and then never speaks again. A therapist becomes obsessed with uncovering why she did it in this gripping page-turner.', 'Available', 'https://images.unsplash.com/photo-1474932430478-367dbb6832c1?auto=format&fit=crop&w=500&q=80')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Book cover of a mystery title" src="https://images.unsplash.com/photo-1474932430478-367dbb6832c1?auto=format&fit=crop&w=500&q=80"/>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">The Silent Patient</h3>
+<div class="w-full h-[2px] bg-surface-container-highest mt-2">
+<div class="w-1/3 h-full bg-primary"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Most Liked Section -->
+<section>
+<div class="flex justify-between items-end mb-8">
+<h2 class="text-xl font-semibold tracking-tight">Most Liked</h2>
+<a class="text-sm font-medium text-primary hover:underline" href="#">Explore More</a>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-6 pb-4">
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Curvature', 'Unknown Author', 'A visual exploration of curved forms in architecture and design. Examines how curved lines and surfaces create dynamic spaces and influence human perception and movement through built environments.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuARGJmWxXCb6HVBr4T_0ZxXhUPdECsrQ2-AeyFYS-zo9RxeEtwvI5mcZN7wO23-9047HhK2vG-MC9NXQEsud2H8uRxr2FUD4jxEff5djJSEXCTBOwxSJK852tyljnX3pKzBqaO0ZmpBclG8SsxPaKGYyTICxHoSSG8544rQ6DU-etoNpGh2MlvRnkmBCJe1H3kCwclhfizbQtp2VwmckF7caZ3_MFqHjTl1pl_-EkfyXaoKyRtmL_wBLnA6sTgLy_A67uE7VuI6Qzo')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 relative hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Black and white photograph of a spiral staircase on a high-gloss book cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARGJmWxXCb6HVBr4T_0ZxXhUPdECsrQ2-AeyFYS-zo9RxeEtwvI5mcZN7wO23-9047HhK2vG-MC9NXQEsud2H8uRxr2FUD4jxEff5djJSEXCTBOwxSJK852tyljnX3pKzBqaO0ZmpBclG8SsxPaKGYyTICxHoSSG8544rQ6DU-etoNpGh2MlvRnkmBCJe1H3kCwclhfizbQtp2VwmckF7caZ3_MFqHjTl1pl_-EkfyXaoKyRtmL_wBLnA6sTgLy_A67uE7VuI6Qzo"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 px-2 py-1">
+<span class="text-[0.65rem] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">favorite</span> 1.2K</span>
+</div>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Curvature</h3>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Zen Planning', 'Unknown Author', 'The intersection of minimalism and urban design. This book explores how Zen principles of simplicity and balance can create more harmonious and restorative architectural spaces.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuDXM6PqNxFc_CWpg6-gYoc7eTUIptZNU03BrkcP9lLfAXctI7wABHQR9hp_GkvQbHUYQO9niNiiwGl8pxvO2ngD_OZ83tI7FAttJoF9pRB27PElm1ZpxNbp9PB3uxlm0PtO91OrTHBa7PN22515x1lJEJz1UGE_ewfPHs2qKu14KycMYlQLk5bu-rIb7yzgMwRAF_QOZdhJ0pkZlLv3P-dXQdsQFUfGq0FeeyDPU0rSxW4vu-ckR1RVbpqPI0aR8SWDFphaaK9yMdU')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 relative hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Warm yellow book cover with a single black square in the center" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXM6PqNxFc_CWpg6-gYoc7eTUIptZNU03BrkcP9lLfAXctI7wABHQR9hp_GkvQbHUYQO9niNiiwGl8pxvO2ngD_OZ83tI7FAttJoF9pRB27PElm1ZpxNbp9PB3uxlm0PtO91OrTHBa7PN22515x1lJEJz1UGE_ewfPHs2qKu14KycMYlQLk5bu-rIb7yzgMwRAF_QOZdhJ0pkZlLv3P-dXQdsQFUfGq0FeeyDPU0rSxW4vu-ckR1RVbpqPI0aR8SWDFphaaK9yMdU"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 px-2 py-1">
+<span class="text-[0.65rem] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">favorite</span> 940</span>
+</div>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Zen Planning</h3>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Kinetic Cities', 'Unknown Author', 'Explores how cities transform through movement, commerce, and cultural change. A study of urban dynamics and the forces that shape metropolitan areas into living, breathing ecosystems.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuA7_gfHisY0NForaVrI9Yw9gRxC0OsRkopqF6obMk8FA7XR1XfctL6k-tAH0s7JaADuj0OHzAXPBM8wUeGaz8alzOALIkz3IhXpZeh-1rWEGv361mcRcPEIa_u_eHazccBGsdm-GM_Db28_-5vPZmb3MfXaFHxMqUxdgehhtPs6gQZfxX-_-PVkZxnQPuHJNb4kUiYQ7XwqSzgh_Zq-B0NHDqN35rJ1q9CF6TlhKbgUt6WJc5ieMzmB8lZg5miHFs68BFmvFnpydj8')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 relative hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Deep red book cover with complex line work representing city traffic patterns" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7_gfHisY0NForaVrI9Yw9gRxC0OsRkopqF6obMk8FA7XR1XfctL6k-tAH0s7JaADuj0OHzAXPBM8wUeGaz8alzOALIkz3IhXpZeh-1rWEGv361mcRcPEIa_u_eHazccBGsdm-GM_Db28_-5vPZmb3MfXaFHxMqUxdgehhtPs6gQZfxX-_-PVkZxnQPuHJNb4kUiYQ7XwqSzgh_Zq-B0NHDqN35rJ1q9CF6TlhKbgUt6WJc5ieMzmB8lZg5miHFs68BFmvFnpydj8"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 px-2 py-1">
+<span class="text-[0.65rem] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">favorite</span> 812</span>
+</div>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Kinetic Cities</h3>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Educated', 'Tara Westover', 'A memoir about a young woman raised by survivalists in Idaho who educates herself enough to attend Brigham Young University and later Cambridge. A powerful story of transformation through education and self-determination.', 'Available', 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=500&q=80')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 relative hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Book cover of an educational title" src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=500&q=80"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 px-2 py-1">
+<span class="text-[0.65rem] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">favorite</span> 690</span>
+</div>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Educated</h3>
+</div>
+<div class="flex-none w-48 cursor-pointer group" onclick="openBookModal('Why We Sleep', 'Matthew Walker', 'A groundbreaking exploration of the science of sleep and why it matters for health, cognitive performance, and longevity. Learn how to optimize your sleep for better life outcomes.', 'Available', 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=500&q=80')">
+<div class="aspect-[4/5] bg-surface-container-low mb-4 relative hover-lift">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Book cover of a health and wellness title" src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=500&q=80"/>
+<div class="absolute top-4 right-4 bg-surface-container-lowest/90 px-2 py-1">
+<span class="text-[0.65rem] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">favorite</span> 575</span>
+</div>
+</div>
+<h3 class="text-[0.875rem] font-semibold mb-1 truncate group-hover:text-primary transition-colors">Why We Sleep</h3>
+</div>
+</div>
+</section>
+</div>
+<!-- All Books Collection (Vertical List) -->
+<section class="mt-12">
+<div class="flex items-center justify-between mb-12">
+<div>
+<h2 class="text-2xl font-bold tracking-tight mb-2">All Books Collection</h2>
+<p class="text-on-surface-variant text-sm">Browse our entire curated archive by metadata.</p>
+</div>
+<div class="flex gap-4">
+<button class="bg-surface-container-low px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-surface-container-high">Filter</button>
+<button class="bg-surface-container-low px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-surface-container-high">Sort by Date</button>
+</div>
+</div>
+<div class="space-y-4">
+<!-- List Item 1 -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 group hover-lift">
+<div class="flex items-center gap-8 flex-1">
+<div class="w-16 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover" data-alt="Small thumbnail of an architectural book cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_obvWx-40-Z03yk1IeosyfkdzOQyd_6gUGFqHl4GhT38Se71FsizxdZE4DH6yHNP4SA9LS_Cy6DBC-jzD0p25wfn-MeyGW83jElAZ1HYYqoLk7H1pMTL6k3Nyjv5mBAf5LN2Lu5Pzj8nCbi3obqC5_DwOfyqAPdTGjFOoXoRIaLYdzh7_0rDQpoL92xUlCzFQG4A2xDfTo3XIJjUT5fIDdDJUs0A-V5OV82oTzFfMRIWatslHPmz9uz4QSKoM7kzqR93m0fG9u6A"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+<div>
+<h4 class="font-bold text-sm mb-1 group-hover:text-primary transition-colors">Architectural Typologies</h4>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-widest">Renzo Piano</p>
+</div>
+<div class="flex items-center">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed text-[0.65rem] font-bold uppercase tracking-tighter">Available</span>
+<span class="ml-2 px-3 py-1 bg-primary text-on-primary text-[0.65rem] font-bold uppercase tracking-tighter">Premium Book</span>
+</div>
+</div>
+</div>
+<button onclick="openBookModal('Architectural Typologies', 'Renzo Piano', 'A comprehensive exploration of building forms and typological systems across contemporary architecture. This volume examines structural systems and design principles that define modern architectural practice.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuC_obvWx-40-Z03yk1IeosyfkdzOQyd_6gUGFqHl4GhT38Se71FsizxdZE4DH6yHNP4SA9LS_Cy6DBC-jzD0p25wfn-MeyGW83jElAZ1HYYqoLk7H1pMTL6k3Nyjv5mBAf5LN2Lu5Pzj8nCbi3obqC5_DwOfyqAPdTGjFOoXoRIaLYdzh7_0rDQpoL92xUlCzFQG4A2xDfTo3XIJjUT5fIDdDJUs0A-V5OV82oTzFfMRIWatslHPmz9uz4QSKoM7kzqR93m0fG9u6A')" class="border border-outline-variant/30 px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all hover:scale-[1.02] active:scale-95">Details</button>
+</div>
+<!-- List Item 2 -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 group hover-lift">
+<div class="flex items-center gap-8 flex-1">
+<div class="w-16 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover" data-alt="Small thumbnail of an architectural book cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgzF0VuTckLL-p5dl8trdm1weXGIZHf6eMMa8kaqeHqJN8RJd0HPzVVEUnnzFzwYbVWMjGkPEpY1uSbqgsAwgoXjodD2j1ERKO5UQGXyUkiL-Rhf54HLc_lvFzx5Hnj3i48WSeTwMQt0gty8aPZs0juBLaqQWlsM10JPVOpxIUplrukBJlezT7wGwvN5UyySM0pkhWnDShpZ5n9KXdenqx9RUYCZxjJqenJr00OveSRxv2FT85KqKH6Hw1iR59mNXMIpQlqROmwnw"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+<div>
+<h4 class="font-bold text-sm mb-1 group-hover:text-primary transition-colors">Parametric Shadows</h4>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-widest">Zaha Hadid</p>
+</div>
+<div class="flex items-center">
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant text-[0.65rem] font-bold uppercase tracking-tighter">Borrowed</span>
+</div>
+</div>
+</div>
+<button onclick="openBookModal('Parametric Shadows', 'Zaha Hadid', 'Explore parametric design and architectural culture. A deep dive into digital design and form generation. This book showcases cutting-edge computational design methodologies used in contemporary practice.', 'Borrowed', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCgzF0VuTckLL-p5dl8trdm1weXGIZHf6eMMa8kaqeHqJN8RJd0HPzVVEUnnzFzwYbVWMjGkPEpY1uSbqgsAwgoXjodD2j1ERKO5UQGXyUkiL-Rhf54HLc_lvFzx5Hnj3i48WSeTwMQt0gty8aPZs0juBLaqQWlsM10JPVOpxIUplrukBJlezT7wGwvN5UyySM0pkhWnDShpZ5n9KXdenqx9RUYCZxjJqjR00OveSRxv2FT85KqKH6Hw1iR59mNXMIpQlqROmwnw')" class="border border-outline-variant/30 px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all hover:scale-[1.02] active:scale-95">Details</button>
+</div>
+<!-- List Item 3 -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-8 flex-1">
+<div class="w-16 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover" data-alt="Small thumbnail of an architectural book cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtU0cFHLkaHVLfbMF4chb0V6xfFyDGqfZEC5cPgfqcRUevgowVy62y6MwBNnjFRlZxt79m9xFSgvDKRv8RmiO4c-mr0OWK019g4cB_2qDm0nc4o7-_zqGA3m_9rW23fygOGU-KXOM9bz7dVZscPi2CoRxBRXEJlCKCPhVsqmjezVHiTnbpHmQ8c1NQOHmpXc3dRgSb9BHXa8T_I-G6Qs-jOqlRW2nYUZUvtdaL-JEFwlGD1JxhQttNsijs5NMvc4ZBncFryAB86Uc"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+<div>
+<h4 class="font-bold text-sm mb-1 group-hover:text-primary transition-colors">Materiality &amp; Form</h4>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-widest">Peter Zumthor</p>
+</div>
+<div class="flex items-center">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed text-[0.65rem] font-bold uppercase tracking-tighter">Available</span>
+<span class="ml-2 px-3 py-1 border border-primary text-primary text-[0.65rem] font-bold uppercase tracking-tighter">Free Book</span>
+</div>
+</div>
+</div>
+<button onclick="openBookModal('Materiality &amp; Form', 'Peter Zumthor', 'A profound meditation on materiality and its role in creating meaningful architectural spaces. Examines how materials shape experience and perception. An essential read for understanding sensory architecture design theory.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuCtU0cFHLkaHVLfbMF4chb0V6xfFyDGqfZEC5cPgfqcRUevgowVy62y6MwBNnjFRlZxt79m9xFSgvDKRv8RmiO4c-mr0OWK019g4cB_2qDm0nc4o7-_zqGA3m_9rW23fygOGU-KXOM9bz7dVZscPi2CoRxBRXEJlCKCPhVsqmjezVHiTnbpHmQ8c1NQOHmpXc3dRgSb9BHXa8T_I-G6Qs-jOqlRW2nYUZUvtdaL-JEFwlGD1JxhQttNsijs5NMvc4ZBncFryAB86Uc')" class="border border-outline-variant/30 px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">Details</button>
+</div>
+<!-- List Item 4 -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-colors group">
+<div class="flex items-center gap-8 flex-1">
+<div class="w-16 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover" data-alt="Small thumbnail of an architectural book cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6Fyno7lTwLEfnw0rl34qcSHVP-OMYVnZkz7OnEKOBMz4M81g3am8b7tMfuTakkSIlMIZDxMhXYwFuwfYFLdUFTvl9CXztNdGEA4qWJILAHMGjM9cLyhkLKwkBgy5g18L0YzwTxXSfxc30l-qwFxdyC__Mc9OoEUT8_mWK0NaviRnIt5n5oTeOeEJqp7nETrjIYlxMj2XMIVVx2G_FLs5vAa8Sukr3Ut25wCtXJixNPyWEAGJzF93MkNMw5rCQli824rJvoyT6jfQ"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+<div>
+<h4 class="font-bold text-sm mb-1 group-hover:text-primary transition-colors">Sustainable Grids</h4>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-widest">Norman Foster</p>
+</div>
+<div class="flex items-center">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed text-[0.65rem] font-bold uppercase tracking-tighter">Available</span>
+</div>
+</div>
+</div>
+<button onclick="openBookModal('Sustainable Grids', 'Norman Foster', 'Investigating sustainable design principles and their integration into urban planning. A comprehensive guide to green architecture and responsible design. Foster explores the balance between human needs and environmental stewardship in modern cities.', 'Available', 'https://lh3.googleusercontent.com/aida-public/AB6AXuA6Fyno7lTwLEfnw0rl34qcSHVP-OMYVnZkz7OnEKOBMz4M81g3am8b7tMfuTakkSIlMIZDxMhXYwFuwfYFLdUFTvl9CXztNdGEA4qWJILAHMGjM9cLyhkLKwkBgy5g18L0YzwTxXSfxc30l-qwFxdyC__Mc9OoEUT8_mWK0NaviRnIt5n5oTeOeEJqp7nETrjIYlxMj2XMIVVx2G_FLs5vAa8Sukr3Ut25wCtXJixNPyWEAGJzF93MkNMw5rCQli824rJvoyT6jfQ')" class="border border-outline-variant/30 px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all">Details</button>
+</div>
+<!-- List Item 5 -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 group hover-lift">
+<div class="flex items-center gap-8 flex-1">
+<div class="w-16 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover" data-alt="Book thumbnail of a drama novel" src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=240&q=80"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+<div>
+<h4 class="font-bold text-sm mb-1 group-hover:text-primary transition-colors">The Kite Runner</h4>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-widest">Khaled Hosseini</p>
+</div>
+<div class="flex items-center">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed text-[0.65rem] font-bold uppercase tracking-tighter">Available</span>
+<span class="ml-2 px-3 py-1 bg-primary text-on-primary text-[0.65rem] font-bold uppercase tracking-tighter">Drama</span>
+</div>
+</div>
+</div>
+<button onclick="openBookModal('The Kite Runner', 'Khaled Hosseini', 'A powerful story of friendship, guilt, and redemption set across Afghanistan and the United States.', 'Available', 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80')" class="border border-outline-variant/30 px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all hover:scale-[1.02] active:scale-95">Details</button>
+</div>
+<!-- List Item 6 -->
+<div class="flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 group hover-lift">
+<div class="flex items-center gap-8 flex-1">
+<div class="w-16 h-20 bg-surface-container-highest shrink-0">
+<img class="w-full h-full object-cover" data-alt="Book thumbnail of a science fiction novel" src="https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=240&q=80"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+<div>
+<h4 class="font-bold text-sm mb-1 group-hover:text-primary transition-colors">Dune</h4>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-widest">Frank Herbert</p>
+</div>
+<div class="flex items-center">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-fixed text-[0.65rem] font-bold uppercase tracking-tighter">Available</span>
+<span class="ml-2 px-3 py-1 bg-primary text-on-primary text-[0.65rem] font-bold uppercase tracking-tighter">Sci-Fi</span>
+</div>
+</div>
+</div>
+<button onclick="openBookModal('Dune', 'Frank Herbert', 'A legendary science fiction novel of politics, ecology, and power on the desert planet Arrakis.', 'Available', 'https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=600&q=80')" class="border border-outline-variant/30 px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-all hover:scale-[1.02] active:scale-95">Details</button>
+</div>
+</div>
+<div class="mt-12 flex justify-center">
+<button class="text-xs font-bold uppercase tracking-widest text-primary hover:underline py-4">Load More From Archive</button>
+</div>
+</section>
+</main>
+
+<!-- Book Details Modal -->
+<div id="bookModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+<div class="bg-surface-bright max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+<div class="flex items-start gap-8 p-8">
+<!-- Book Image -->
+<div class="flex-shrink-0 w-48">
+<img id="modalBookImage" class="w-full h-auto object-cover" src="" alt="book"/>
+<div class="mt-4 text-center text-xs text-on-surface-variant uppercase font-semibold">ARCHIVE NO. 842</div>
+</div>
+
+<!-- Book Details -->
+<div class="flex-1">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div id="modalStatus" class="text-xs font-bold uppercase tracking-widest bg-primary-container text-primary px-3 py-1 inline-block mb-4">AVAILABLE</div>
+<h2 id="modalBookTitle" class="text-2xl font-bold text-on-surface mb-1">Book Title</h2>
+<p id="modalBookAuthor" class="text-on-surface-variant">By Author Name</p>
+</div>
+<button onclick="closeBookModal()" class="text-on-surface-variant hover:text-on-surface text-2xl">×</button>
+</div>
+
+<div class="border-l-4 border-primary pl-4 py-4 my-6">
+<h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-2">About This Book</h3>
+<p id="modalBookDescription" class="text-sm text-on-surface-variant leading-relaxed">Book description goes here</p>
+</div>
+
+<!-- Metadata -->
+<div class="grid grid-cols-2 gap-6 my-6 pb-6 border-b border-surface-variant">
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest">PUBLISHED</p>
+<p class="text-sm font-semibold text-on-surface">2023</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest">LANGUAGE</p>
+<p class="text-sm font-semibold text-on-surface">English</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest">FORMAT</p>
+<p class="text-sm font-semibold text-on-surface">Hardcover</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest">PAGES</p>
+<p class="text-sm font-semibold text-on-surface">412</p>
+</div>
+</div>
+
+<!-- Action Buttons -->
+<div class="flex flex-col gap-3">
+<button id="borrowBtn" onclick="borrowBook()" class="w-full bg-primary text-on-primary px-6 py-3 text-sm font-bold uppercase tracking-widest hover:bg-primary/90 transition-all">Borrow Book</button>
+<button onclick="addToWishlist()" class="w-full border-2 border-primary text-primary px-6 py-3 text-sm font-bold uppercase tracking-widest hover:bg-primary-container transition-all">+ Add to Wishlist</button>
+<p id="loginMessage" class="hidden text-center text-xs text-error uppercase font-bold mt-2">🔒 PLEASE LOGIN TO BORROW BOOKS</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer class="bg-[#f9f9f9] w-full py-12 border-t border-[#acb3b4]/15">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-[1440px] mx-auto">
+<div class="mb-8 md:mb-0">
+<span class="text-sm font-bold text-[#2d3435]">BrainRoot Architectural Library</span>
+<p class="text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60 mt-2">© 2024 BrainRoot Architectural Library</p>
+</div>
+<div class="flex gap-8 items-center text-[0.75rem] font-semibold uppercase tracking-widest">
+<a class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Privacy Policy</a>
+<a class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Terms of Service</a>
+<a class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Archive Rules</a>
+<a class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<script src="../auth.js"></script>
+<script src="./explore.js"></script>
+</body></html>

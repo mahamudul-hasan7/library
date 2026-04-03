@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BrainRoot | Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./profile.css"/>
+</head>
+<body class="profile-page bg-surface text-on-surface antialiased">
+<nav class="fixed top-0 w-full z-50 bg-[#f9f9f9]/95 backdrop-blur-md border-b border-outline-variant/15">
+<div class="flex justify-between items-center px-12 py-4 w-full max-w-[1440px] mx-auto">
+<div class="flex items-center">
+<span class="text-xl font-bold tracking-tight text-[#2d3435]"><a href="../index/index.html" class="profile-brand-link">BrainRoot</a></span>
+</div>
+<div class="flex items-center gap-8">
+<div class="hidden md:flex gap-8 items-center text-[0.875rem] font-medium">
+<a class="text-[#2d3435] hover:text-[#005faf] transition-colors" href="../index/index.html" data-auth="public">Home</a>
+<a class="text-[#2d3435] hover:text-[#005faf] transition-colors" href="../explore/explore.html" data-auth="public">Explore</a>
+<a class="text-[#2d3435] hover:text-[#005faf] transition-colors" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+<a class="text-[#2d3435] hover:text-[#005faf] transition-colors" href="../collections/collections.html" data-auth="private">Collections</a>
+</div>
+<div class="flex items-center gap-6">
+<a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435] hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
+<a href="../profile/profile.html" data-auth="profile" class="material-symbols-outlined p-2 hover:bg-surface-container-low transition-all active:scale-95" title="Profile" style="display: none;">person</a>
+</div>
+</div>
+</nav>
+
+<main class="px-6 md:px-10 pt-28 pb-20">
+<div class="mx-auto max-w-7xl space-y-10">
+<section class="grid gap-6 grid-cols-1 items-center">
+<div class="flex flex-col sm:flex-row sm:items-center gap-6">
+<div class="w-28 h-28 rounded-full border border-outline-variant/15 bg-surface-container-low flex items-center justify-center text-outline/50 shrink-0 profile-avatar-shell">
+<span class="material-symbols-outlined text-[4rem]">account_circle</span>
+</div>
+<div class="space-y-3">
+<div>
+<h1 id="profileDisplayName" class="text-[2.75rem] font-bold leading-tight tracking-tight text-on-surface">Mahamudul Hasan</h1>
+</div>
+<div class="flex flex-wrap items-center gap-3 text-[0.72rem] font-bold uppercase tracking-[0.2em]">
+<span class="bg-primary-container text-primary px-3 py-1">Premium Member</span>
+<span class="text-on-surface-variant">Member since 2022</span>
+</div>
+</div>
+</div>
+</section>
+
+<div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.9fr)] gap-8 items-start">
+<section class="space-y-8">
+<div class="profile-card profile-account-panel bg-surface-container-lowest border border-outline-variant/15 p-8">
+<h2 class="text-[1.125rem] font-semibold uppercase tracking-widest text-on-surface border-l-4 border-primary pl-4 mb-8">Account Settings</h2>
+<form id="profileSettingsForm" class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="profile-label">First Name</label>
+<input data-profile-field="firstName" class="profile-input" type="text" value="Mahamudul"/>
+</div>
+<div class="space-y-2">
+<label class="profile-label">Last Name</label>
+<input data-profile-field="lastName" class="profile-input" type="text" value="Hasan"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="profile-label">Email Address</label>
+<input data-profile-field="email" class="profile-input" type="email" value="mahamudul@arch-institute.org"/>
+</div>
+<div class="space-y-2">
+<label class="profile-label">Institution / Organization</label>
+<input data-profile-field="institution" class="profile-input" type="text" value="Metropolitan School of Architecture"/>
+</div>
+<div class="space-y-2">
+<label class="profile-label">Password</label>
+<div class="relative">
+<input class="profile-input pr-20" type="password" value="••••••••••••"/>
+<button class="profile-inline-action" type="button">Change</button>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-3 pt-2">
+<button class="profile-primary-button" type="submit">Update Profile</button>
+<button id="logoutBtn" type="button" class="profile-secondary-button">Logout</button>
+</div>
+</form>
+</div>
+</section>
+
+<aside class="space-y-8">
+<section>
+<h2 class="text-[1.125rem] font-semibold uppercase tracking-widest text-on-surface border-l-4 border-primary pl-4 mb-8">Membership &amp; Billing</h2>
+<div class="profile-card profile-membership-panel bg-surface-container-lowest border border-outline-variant/15 p-8 space-y-8">
+<div class="flex justify-between items-start gap-4">
+<div>
+<p class="text-[0.75rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1">Current Plan</p>
+<p id="currentPlanName" class="text-[1.5rem] font-semibold text-primary leading-tight">Premium Subscriber</p>
+<p id="currentPlanMeta" class="text-[0.875rem] text-on-surface-variant mt-2">Payment Method: Mastercard **** 4242</p>
+</div>
+<span class="material-symbols-outlined text-surface-dim scale-150 profile-verification-icon" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-[0.875rem] gap-4">
+<span class="text-on-surface-variant">Renewal Date</span>
+<span id="renewalDateValue" class="font-semibold text-right">October 14, 2024</span>
+</div>
+<div class="flex justify-between text-[0.875rem] gap-4">
+<span class="text-on-surface-variant">Account Type</span>
+<span class="font-semibold text-right">Reading access synced</span>
+</div>
+</div>
+<button onclick="openPlanSelector()" class="profile-upgrade-button">Manage Subscription</button>
+</div>
+</section>
+
+<section>
+<h2 class="text-[1.125rem] font-semibold uppercase tracking-widest text-on-surface border-l-4 border-primary pl-4 mb-8">Security &amp; Privacy</h2>
+<div class="profile-card profile-security-panel bg-surface-container-lowest border border-outline-variant/15 divide-y divide-outline-variant/10">
+<div class="p-6 flex items-center justify-between gap-4">
+<div>
+<p class="text-[0.875rem] font-semibold text-on-surface">Email Notifications</p>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Updates on archive additions</p>
+</div>
+<button type="button" class="profile-toggle profile-toggle-on" data-security-toggle="emailNotifications" aria-pressed="true"><span class="profile-toggle-knob profile-toggle-knob-on"></span></button>
+</div>
+<div class="p-6 flex items-center justify-between gap-4">
+<div>
+<p class="text-[0.875rem] font-semibold text-on-surface">Two-Factor Authentication</p>
+<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider">Enhanced library security</p>
+</div>
+<button type="button" class="profile-toggle profile-toggle-off" data-security-toggle="twoFactor" aria-pressed="false"><span class="profile-toggle-knob profile-toggle-knob-off"></span></button>
+</div>
+</div>
+</section>
+
+<section id="subscriptionPlansSection" class="hidden fixed inset-0 z-50 profile-overlay p-4 md:p-8 flex items-center justify-center">
+<div class="profile-plans-popup bg-surface-container-lowest border border-outline-variant/15 p-6 md:p-7 max-w-5xl w-full">
+<header class="mb-8 flex items-start justify-between gap-4">
+<div>
+<h2 class="text-[1.125rem] font-semibold uppercase tracking-widest text-on-surface">Subscription Plans</h2>
+<div class="h-1 w-12 bg-primary mt-3"></div>
+</div>
+<button onclick="closePlanSelector()" class="text-on-surface-variant hover:text-on-surface text-2xl leading-none" aria-label="Close plans popup">×</button>
+</header>
+<div class="profile-plan-row">
+<div class="profile-plan-card border border-outline-variant/15 hover:border-primary transition-all">
+<h3 class="text-lg font-semibold text-on-surface mb-2">Free Book</h3>
+<div class="mb-4">
+<span class="text-[0.75rem] text-on-surface-variant">starter plan</span>
+<div class="text-[2rem] font-bold text-primary">BDT 0</div>
+<span class="text-[0.65rem] text-on-surface-variant">No payment required</span>
+</div>
+<ul class="space-y-2 text-[0.875rem] text-on-surface-variant mb-4">
+<li>2 books/month access</li>
+<li>Standard reading queue</li>
+<li>Community support</li>
+</ul>
+<button data-plan-button="free" onclick="selectPlan('free', 0)" class="profile-plan-button">Select Plan</button>
+</div>
+
+<div class="profile-plan-card border border-outline-variant/15 hover:border-primary transition-all">
+<h3 class="text-lg font-semibold text-on-surface mb-2">Basic</h3>
+<div class="mb-4">
+<span class="text-[0.75rem] text-on-surface-variant">per month</span>
+<div class="text-[2rem] font-bold text-primary">BDT 199</div>
+<span class="text-[0.65rem] text-on-surface-variant line-through">BDT 299</span>
+</div>
+<ul class="space-y-2 text-[0.875rem] text-on-surface-variant mb-4">
+<li>7 books/week limit</li>
+<li>30 books/month max</li>
+<li>Basic support</li>
+</ul>
+<button data-plan-button="basic" onclick="selectPlan('basic', 199)" class="profile-plan-button">Select Plan</button>
+</div>
+
+<div class="profile-plan-card profile-plan-card-featured border-2 border-primary shadow-lg">
+<div class="text-[0.65rem] font-bold uppercase tracking-widest text-primary mb-2">Most Popular</div>
+<h3 class="text-lg font-semibold text-on-surface mb-2">Standard</h3>
+<div class="mb-4">
+<span class="text-[0.75rem] text-on-surface-variant">per month</span>
+<div class="text-[2rem] font-bold text-primary">BDT 299</div>
+<span class="text-[0.65rem] text-on-surface-variant line-through">BDT 449</span>
+</div>
+<ul class="space-y-2 text-[0.875rem] text-on-surface-variant mb-4">
+<li>10 books/week limit</li>
+<li>34 books/month max</li>
+<li>Priority support</li>
+</ul>
+<button data-plan-button="standard" onclick="selectPlan('standard', 299)" class="profile-plan-button profile-plan-button-active">Select Plan</button>
+</div>
+
+<div class="profile-plan-card border border-outline-variant/15 hover:border-primary transition-all">
+<h3 class="text-lg font-semibold text-on-surface mb-2">Premium</h3>
+<div class="mb-4">
+<span class="text-[0.75rem] text-on-surface-variant">per month</span>
+<div class="text-[2rem] font-bold text-primary">BDT 399</div>
+<span class="text-[0.65rem] text-on-surface-variant line-through">BDT 599</span>
+</div>
+<ul class="space-y-2 text-[0.875rem] text-on-surface-variant mb-4">
+<li>15 books/week limit</li>
+<li>40 books/month max</li>
+<li>24/7 Premium support</li>
+</ul>
+<button data-plan-button="premium" onclick="selectPlan('premium', 399)" class="profile-plan-button">Select Plan</button>
+</div>
+</div>
+
+<div class="bg-primary-container p-4 border border-primary mt-4">
+<p class="text-[0.75rem] font-semibold uppercase tracking-widest text-primary mb-1">Annual Discount</p>
+<p class="text-[0.875rem] text-on-surface">Get <strong>25% off</strong> when you upgrade to annual billing.</p>
+</div>
+</div>
+</section>
+</aside>
+</div>
+</div>
+</main>
+
+<div id="subscriptionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 profile-overlay profile-overlay-strong">
+<div class="bg-surface-container-lowest max-w-md w-full p-8 border border-outline-variant/15 profile-modal">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold text-on-surface">Confirm Subscription</h2>
+<button onclick="closeSubscriptionModal()" class="text-on-surface-variant hover:text-on-surface text-2xl">×</button>
+</div>
+
+<div class="space-y-4 mb-6">
+<div class="p-4 bg-surface-container-low border border-outline-variant/15">
+<p class="text-[0.875rem] text-on-surface-variant">Selected Plan</p>
+<h3 class="text-lg font-semibold text-on-surface" id="modalPlanName">Standard</h3>
+<p class="text-[0.875rem] text-on-surface-variant mt-1">Monthly price: <span id="modalPrice" class="font-semibold text-primary">BDT 299</span></p>
+</div>
+
+<div>
+<label class="block text-[0.875rem] font-medium text-on-surface mb-2">Billing Cycle</label>
+<select onchange="updateBillingCycle()" id="billingCycle" class="w-full px-4 py-2 border border-outline-variant/15 bg-surface-container-lowest text-on-surface">
+<option value="monthly">Monthly (Full Price)</option>
+<option value="annual">Annual (25% Discount)</option>
+</select>
+</div>
+
+<div class="p-4 bg-primary-container border border-primary">
+<p class="text-[0.875rem] text-on-surface-variant">Total Amount</p>
+<h3 class="text-[1.5rem] font-bold text-primary" id="modalTotal">BDT 299</h3>
+<p class="text-[0.65rem] text-on-surface-variant mt-1" id="billingInfo">Charged monthly</p>
+</div>
+</div>
+
+<div class="flex gap-3">
+<button onclick="closeSubscriptionModal()" class="flex-1 px-4 py-2 text-[0.75rem] font-bold uppercase tracking-widest border border-outline-variant/15 text-on-surface hover:bg-surface-container-low transition-all">Cancel</button>
+<button onclick="confirmSubscription()" class="flex-1 px-4 py-2 text-[0.75rem] font-bold uppercase tracking-widest text-on-primary bg-primary hover:bg-primary/90 transition-all">Confirm Payment</button>
+</div>
+</div>
+</div>
+
+<footer class="bg-surface-container-lowest w-full border-t border-outline-variant/10 mt-20">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-6 md:px-10 py-6 max-w-7xl mx-auto gap-4">
+<div class="text-lg font-bold text-[#2d3435]">BrainRoot</div>
+<div class="flex items-center gap-6">
+<a class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Contact</a>
+</div>
+<div class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60">© 2024 BrainRoot. The Architectural Librarian.</div>
+</div>
+</footer>
+
+<script src="../auth.js"></script>
+<script src="./profile.js"></script>
+</body>
+</html>

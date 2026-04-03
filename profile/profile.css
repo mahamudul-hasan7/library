@@ -1,0 +1,386 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #efefef;
+  color: #2d3435;
+}
+
+.profile-page {
+  min-height: 100vh;
+}
+
+.profile-page.modal-locked {
+  overflow: hidden;
+}
+
+.profile-overlay {
+  background: rgba(245, 246, 248, 0.55);
+}
+
+.profile-overlay-strong {
+  background: rgba(245, 246, 248, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.profile-brand-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.profile-card,
+.profile-modal {
+  border-color: rgba(172, 179, 180, 0.08);
+  box-shadow: none;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 12px !important;
+}
+
+main .profile-card {
+  border-radius: 12px !important;
+  background: transparent;
+  border: none;
+}
+
+main {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.profile-avatar-shell {
+  flex-shrink: 0;
+}
+
+.profile-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #596061;
+}
+
+.profile-input {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid rgba(172, 179, 180, 0.14);
+  padding: 0.8rem 1rem;
+  color: #2d3435;
+  outline: none;
+  border-radius: 8px !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.profile-input:focus {
+  border-color: rgba(0, 95, 175, 0.45);
+}
+
+.profile-inline-action {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #005faf;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.profile-primary-button,
+.profile-secondary-button,
+.profile-upgrade-button,
+.profile-plan-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: background-color 150ms ease, color 150ms ease, opacity 150ms ease, transform 150ms ease;
+  border-radius: 8px !important;
+}
+
+.profile-primary-button {
+  background: #005faf;
+  color: #f6f7ff;
+}
+
+.profile-primary-button:hover,
+.profile-plan-button-active:hover,
+.profile-upgrade-button:hover {
+  opacity: 0.9;
+}
+
+.profile-secondary-button {
+  border: 1px solid rgba(172, 179, 180, 0.1);
+  color: #596061;
+  background: #ffffff;
+}
+
+.profile-secondary-button:hover {
+  background: #f2f4f4;
+}
+
+.profile-upgrade-button {
+  width: 100%;
+  background: #cfdde8;
+  color: #46545d;
+  border-radius: 8px !important;
+}
+
+.profile-plan-card {
+  background: #ffffff;
+  padding: 1.35rem;
+  border-color: rgba(172, 179, 180, 0.08);
+  border-radius: 12px !important;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.profile-plan-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 95, 175, 0.25);
+  box-shadow: 0 10px 20px rgba(45, 52, 53, 0.1);
+}
+
+.profile-plan-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.profile-plans-popup {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(45, 52, 53, 0.18);
+  border-radius: 14px !important;
+}
+
+.profile-plan-row .profile-plan-card {
+  min-width: 0;
+}
+
+.profile-plan-card-featured {
+  background: #ffffff;
+  border-color: rgba(0, 95, 175, 0.18);
+}
+
+.profile-plan-button {
+  width: 100%;
+  border: 1px solid #005faf;
+  color: #005faf;
+  background: #ffffff;
+  border-radius: 8px !important;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.profile-plan-button:hover {
+  background: #005faf;
+  color: #f6f7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 95, 175, 0.25);
+}
+
+.profile-plan-button-active {
+  background: #005faf;
+  color: #f6f7ff;
+}
+
+.profile-toggle {
+  position: relative;
+  width: 3rem;
+  height: 1.5rem;
+  border-radius: 999px !important;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.profile-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(45, 52, 53, 0.12);
+}
+
+.profile-toggle-on {
+  background: #005faf;
+}
+
+.profile-toggle-off {
+  background: #acb3b4;
+}
+
+.profile-toggle-knob {
+  position: absolute;
+  top: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  background: #ffffff;
+  border-radius: 999px !important;
+}
+
+.profile-account-panel {
+  padding: 0;
+}
+
+.profile-membership-panel,
+.profile-security-panel {
+  background: #f3f4f5;
+  border: 1px solid rgba(172, 179, 180, 0.14);
+  border-radius: 12px !important;
+}
+
+.profile-membership-panel {
+  padding: 1.2rem;
+}
+
+.profile-membership-panel > .flex,
+.profile-membership-panel > .space-y-4,
+.profile-membership-panel > .profile-upgrade-button {
+  background: #ffffff;
+  padding-left: 1.3rem;
+  padding-right: 1.3rem;
+}
+
+.profile-membership-panel > .flex {
+  padding-top: 1.2rem;
+  padding-bottom: 1rem;
+}
+
+.profile-membership-panel > .space-y-4 {
+  padding-top: 0.8rem;
+  padding-bottom: 1rem;
+}
+
+.profile-membership-panel > .profile-upgrade-button {
+  margin-top: 0;
+  margin-bottom: 0.2rem;
+  min-height: 2.65rem;
+}
+
+.profile-security-panel {
+  padding: 0;
+}
+
+.profile-security-panel > div {
+  background: #f3f4f5;
+}
+
+.profile-membership-panel #currentPlanName {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.profile-toggle-knob-on {
+  right: 0.25rem;
+}
+
+.profile-toggle-knob-off {
+  left: 0.25rem;
+}
+
+.profile-toast {
+  position: fixed;
+  top: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  width: min(640px, calc(100vw - 1.5rem));
+  border-radius: 14px;
+  box-shadow: 0 16px 42px rgba(12, 26, 43, 0.34);
+  padding: 1rem 1.15rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 220ms ease;
+}
+
+.profile-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.profile-toast-success {
+  background: linear-gradient(135deg, #0b65b7 0%, #1483d3 100%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.profile-toast-neutral {
+  background: linear-gradient(135deg, #2d3435 0%, #3f4b4d 100%);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+}
+
+.profile-toast-icon {
+  color: #ffffff;
+  font-size: 1.35rem;
+  line-height: 1;
+  margin-top: 0.08rem;
+}
+
+.profile-toast-text {
+  min-width: 0;
+}
+
+.profile-toast-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 0.2rem;
+}
+
+.profile-toast-message {
+  font-size: 0.96rem;
+  color: rgba(255, 255, 255, 0.96);
+  margin: 0;
+}
+
+.profile-panel-highlight {
+  animation: planPanelPulse 2.2s ease;
+}
+
+@keyframes planPanelPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(20, 131, 211, 0.35);
+  }
+  45% {
+    box-shadow: 0 0 0 14px rgba(20, 131, 211, 0);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-primary-button,
+  .profile-secondary-button,
+  .profile-upgrade-button,
+  .profile-plan-button {
+    width: 100%;
+  }
+
+  .profile-plans-popup {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .profile-plan-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .profile-plan-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

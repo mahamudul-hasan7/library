@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainRoot - Wishlist</title>
+  <link rel="stylesheet" href="./wishlist.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
+    a.material-symbols-outlined { transition: all 0.2s ease; }
+    a.material-symbols-outlined:hover { background-color: rgba(0, 0, 0, 0.05); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><a href="../index/index.html" style="color: inherit; text-decoration: none;">BrainRoot</a></div>
+    <nav>
+      <a href="../index/index.html">Home</a>
+      <a href="../explore/explore.html">Explore</a>
+      <a class="active" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+      <a href="../collections/collections.html" data-auth="private">Collections</a>
+      <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
+      <a href="../profile/profile.html" data-auth="profile" class="material-symbols-outlined" style="font-size: 1.5rem; cursor: pointer; padding: 0.5rem; border-radius: 4px; display: none;" title="Profile">person</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <p class="kicker">Personal Archive</p>
+    <h1>Wishlist</h1>
+    <p class="sub">Curated records awaiting inclusion into your primary research library.</p>
+
+    <section class="wish-list">
+      <article><b>01</b><img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>Theory · 2023</small><h3>Spatial Logics of Northern Brutalism</h3><p>Professor Elena Vane</p><a href="../collections/collections.html">Add to Collection</a> <a href="#">Remove</a></div></article>
+      <article><b>02</b><img src="https://images.unsplash.com/photo-1474932430478-367dbb6832c1?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>History · 1994</small><h3>The Transparent Void</h3><p>Arthur K. Sterling</p><a href="../collections/collections.html">Add to Collection</a> <a href="#">Remove</a></div></article>
+      <article><b>03</b><img src="https://images.unsplash.com/photo-1531901599143-df5010ab9438?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>Urbanism · 2021</small><h3>Post-Digital Infrastructure</h3><p>S. T. Marone</p><a href="../collections/collections.html">Add to Collection</a> <a href="#">Remove</a></div></article>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <strong>BrainRoot</strong>
+    <p>&copy; 2026 BrainRoot. The Architectural Librarian.</p>
+    <div class="links">
+      <a href="../login/login.html">Sign In</a>
+      <a href="../register/register.html">Create Account</a>
+      <a href="../collections/collections.html">Collections</a>
+    </div>
+  </footer>
+  <script src="../auth.js"></script>
+  <script src="./wishlist.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainRoot - Register</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./register.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <style>
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
+    a.material-symbols-outlined { transition: all 0.2s ease; }
+    a.material-symbols-outlined:hover { background-color: rgba(0, 0, 0, 0.05); }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><a href="../index/index.html" style="color: inherit; text-decoration: none;">BrainRoot</a></div>
+    <nav>
+      <a href="../index/index.html">Home</a>
+      <a href="../explore/explore.html">Explore</a>
+      <a href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+      <a href="../collections/collections.html" data-auth="private">Collections</a>
+      <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
+      <a href="../profile/profile.html" data-auth="profile" class="material-symbols-outlined" style="font-size: 1.5rem; cursor: pointer; padding: 0.5rem; border-radius: 4px; display: none;" title="Profile">person</a>
+    </nav>
+  </header>
+  <main class="container">
+    <p class="kicker">Access The Archive</p>
+    <h1>Create Account</h1>
+    <form>
+      <label for="fullName">Full Name</label>
+      <input id="fullName" name="fullName" placeholder="E.g. Julian Barnes" autocomplete="name">
+      <label for="emailAddress">Email Address</label>
+      <input id="emailAddress" name="emailAddress" type="email" placeholder="archive@brainroot.org" autocomplete="email">
+      <label for="institute">Institute</label>
+      <select id="institute" name="institute">
+        <option value="">Select your institute</option>
+        <option value="University of Dhaka">University of Dhaka</option>
+        <option value="BUET">BUET</option>
+        <option value="BRAC University">BRAC University</option>
+        <option value="North South University">North South University</option>
+        <option value="Daffodil International University">Daffodil International University</option>
+        <option value="Independent University, Bangladesh">Independent University, Bangladesh</option>
+        <option value="Jahangirnagar University">Jahangirnagar University</option>
+        <option value="Other">Other Institute</option>
+      </select>
+      <input id="customInstitute" name="customInstitute" class="is-hidden" placeholder="Type your institute name">
+      <label for="role">Role</label>
+      <select id="role" name="role">
+        <option value="Student">Student</option>
+        <option value="Researcher">Researcher</option>
+        <option value="Faculty">Faculty</option>
+        <option value="Reader">Reader</option>
+      </select>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" placeholder="At least 8 characters" autocomplete="new-password">
+      <label class="check-row" for="termsAccepted">
+        <input id="termsAccepted" name="termsAccepted" type="checkbox">
+        <span>I agree to archive access terms</span>
+      </label>
+      <button type="submit">Create Account</button>
+    </form>
+    <p>Already have an account? <a href="../login/login.html">Sign In</a></p>
+  </main>
+  <footer class="footer">
+    <strong>BrainRoot</strong>
+    <p>&copy; 2026 BrainRoot. The Architectural Librarian.</p>
+    <div class="links">
+      <a href="../login/login.html">Sign In</a>
+      <a href="../register/register.html">Create Account</a>
+      <a href="../collections/collections.html">Collections</a>
+    </div>
+  </footer>
+  <script src="../auth.js"></script>
+  <script src="./register.js"></script>
+</body>
+</html>

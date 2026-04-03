@@ -1,0 +1,728 @@
+/* 
+  BRAINROOT - Index Page Stylesheet
+  DESCRIPTION: Styles for the homepage (index.html)
+  LAYOUT SYSTEM: CSS Grid + Flexbox
+  RESPONSIVE BREAKPOINT: 760px (mobile)
+  COLOR SCHEME: Light gray background (#eeeeef), Dark text (#1f2a30), Blue accents (#0b56b2)
+  
+  STUDENT LEARNING POINTS:
+  1. CSS Reset: * selector removes default margins/padding and enables box-sizing
+  2. Flexbox: Used for header navigation and responsive layouts
+  3. CSS Grid: Used for multi-column book layouts
+  4. Media Queries: @media rule handles mobile responsiveness
+  5. Semantic Styling: Uses class names that describe purpose (not appearance)
+*/
+
+/* CSS RESET: Remove default browser margins and padding */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box; /* Includes padding/border in width calculation */
+}
+
+/* BODY: Global styles applied to entire page */
+body {
+	font-family: Arial, Helvetica, sans-serif; /* Font stack with fallback */
+	background: #eeeeef; /* Light gray background */
+	color: #1f2a30; /* Dark text color for readability */
+}
+
+/* TOP NAVIGATION BAR: Header with logo and nav links */
+.topbar {
+	max-width: 1320px; /* Content never wider than 1320px */
+	margin: 0 auto; /* Center the navbar horizontally */
+	padding: 20px 28px; /* Internal spacing */
+	display: flex; /* Use flexbox for horizontal layout */
+	justify-content: space-between; /* Logo on left, nav on right */
+	align-items: center; /* Vertically center items */
+}
+
+/* BRAND/LOGO: BrainRoot text */
+.brand {
+	font-weight: 700; /* Make text bold */
+	font-size: 28px;
+}
+
+/* NAVIGATION LINKS: Home, Explore, Wishlist, etc. */
+nav a {
+	text-decoration: none; /* Remove underline from links */
+	color: #747b82; /* Light gray color */
+	font-size: 13px;
+	margin-left: 22px; /* Space between nav items */
+}
+
+/* ACTIVE NAV LINK: Highlight current page */
+nav a.active {
+	color: #0b56b2; /* Change to blue */
+	border-bottom: 2px solid #0b56b2; /* Add blue underline */
+	padding-bottom: 4px; /* Space between text and underline */
+}
+
+/* MAIN CONTAINER: Wrapper for all content */
+.container {
+	max-width: 1320px;
+	margin: 0 auto; /* Center content */
+	padding: 20px 28px 60px; /* Add spacing around content */
+}
+
+/* HERO SECTION: Welcome area with search and categories */
+.hero {
+	text-align: center; /* Center all content */
+	padding: 90px 0 110px; /* Large vertical spacing */
+}
+
+.hero h1 {
+	font-size: 58px; /* Large heading for visual impact */
+	margin-bottom: 38px;
+}
+
+/* SEARCH BOX: Input field with icon and border */
+.search-box {
+	position: relative;
+	width: 100%; /* Full width of container */
+	max-width: 760px; /* But never wider than 760px */
+	margin: 0 auto; /* Center horizontally */
+	border: 1px solid #dcdde0; /* Light gray border */
+	background: #f7f7f8; /* Slightly off-white background */
+	display: flex; /* Horizontal layout for icon + input */
+	align-items: center; /* Vertically center items */
+	padding: 14px 16px;
+}
+
+/* SEARCH ICON: Magnifying glass emoji styling */
+.icon {
+	color: #8f959b; /* Gray color for subtle appearance */
+	margin-right: 10px; /* Space between icon and input */
+}
+
+/* SEARCH INPUT: Text input field */
+.search-box input {
+	border: 0; /* No border - uses parent border instead */
+	outline: none; /* Remove browser outline on focus */
+	width: 100%; /* Fill remaining space */
+	background: transparent; /* Transparent so parent background shows */
+	font-size: 14px;
+}
+
+/* DISCOVER TEXT: "OR DISCOVER BY CATEGORY" label */
+.discover {
+	margin-top: 36px;
+	font-size: 12px;
+	letter-spacing: 2px; /* Wide letter spacing for emphasis */
+	color: #404a52;
+}
+
+/* CATEGORY CHIPS: Flexbox layout for category buttons */
+.chips {
+	margin-top: 12px;
+	display: flex; /* Horizontal layout */
+	justify-content: center; /* Center buttons */
+	gap: 8px; /* Space between buttons */
+	flex-wrap: wrap; /* Allow wrapping on small screens */
+}
+
+/* CHIP BUTTONS: Category selection buttons */
+.chips button {
+	border: 1px solid #c7d8ea; /* Light blue border */
+	background: #dce9f6; /* Light blue background */
+	color: #2a3a49; /* Dark text */
+	font-size: 11px;
+	letter-spacing: 1px;
+	padding: 7px 14px; /* Internal spacing */
+}
+
+/* FEATURED BOOKS SECTION HEADER */
+.section-top {
+	display: flex; /* Horizontal layout */
+	justify-content: space-between; /* Title left, button right */
+	align-items: end; /* Align items to bottom */
+	margin-bottom: 14px;
+}
+
+/* SECTION LABEL: Small colored text above heading */
+.label {
+	color: #0b56b2; /* Blue color */
+	font-size: 11px;
+	letter-spacing: 2px;
+	margin-bottom: 6px;
+}
+
+/* SECTION HEADING: "Featured Books" heading */
+.section-top h2 {
+	font-size: 28px; /* Large heading */
+}
+
+/* BROWSE BUTTON: CTA button to view all books */
+.browse {
+	text-decoration: none;
+	background: #0b56b2; /* Blue background */
+	color: #fff; /* White text */
+	padding: 11px 24px; /* Internal spacing */
+	font-size: 12px;
+}
+
+/* BOOK GRID: CSS Grid layout for featured books */
+.grid {
+	display: grid; /* Use CSS Grid layout system */
+	grid-template-columns: repeat(3, 1fr); /* 3 equal columns - 1fr = 1 fraction unit */
+	gap: 12px; /* Space between grid items (vertical and horizontal) */
+}
+
+/* BOOK IMAGE: Cover image styling */
+.book img {
+	width: 100%; /* Fill full grid item width */
+	height: 240px; /* Fixed height for consistency */
+	object-fit: cover; /* Crop image to fit box without distortion */
+	border: 1px solid #d7d8db;
+	filter: grayscale(100%); /* Convert to black and white */
+	transition: filter 0.4s ease; /* Smooth transition effect */
+	cursor: pointer;
+}
+
+/* BOOK IMAGE HOVER: Colorful effect on hover */
+.book img:hover {
+	filter: grayscale(0%); /* Convert to full color */
+}
+
+/* BOOK BADGE: Free/Paid indicator */
+.badge {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	padding: 4px 8px;
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	border-radius: 3px;
+	z-index: 10;
+}
+
+/* FREE BADGE */
+.badge.free {
+	background: #15613c;
+	color: white;
+}
+
+/* PAID BADGE */
+.badge.paid {
+	background: #af6b00;
+	color: white;
+}
+
+/* BOOK CONTAINER: Position relative for badge positioning */
+.book {
+	position: relative;
+}
+
+/* BOOK CATEGORY: "ARCHITECTURE", "PHILOSOPHY" labels */
+.cat {
+	margin-top: 8px;
+	color: #49525a;
+	font-size: 10px; /* Small text */
+	letter-spacing: 1.5px; /* Wide spacing for emphasis */
+}
+
+/* BOOK TITLE: Book name heading */
+.book h3 {
+	font-size: 22px; /* Medium-large heading */
+	margin: 4px 0; /* Compact vertical spacing */
+}
+
+/* AUTHOR NAME: Author styling */
+.author {
+	color: #737b83; /* Muted gray color */
+	font-style: italic; /* Italic text to distinguish from title */
+	font-size: 15px;
+}
+
+/* STATISTICS SECTION: Shows library metrics */
+.stats {
+	margin-top: 70px;
+	border-top: 1px solid #ddd; /* Top border line */
+	border-bottom: 1px solid #ddd; /* Bottom border line */
+	background: #ececef; /* Slightly darker background */
+	padding: 44px 28px; /* Large internal spacing */
+	display: grid;
+	grid-template-columns: repeat(3, 1fr); /* 3 equal columns for stats */
+	gap: 30px;
+	max-width: 1320px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* STAT NUMBERS: Large numbers like "12.4k", "24/7" */
+.stats h4 {
+	color: #0b56b2; /* Blue color */
+	font-size: 52px; /* Very large numbers */
+}
+
+/* STAT LABELS: "DIGITAL VOLUMES", "GLOBAL ACCESS" */
+.stats p {
+	font-size: 11px;
+	letter-spacing: 1.5px; /* Wide spacing */
+	margin: 8px 0;
+}
+
+/* STAT DESCRIPTIONS: Longer explanation text */
+.stats span {
+	color: #646d75; /* Muted gray */
+	font-size: 13px;
+	line-height: 1.5; /* Extra line height for readability */
+}
+
+/* FOOTER: Bottom section with copyright and links */
+.footer {
+	max-width: 1320px;
+	margin: 0 auto; /* Center footer */
+	padding: 26px 28px; /* Internal spacing */
+	display: flex; /* Horizontal layout */
+	justify-content: space-between; /* Spread items apart */
+	align-items: center;
+	color: #666f77;
+	font-size: 11px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+}
+
+/* FOOTER BRAND: "BrainRoot" text in footer */
+.footer strong {
+	color: #1f2a30; /* Dark color */
+	text-transform: none; /* Don't uppercase this */
+	letter-spacing: 0; /* Normal spacing */
+	font-size: 22px;
+}
+
+/* FOOTER LINKS: Sign In, Create Account, etc. */
+.footer .links a {
+	text-decoration: none;
+	color: #666f77;
+	margin-left: 16px;
+}
+
+/* ============================================================ */
+/* RESPONSIVE DESIGN: Media Queries for Mobile & Tablet       */
+/* These rules apply at specific screen sizes                  */
+/* ============================================================ */
+
+/* Tablet size: Max width 900px */
+@media (max-width: 900px) {
+	/* Grid changes from 3 columns to 2 columns */
+	.grid {
+		grid-template-columns: 1fr 1fr; /* 2 equal columns */
+	}
+
+	/* Stats stack vertically instead of 3 columns */
+	.stats {
+		grid-template-columns: 1fr; /* Single column */
+	}
+
+	/* Footer wraps content vertically */
+	.footer {
+		flex-direction: column; /* Stack items vertically */
+		gap: 12px;
+		text-align: center;
+	}
+}
+
+/* Mobile size: Max width 640px */
+@media (max-width: 640px) {
+	/* Make heading smaller for mobile */
+	.hero h1 {
+		font-size: 38px; /* Reduced from 58px */
+	}
+
+	/* Make section heading smaller */
+	.section-top h2 {
+		font-size: 34px; /* Reduced from 42px */
+	}
+
+	/* Grid becomes single column */
+	.grid {
+		grid-template-columns: 1fr; /* One book per row */
+	}
+}
+
+/* ============================================================ */
+/* SHARED STYLES: Applied to all pages for consistency        */
+/* ============================================================ */
+/* ============================================================ */
+/* SHARED STYLES: Applied to all pages for consistency        */
+/* ============================================================ */
+
+/* BRAND LINK: Logo text styling */
+.brand a { 
+	color: inherit; /* Use parent color */
+	text-decoration: none; /* Remove underline */
+}
+
+/* NAVIGATION BAR: Flexbox layout for nav items */
+.topbar nav { 
+	display: flex; /* Horizontal layout */
+	align-items: center; /* Vertically center items */
+	gap: 0; /* No gap between items */
+}
+
+/* NAV LINKS: Home, Explore, Wishlist, Collections */
+.topbar nav a { 
+	margin-left: 20px; /* Space between nav items */
+	color: #667; /* Gray text */
+	text-decoration: none; /* Remove underlines */
+	font-size: 14px;
+}
+
+/* ACTIVE NAV: Highlight current page */
+.topbar nav a.active { 
+	color: #0b56b2; /* Blue color for active page */
+	border-bottom: 2px solid #0b56b2; /* Blue underline */
+	padding-bottom: 4px; /* Space between text and underline */
+}
+
+/* PROFILE ICON: Round avatar button in navbar */
+.topbar nav a.profile-icon { 
+	width: 36px; /* Square dimensions */
+	height: 36px;
+	border-radius: 50%; /* Make it circular: 50% = perfect circle */
+	background: #f5f5f5; /* Light gray background */
+	display: inline-flex; /* Center content inside */
+	align-items: center; /* Vertical centering */
+	justify-content: center; /* Horizontal centering */
+	margin-left: 20px;
+	padding: 0; /* No padding needed */
+	border: 2px solid #ddd; /* Border around circle */
+	font-size: 18px; /* Size of person emoji */
+}
+
+/* PROFILE ICON HOVER: Interactive feedback on mouse over */
+.topbar nav a.profile-icon:hover { 
+	background: #e8e8e8; /* Slightly darker gray */
+	border-color: #0b56b2; /* Blue border on hover */
+}
+
+/* PROFILE ICON ACTIVE: When on profile page */
+.topbar nav a.profile-icon.active { 
+	background: #0b56b2; /* Blue background */
+	color: white; /* White emoji/icon */
+	border-color: #0b56b2; /* Blue border */
+	padding-bottom: 0; /* Remove bottom padding */
+}
+
+/* FOOTER: Bottom section structure */
+.footer { 
+	max-width: 1320px;
+	margin: 0 auto; /* Center footer */
+	padding: 20px 32px; /* Internal spacing */
+	border-top: 1px solid #ddd; /* Line above footer */
+	display: flex; /* Horizontal layout */
+	justify-content: space-between; /* Spread items */
+	align-items: center;
+	gap: 16px; /* Space between items */
+}
+
+/* ============================================================ */
+/* BOOK DETAILS MODAL: Popup for book information              */
+/* ============================================================ */
+
+/* MODAL CONTAINER: Wrapper for modal */
+.book-modal {
+	position: fixed; /* Fixed position on screen */
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex; /* Flexbox for centering */
+	align-items: center; /* Vertical centering */
+	justify-content: center; /* Horizontal centering */
+	z-index: 1000; /* Layer on top of all content */
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* MODAL HIDDEN STATE */
+.book-modal.hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+/* MODAL BACKDROP: Darkened background */
+.modal-backdrop {
+	position: absolute; /* Cover entire modal */
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
+	cursor: pointer; /* Indicates it's clickable */
+}
+
+/* MODAL CONTENT: White card with book details */
+.modal-content {
+	position: relative; /* Position above backdrop */
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+	max-width: 600px;
+	width: 90%; /* Responsive width */
+	overflow: hidden;
+}
+
+/* MODAL BODY: Flex layout for image and info */
+.modal-body {
+	display: flex; /* Horizontal layout */
+	gap: 24px;
+	padding: 32px;
+}
+
+/* MODAL IMAGE: Book cover */
+.modal-image {
+	width: 180px;
+	height: 280px;
+	object-fit: cover;
+	border-radius: 4px;
+	flex-shrink: 0;
+}
+
+/* MODAL INFO: Text content section */
+.modal-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+/* MODAL CATEGORY LABEL */
+.modal-category {
+	color: #0b56b2;
+	font-size: 11px;
+	letter-spacing: 1.5px;
+	margin-bottom: 8px;
+	font-weight: 600;
+}
+
+/* MODAL TITLE */
+.modal-info h2 {
+	font-size: 28px;
+	margin: 0 0 12px 0;
+	color: #1f2a30;
+	line-height: 1.3;
+}
+
+/* MODAL AUTHOR */
+.modal-author {
+	color: #737b83;
+	font-style: italic;
+	font-size: 14px;
+	margin-bottom: 16px;
+}
+
+/* ACCESS BADGE: Modal free/paid indicator */
+.access-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.5px;
+	border-radius: 4px;
+	white-space: nowrap;
+}
+
+.access-badge.free {
+	background: #15613c;
+	color: white;
+}
+
+.access-badge.paid {
+	background: #af6b00;
+	color: white;
+}
+
+/* MODAL DESCRIPTION */
+.modal-description {
+	color: #55666d;
+	font-size: 13px;
+	line-height: 1.6;
+	margin-bottom: 20px;
+}
+
+/* MODAL ACCESS NOTE */
+.modal-access-note {
+	padding: 12px 14px;
+	margin-bottom: 18px;
+	border-left: 3px solid #af6b00;
+	background: #fff6ea;
+	color: #7a4a00;
+	font-size: 13px;
+	line-height: 1.5;
+	border-radius: 4px;
+}
+
+.modal-access-note.hidden {
+	display: none;
+}
+
+/* MODAL ACTIONS: Button container */
+.modal-actions {
+	display: flex;
+	gap: 12px;
+}
+
+/* PRIMARY BUTTON */
+.btn-primary {
+	flex: 1;
+	padding: 12px 16px;
+	background: #0b56b2;
+	color: white;
+	border: none;
+	border-radius: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.btn-primary:hover {
+	background: #084591;
+}
+
+/* SECONDARY BUTTON */
+.btn-secondary {
+	flex: 1;
+	padding: 12px 16px;
+	background: #f0f1f2;
+	color: #1f2a30;
+	border: 1px solid #dcdde0;
+	border-radius: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+	background: #e5e6e8;
+	border-color: #0b56b2;
+	color: #0b56b2;
+}
+
+/* TERTIARY BUTTON: Upgrade plan CTA */
+.btn-tertiary {
+	flex: 1;
+	padding: 12px 16px;
+	background: #fff6ea;
+	color: #7a4a00;
+	border: 1px solid #e4c18a;
+	border-radius: 4px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.btn-tertiary:hover {
+	background: #fde7c8;
+	border-color: #af6b00;
+	color: #5f3900;
+}
+
+/* MODAL CLOSE BUTTON */
+.modal-close {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 36px;
+	height: 36px;
+	background: none;
+	border: none;
+	font-size: 28px;
+	cursor: pointer;
+	color: #999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: color 0.2s ease;
+	padding: 0;
+}
+
+.modal-close:hover {
+	color: #1f2a30;
+}
+
+/* MOBILE MODAL RESPONSIVE */
+@media (max-width: 760px) {
+	.modal-body {
+		flex-direction: column;
+		padding: 20px;
+		gap: 16px;
+	}
+
+	.modal-image {
+		width: 100%;
+		height: 240px;
+	}
+
+	.modal-info h2 {
+		font-size: 22px;
+	}
+
+	.modal-actions {
+		flex-direction: column;
+	}
+}
+
+/* FOOTER BRAND NAME: "BrainRoot" text */
+.footer strong { 
+	font-size: 16px;
+}
+
+/* FOOTER DESCRIPTION: Copyright text */
+.footer p { 
+	font-size: 12px;
+	color: #666; /* Gray text */
+}
+
+/* FOOTER LINKS CONTAINER: Sign In, Create Account, etc. */
+.footer .links { 
+	display: flex; /* Horizontal layout */
+	align-items: center;
+	gap: 14px; /* Space between footer links */
+}
+
+/* FOOTER LINKS: Individual link styling */
+.footer .links a { 
+	text-decoration: none;
+	color: #666; /* Gray color */
+	font-size: 12px;
+}
+
+/* MOBILE RESPONSIVE: Footer adjusts for screens <= 760px */
+@media (max-width: 760px) {
+	/* Navigation wraps to next line if needed */
+	.topbar { 
+		flex-wrap: wrap; /* Allow wrapping */
+		gap: 10px;
+	}
+
+	/* Nav items take full width on mobile */
+	.topbar nav { 
+		width: 100%;
+		flex-wrap: wrap;
+	}
+
+	/* Reduce nav item spacing */
+	.topbar nav a { 
+		margin-left: 0; /* Remove left margin */
+		margin-right: 14px; /* Space between items */
+	}
+
+	/* Footer stacks vertically */
+	.footer { 
+		flex-direction: column; /* Stack items vertically */
+		align-items: flex-start; /* Align to left */
+	}
+
+	/* Footer links wrap if needed */
+	.footer .links { 
+		flex-wrap: wrap;
+	}
+}

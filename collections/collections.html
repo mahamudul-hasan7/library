@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BrainRoot | Collections</title>
+<link href="./collections.css" rel="stylesheet"/>
+<script src="./collections.config.js"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</head>
+<body class="bg-surface selection:bg-primary-container collections-page">
+<!-- Top Navigation -->
+<nav class="bg-[#f9f9f9]/95 backdrop-blur-md fixed top-0 z-50 w-full border-none">
+<div class="flex justify-between items-center w-full px-8 h-16 max-w-7xl mx-auto relative">
+<div class="text-xl font-bold tracking-tighter text-[#2d3435]"><a href="../index/index.html" style="color: inherit; text-decoration: none;">BrainRoot</a></div>
+<div class="hidden md:flex items-center gap-8 h-full"><a class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" href="../index/index.html">Home</a>
+<a class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" href="../explore/explore.html">Explore</a>
+<a class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+<a class="text-[#005faf] border-b-2 border-[#005faf] font-medium text-[0.875rem] tracking-tight" href="../collections/collections.html" data-auth="private">Collections</a>
+<a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435] hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
+<a href="../profile/profile.html" data-auth="profile" class="material-symbols-outlined p-2 hover:bg-surface-container-low transition-all active:scale-95" title="Profile" style="display: none;">person</a></div>
+<div class="bg-[#f2f4f4] h-[1px] w-full absolute bottom-0 left-0"></div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="max-w-7xl mx-auto px-8 pt-32 pb-24 flex flex-col md:flex-row gap-16">
+<!-- Left Column: Collections -->
+<div class="flex-1">
+<header class="mb-12">
+<span class="text-[0.75rem] font-semibold uppercase tracking-widest text-primary mb-2 block">Curated Collections</span>
+<h1 class="text-[2.75rem] font-bold text-on-surface tracking-tight leading-none">My Collections</h1>
+</header>
+<div id="collectionsEmptyState" class="collections-empty hidden">Your collection is empty. Add a book from Recommendations or browse the archive to build it.</div>
+<section id="collectionsList" class="space-y-[1.4rem]"></section>
+</div>
+<!-- Right Column: Recommendations -->
+<aside class="w-full md:w-80">
+<div class="sticky top-32">
+<header class="mb-8">
+<h2 class="text-xl font-bold text-on-surface tracking-tight mb-2">Recommendations</h2>
+<p class="text-sm text-on-surface-variant max-w-xs">Tailored from what you have browsed, opened, and saved.</p>
+</header>
+<div id="recommendationsList" class="space-y-6"></div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="bg-[#f9f9f9] w-full border-t-0 mt-24">
+<div class="bg-[#f2f4f4] h-[1px]"></div>
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-12 py-8 max-w-7xl mx-auto gap-4">
+<div class="text-lg font-bold text-[#2d3435]">BrainRoot</div>
+<div class="flex items-center gap-6">
+<a class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60 hover:text-[#005faf] transition-colors" href="#">Contact</a>
+</div>
+<div class="font-['Inter'] text-[0.75rem] font-semibold uppercase tracking-widest text-[#2d3435]/60">
+                © 2024 BrainRoot. The Architectural Librarian.
+            </div>
+</div>
+</footer>
+<script src="../auth.js"></script>
+<script src="./collections.js"></script>
+</body></html>

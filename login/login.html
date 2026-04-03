@@ -8,12 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./login.css">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-  <style>
-    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400; }
-    a.material-symbols-outlined { transition: all 0.2s ease; }
-    a.material-symbols-outlined:hover { background-color: rgba(0, 0, 0, 0.05); }
-  </style>
 </head>
 <body>
   <header class="topbar">
@@ -24,7 +18,9 @@
       <a href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
       <a href="../collections/collections.html" data-auth="private">Collections</a>
       <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
-      <a href="../profile/profile.html" data-auth="profile" class="material-symbols-outlined" style="font-size: 1.5rem; cursor: pointer; padding: 0.5rem; border-radius: 4px; display: none;" title="Profile">person</a>
+      <a href="../profile/profile.html" data-auth="profile" class="profile-icon" style="display: none;" title="Profile">
+        <img src="../Assets/profile icon.png" alt="Profile">
+      </a>
     </nav>
   </header>
   <main class="wrap">

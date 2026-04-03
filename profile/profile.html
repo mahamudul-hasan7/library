@@ -6,7 +6,6 @@
 <title>BrainRoot | Profile</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./profile.css"/>
 </head>
 <body class="profile-page bg-surface text-on-surface antialiased">
@@ -24,7 +23,7 @@
 </div>
 <div class="flex items-center gap-6">
 <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435] hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
-<a href="../profile/profile.html" data-auth="profile" class="material-symbols-outlined p-2 hover:bg-surface-container-low transition-all active:scale-95" title="Profile" style="display: none;">person</a>
+<a href="../profile/profile.html" data-auth="profile" class="profile-icon inline-flex items-center justify-center w-9 h-9 overflow-hidden transition-all active:scale-95" title="Profile" style="display: none;"><img src="../Assets/profile icon.png" alt="Profile" class="w-full h-full object-cover"/></a>
 </div>
 </div>
 </nav>
@@ -34,7 +33,7 @@
 <section class="grid gap-6 grid-cols-1 items-center">
 <div class="flex flex-col sm:flex-row sm:items-center gap-6">
 <div class="w-28 h-28 rounded-full border border-outline-variant/15 bg-surface-container-low flex items-center justify-center text-outline/50 shrink-0 profile-avatar-shell">
-<span class="material-symbols-outlined text-[4rem]">account_circle</span>
+<img src="../Assets/profile image.png" alt="Profile avatar" class="profile-avatar-image"/>
 </div>
 <div class="space-y-3">
 <div>
@@ -96,7 +95,7 @@
 <p id="currentPlanName" class="text-[1.5rem] font-semibold text-primary leading-tight">Premium Subscriber</p>
 <p id="currentPlanMeta" class="text-[0.875rem] text-on-surface-variant mt-2">Payment Method: Mastercard **** 4242</p>
 </div>
-<span class="material-symbols-outlined text-surface-dim scale-150 profile-verification-icon" style="font-variation-settings: 'FILL' 1;">verified</span>
+<img src="../Assets/verify badge.png" alt="Verified account" class="profile-verification-icon"/>
 </div>
 <div class="space-y-4">
 <div class="flex justify-between text-[0.875rem] gap-4">
@@ -204,9 +203,9 @@
 </div>
 </div>
 
-<div class="bg-primary-container p-4 border border-primary mt-4">
-<p class="text-[0.75rem] font-semibold uppercase tracking-widest text-primary mb-1">Annual Discount</p>
-<p class="text-[0.875rem] text-on-surface">Get <strong>25% off</strong> when you upgrade to annual billing.</p>
+<div class="profile-plans-message mt-5" id="subscriptionPlansMessage" role="status" aria-live="polite">
+<p class="profile-plans-message-title">Smart Billing Tip</p>
+<p class="profile-plans-message-body">Choose annual billing in the next step to unlock <strong>25% savings</strong> on all paid plans. Free Book plan always stays free.</p>
 </div>
 </div>
 </section>

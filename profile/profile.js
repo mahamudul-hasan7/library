@@ -84,7 +84,7 @@ function showToast(title, message, variant) {
     toast.setAttribute("role", "status");
     toast.setAttribute("aria-live", "polite");
     toast.innerHTML = ""
-      + '<span class="material-symbols-outlined profile-toast-icon" style="font-variation-settings: \'FILL\' 1;">verified</span>'
+      + '<img src="../Assets/verify badge.png" alt="Verified" class="profile-toast-icon"/>'
       + '<div class="profile-toast-text">'
       + '  <p id="profileToastTitle" class="profile-toast-title"></p>'
       + '  <p id="profileToastMessage" class="profile-toast-message"></p>'
@@ -239,13 +239,11 @@ function ensureSubscriptionBadge() {
 
   let badge = document.getElementById("subscriptionPaidBadge");
   if (!badge) {
-    badge = document.createElement("span");
+    badge = document.createElement("img");
     badge.id = "subscriptionPaidBadge";
-    badge.className = "hidden material-symbols-outlined text-primary text-[1.4rem]";
-    badge.style.fontVariationSettings = "'FILL' 1";
-    badge.textContent = "verified";
-    badge.style.marginLeft = "10px";
-    badge.style.verticalAlign = "middle";
+    badge.className = "hidden profile-name-badge";
+    badge.src = "../Assets/verify badge.png";
+    badge.alt = "Paid subscriber verified";
     nameHeading.appendChild(badge);
   }
 

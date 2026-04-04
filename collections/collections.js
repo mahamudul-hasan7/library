@@ -565,6 +565,14 @@ document.addEventListener("DOMContentLoaded", function () {
     collectionEntries.unshift(normalizeCollectionEntry(book));
     saveStoredCollections(collectionEntries);
     clearRecentlyRemoved(book.title);
+    
+    // Add back to borrowed list if it was borrowed before
+    const borrowedBooks = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
+    if (borrowedBooks.indexOf(book.title) === -1) {
+      borrowedBooks.push(book.title);
+      localStorage.setItem("brainrootBorrowed", JSON.stringify(borrowedBooks));
+    }
+    
     rerender();
     showToast('Restored "' + book.title + '" to your collection.');
   }
@@ -582,6 +590,14 @@ document.addEventListener("DOMContentLoaded", function () {
     showFakeLoading("Processing return...", 950, function () {
       saveStoredCollections(filteredEntries);
       markRecentlyRemoved(book.title);
+      
+      // Remove from borrowed list  
+      const borrowedBooks = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
+      const filteredBorrowed = borrowedBooks.filter(function (title) {
+        return title !== book.title;
+      });
+      localStorage.setItem("brainrootBorrowed", JSON.stringify(filteredBorrowed));
+      
       rerender();
       showToast({
         text: 'Done. "' + book.title + '" was returned from your collection.',
@@ -927,7 +943,7 @@ document.addEventListener("DOMContentLoaded", function () {
         Math.max(12, Math.min(100, book.progress || 36)) +
         '%"></span></div>' +
         '<div class="collection-actions">' +
-        '<button type="button" data-collection-action="read" class="collection-action">Read Book</button>' +
+        '<button type="button" data-collection-action="read" class="collection-action">View Book</button>' +
         '<button type="button" data-collection-action="return" class="collection-action collection-action--ghost">Return</button>' +
         '</div>' +
         '</div>';

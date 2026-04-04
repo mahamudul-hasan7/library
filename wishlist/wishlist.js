@@ -141,6 +141,17 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         ctaLink.style.display = "none";
       }
+
+      if (!ctaLink.dataset.loaderBound) {
+        ctaLink.addEventListener("click", function (event) {
+          event.preventDefault();
+          const targetUrl = ctaLink.getAttribute("href") || "../collections/collections.html";
+          showFakeLoading("Opening Collections...", 1200, function () {
+            window.location.href = targetUrl;
+          });
+        });
+        ctaLink.dataset.loaderBound = "true";
+      }
     }
 
     feedback.classList.add("show");
@@ -151,7 +162,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
     feedbackTimer = setTimeout(function () {
       feedback.classList.remove("show");
-    }, typeof config.duration === "number" ? config.duration : 4200);
+    }, typeof config.duration === "number" ? config.duration : 5000);
+  }
+
+  function showFakeLoading(message, duration, onDone) {
+    let overlay = document.getElementById("wishlistLoadingOverlay");
+
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "wishlistLoadingOverlay";
+      overlay.style.position = "fixed";
+      overlay.style.inset = "0";
+      overlay.style.background = "rgba(12, 15, 15, 0.34)";
+      overlay.style.backdropFilter = "blur(6px)";
+      overlay.style.webkitBackdropFilter = "blur(6px)";
+      overlay.style.display = "grid";
+      overlay.style.placeItems = "center";
+      overlay.style.zIndex = "95";
+
+      const card = document.createElement("div");
+      card.style.background = "rgba(246, 247, 255, 0.9)";
+      card.style.border = "1px solid rgba(172, 179, 180, 0.45)";
+      card.style.borderRadius = "14px";
+      card.style.padding = "14px 16px";
+      card.style.minWidth = "220px";
+      card.style.display = "flex";
+      card.style.alignItems = "center";
+      card.style.gap = "10px";
+      card.style.color = "#2d3435";
+      card.style.fontWeight = "700";
+
+      const spinner = document.createElement("span");
+      spinner.style.width = "16px";
+      spinner.style.height = "16px";
+      spinner.style.border = "2px solid rgba(0, 95, 175, 0.3)";
+      spinner.style.borderTopColor = "#005faf";
+      spinner.style.borderRadius = "50%";
+      spinner.style.animation = "brainrootSpin 0.8s linear infinite";
+
+      const text = document.createElement("span");
+      text.id = "wishlistLoadingText";
+
+      card.appendChild(spinner);
+      card.appendChild(text);
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+    }
+
+    if (!document.getElementById("brainrootLoadingSpinStyle")) {
+      const style = document.createElement("style");
+      style.id = "brainrootLoadingSpinStyle";
+      style.textContent = "@keyframes brainrootSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }";
+      document.head.appendChild(style);
+    }
+
+    const textNode = document.getElementById("wishlistLoadingText");
+    if (textNode) {
+      textNode.textContent = message || "Loading...";
+    }
+
+    overlay.style.display = "grid";
+    setTimeout(function () {
+      overlay.style.display = "none";
+      if (typeof onDone === "function") {
+        onDone();
+      }
+    }, typeof duration === "number" ? duration : 1200);
   }
 
   function removeFromWishlistStorage(bookTitle) {
@@ -180,6 +256,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function saveCollections(items) {
     localStorage.setItem(collectionsKey, JSON.stringify(items));
+  }
+
+  function getCollectionTitle(item) {
+    if (typeof item === "string") {
+      return item;
+    }
+
+    if (item && typeof item === "object") {
+      return item.title;
+    }
+
+    return "";
+  }
+
+  function isBookAlreadyInCollections(items, title) {
+    const key = normalizeTitleKey(title);
+    return items.some(function (entry) {
+      return normalizeTitleKey(getCollectionTitle(entry)) === key;
+    });
+  }
+
+  function getCollectionLimit() {
+    if (window.brainrootAuth && typeof window.brainrootAuth.getCollectionLimit === "function") {
+      return window.brainrootAuth.getCollectionLimit();
+    }
+
+    return 8;
+  }
+
+  function getPlanType() {
+    if (window.brainrootAuth && typeof window.brainrootAuth.getPlanType === "function") {
+      return window.brainrootAuth.getPlanType();
+    }
+
+    return "free";
+  }
+
+  function getPlanDisplayName(type) {
+    const normalized = String(type || "free").toLowerCase();
+    if (normalized === "basic") {
+      return "Basic";
+    }
+    if (normalized === "standard") {
+      return "Standard";
+    }
+    if (normalized === "premium") {
+      return "Premium";
+    }
+    return "Free";
   }
 
   function isPaidSubscriber() {
@@ -282,7 +407,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const addBtn = article.querySelector(".add-btn");
     if (addBtn) {
       const paidLocked = getBookAccess(bookTitle) === "paid" && !isPaidSubscriber();
-      setAddedState(addBtn, getCollections().includes(bookTitle), paidLocked);
+      setAddedState(addBtn, isBookAlreadyInCollections(getCollections(), bookTitle), paidLocked);
 
       addBtn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -297,8 +422,20 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const collections = getCollections();
-        if (!collections.includes(bookTitle)) {
-          collections.push(bookTitle);
+        const limit = getCollectionLimit();
+        if (Number.isFinite(limit) && collections.length >= limit) {
+          showFeedback("Collection limit reached for " + getPlanDisplayName(getPlanType()) + " plan (" + limit + " books). Upgrade plan from Profile.");
+          return;
+        }
+
+        if (!isBookAlreadyInCollections(collections, bookTitle)) {
+          collections.push({
+            title: bookTitle,
+            author: bookData.author,
+            category: bookData.category,
+            image: bookData.image,
+            access: getBookAccess(bookTitle)
+          });
           saveCollections(collections);
         }
 
@@ -311,9 +448,9 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 220);
 
         const displayTitle = getDisplayBookTitle(bookTitle);
-        showFeedback(`Added "${displayTitle}" to your collection. You can view it anytime in Collections.`, {
+        showFeedback(`Great choice. "${displayTitle}" is now in your collection. Open Collections to continue reading.`, {
           showGoToCollection: true,
-          duration: 5600
+          duration: 5000
         });
       });
     }

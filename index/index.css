@@ -104,6 +104,105 @@ nav a.active {
 	font-size: 14px;
 }
 
+.search-live-panel {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 0;
+	width: 100%;
+	max-height: 310px;
+	overflow-y: auto;
+	background: #ffffff;
+	border: 1px solid #d6dbe0;
+	box-shadow: 0 16px 34px rgba(22, 32, 41, 0.14);
+	z-index: 30;
+	display: none;
+}
+
+.search-live-panel.show {
+	display: block;
+}
+
+.search-live-item {
+	width: 100%;
+	border: 0;
+	background: #fff;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 12px;
+	text-align: left;
+	border-bottom: 1px solid #edf0f3;
+	cursor: pointer;
+}
+
+.search-live-item:hover {
+	background: #f6f9fc;
+}
+
+.search-live-item img {
+	width: 36px;
+	height: 48px;
+	object-fit: cover;
+	border: 1px solid #d7d8db;
+	flex-shrink: 0;
+}
+
+.search-live-copy {
+	min-width: 0;
+}
+
+.search-live-title {
+	font-size: 13px;
+	font-weight: 700;
+	color: #202b32;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.search-live-meta {
+	font-size: 11px;
+	color: #5b6570;
+	margin-top: 2px;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+.search-live-empty {
+	padding: 12px;
+	font-size: 12px;
+	color: #5b6570;
+}
+
+.home-collection-toast {
+	position: fixed;
+	left: 50%;
+	top: 1rem;
+	transform: translateX(-50%) translateY(12px);
+	width: min(92vw, 36rem);
+	padding: 0.85rem 1rem;
+	border-radius: 14px;
+	border: 1px solid rgba(212, 227, 255, 0.38);
+	background: linear-gradient(135deg, rgba(0, 95, 175, 0.86), rgba(83, 97, 106, 0.74));
+	backdrop-filter: blur(14px);
+	-webkit-backdrop-filter: blur(14px);
+	color: #f6f7ff;
+	box-shadow: 0 16px 36px rgba(7, 32, 67, 0.3);
+	line-height: 1.5;
+	font-size: 0.92rem;
+	font-weight: 700;
+	letter-spacing: 0.01em;
+	opacity: 0;
+	pointer-events: none;
+	z-index: 80;
+	transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.home-collection-toast.show {
+	opacity: 1;
+	transform: translateX(-50%) translateY(0);
+}
+
 /* DISCOVER TEXT: "OR DISCOVER BY CATEGORY" label */
 .discover {
 	margin-top: 36px;

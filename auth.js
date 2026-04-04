@@ -137,6 +137,48 @@
       plan.includes("basic") || plan.includes("standard") || plan.includes("premium");
   }
 
+  function getPlanType() {
+    const subscription = getSubscription();
+    if (!subscription) {
+      return "free";
+    }
+
+    const type = String(subscription.planType || "").toLowerCase();
+    const plan = String(subscription.plan || "").toLowerCase();
+
+    if (type === "basic" || plan.includes("basic")) {
+      return "basic";
+    }
+
+    if (type === "standard" || plan.includes("standard")) {
+      return "standard";
+    }
+
+    if (type === "premium" || plan.includes("premium")) {
+      return "premium";
+    }
+
+    return "free";
+  }
+
+  function getCollectionLimit() {
+    const planType = getPlanType();
+
+    if (planType === "basic") {
+      return 30;
+    }
+
+    if (planType === "standard") {
+      return 34;
+    }
+
+    if (planType === "premium") {
+      return 40;
+    }
+
+    return 2;
+  }
+
   function getBookAccess(title) {
     return BOOK_ACCESS[String(title || "").trim()] || "free";
   }
@@ -309,6 +351,8 @@
     setSubscription: setSubscription,
     isLoggedIn: isLoggedIn,
     isPaidSubscriber: isPaidSubscriber,
+    getPlanType: getPlanType,
+    getCollectionLimit: getCollectionLimit,
     getBookAccess: getBookAccess,
     isPaidBook: isPaidBook,
     requireLogin: requireLogin,

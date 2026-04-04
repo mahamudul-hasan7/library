@@ -14,6 +14,13 @@ document.addEventListener("DOMContentLoaded", function () {
     "Vascular Cities",
     "Silent Archives"
   ];
+  const fallbackCollectionCovers = [
+    "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=700&q=80",
+    "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=700&q=80"
+  ];
 
   const bookCatalog = [
     {
@@ -270,6 +277,85 @@ document.addEventListener("DOMContentLoaded", function () {
   const collectionsList = document.getElementById("collectionsList");
   const recommendationsList = document.getElementById("recommendationsList");
   const collectionsEmptyState = document.getElementById("collectionsEmptyState");
+  const collectionsRootColumn = collectionsList ? collectionsList.parentElement : null;
+
+  function getPlanType() {
+    if (window.brainrootAuth && typeof window.brainrootAuth.getPlanType === "function") {
+      return window.brainrootAuth.getPlanType();
+    }
+
+    return "free";
+  }
+
+  function getCollectionLimit() {
+    if (window.brainrootAuth && typeof window.brainrootAuth.getCollectionLimit === "function") {
+      return window.brainrootAuth.getCollectionLimit();
+    }
+
+    return 8;
+  }
+
+  function getCollectionLimitLabel(limit) {
+    return Number.isFinite(limit) ? String(limit) : "Unlimited";
+  }
+
+  function getPlanDisplay(planType) {
+    const normalized = String(planType || "free").toLowerCase();
+
+    if (normalized === "basic") {
+      return "Basic";
+    }
+
+    if (normalized === "standard") {
+      return "Standard";
+    }
+
+    if (normalized === "premium") {
+      return "Premium";
+    }
+
+    return "Free";
+  }
+
+  function isCollectionLimitReached(collectionEntries) {
+    const limit = getCollectionLimit();
+    if (!Number.isFinite(limit)) {
+      return false;
+    }
+
+    return collectionEntries.length >= limit;
+  }
+
+  function getLimitReachedMessage() {
+    const planType = getPlanType();
+    const limit = getCollectionLimit();
+    return "Collection limit reached for " + getPlanDisplay(planType) + " plan (" + getCollectionLimitLabel(limit) + " books). Upgrade plan from Profile to add more.";
+  }
+
+  function renderCollectionLimitNote(collectionEntries) {
+    if (!collectionsRootColumn || !collectionsEmptyState) {
+      return;
+    }
+
+    let note = document.getElementById("collectionsLimitNote");
+    if (!note) {
+      note = document.createElement("div");
+      note.id = "collectionsLimitNote";
+      note.className = "collections-limit-note";
+      collectionsRootColumn.insertBefore(note, collectionsEmptyState);
+    }
+
+    const planType = getPlanType();
+    const limit = getCollectionLimit();
+    const reached = isCollectionLimitReached(collectionEntries);
+    const used = collectionEntries.length;
+
+    note.classList.toggle("is-limit-reached", reached);
+    note.textContent =
+      "Plan: " + getPlanDisplay(planType) +
+      " | Collections: " + used + " / " + getCollectionLimitLabel(limit) +
+      (reached ? " | Limit Reached" : "");
+  }
 
   function normalizeKey(value) {
     return String(value || "").trim().toLowerCase();
@@ -305,7 +391,56 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function hashValue(value) {
+    return String(value || "").split("").reduce(function (accumulator, char) {
+      return (accumulator * 31 + char.charCodeAt(0)) >>> 0;
+    }, 17);
+  }
+
+  function getFallbackCoverForTitle(title) {
+    return fallbackCollectionCovers[hashValue(title) % fallbackCollectionCovers.length];
+  }
+
+  function getCollectionTitle(entry) {
+    if (typeof entry === "string") {
+      return String(entry).trim();
+    }
+
+    if (entry && typeof entry === "object") {
+      return String(entry.title || "").trim();
+    }
+
+    return "";
+  }
+
+  function normalizeCollectionEntry(entry) {
+    const title = getCollectionTitle(entry);
+    if (!title) {
+      return null;
+    }
+
+    const source = entry && typeof entry === "object" ? entry : {};
+    const catalogMeta = catalogByTitle[normalizeKey(title)] || {};
+
+    return {
+      title: title,
+      author: String(source.author || catalogMeta.author || "Unknown").trim(),
+      category: String(source.category || catalogMeta.category || "General").trim(),
+      image: String(source.image || source.imageUrl || catalogMeta.image || getFallbackCoverForTitle(title)).trim(),
+      summary: String(source.summary || catalogMeta.summary || "A saved title from your library.").trim(),
+      progress: Number(source.progress || catalogMeta.progress || 32),
+      access: String(source.access || catalogMeta.access || window.brainrootAuth?.getBookAccess?.(title) || "free").trim(),
+      tags: Array.isArray(source.tags) ? source.tags : (Array.isArray(catalogMeta.tags) ? catalogMeta.tags : ["general"]),
+      importance: Number(source.importance || catalogMeta.importance || 60)
+    };
+  }
+
   function showToast(message) {
+    const hasConfig = message && typeof message === "object";
+    const toastMessage = hasConfig ? String(message.text || "") : String(message || "");
+    const actionLabel = hasConfig ? String(message.actionLabel || "") : "";
+    const actionHandler = hasConfig ? message.onAction : null;
+
     let toast = document.getElementById(toastId);
     if (!toast) {
       toast = document.createElement("div");
@@ -314,21 +449,223 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.appendChild(toast);
     }
 
-    toast.textContent = message;
+    toast.innerHTML = "";
+    const textNode = document.createElement("span");
+    textNode.textContent = toastMessage;
+    toast.appendChild(textNode);
+
+    if (actionLabel && typeof actionHandler === "function") {
+      const actionButton = document.createElement("button");
+      actionButton.type = "button";
+      actionButton.className = "collections-toast-action";
+      actionButton.textContent = actionLabel;
+      actionButton.addEventListener("click", function () {
+        actionHandler();
+        toast.classList.remove("show");
+      });
+      toast.appendChild(actionButton);
+    }
+
     toast.classList.add("show");
 
     clearTimeout(window.__collectionsToastTimer);
     window.__collectionsToastTimer = setTimeout(function () {
       toast.classList.remove("show");
-    }, 2200);
+    }, 5000);
+  }
+
+  function getReturnModal() {
+    let overlay = document.getElementById("returnModalOverlay");
+
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "returnModalOverlay";
+      overlay.className = "return-modal-overlay";
+      overlay.innerHTML =
+        '<div class="return-modal" role="dialog" aria-modal="true" aria-label="Return confirmation">' +
+        '<div class="return-modal-body">' +
+        '<div class="return-modal-cover"><img alt="Book cover" id="returnModalCover"></div>' +
+        '<div class="return-modal-copy">' +
+        '<h3 id="returnModalTitle">Return this book?</h3>' +
+        '<p id="returnModalMessage"></p>' +
+        '</div>' +
+        '</div>' +
+        '<div class="return-modal-actions">' +
+        '<button type="button" class="return-modal-btn" data-return-modal="cancel">Keep in Collection</button>' +
+        '<button type="button" class="return-modal-btn return-modal-btn--primary" data-return-modal="confirm">Return Book</button>' +
+        '</div>' +
+        '</div>';
+
+      document.body.appendChild(overlay);
+    }
+
+    return overlay;
+  }
+
+  function openReturnModal(book, onConfirm) {
+    const overlay = getReturnModal();
+    const cover = overlay.querySelector("#returnModalCover");
+    const title = overlay.querySelector("#returnModalTitle");
+    const message = overlay.querySelector("#returnModalMessage");
+    const confirmButton = overlay.querySelector('[data-return-modal="confirm"]');
+    const cancelButton = overlay.querySelector('[data-return-modal="cancel"]');
+
+    if (cover) {
+      cover.src = book.image || "";
+    }
+
+    if (title) {
+      title.textContent = 'Return "' + book.title + '"?';
+    }
+
+    if (message) {
+      message.textContent = "This will remove the book from your collection list. You can still add it again later anytime.";
+    }
+
+    function closeModal() {
+      overlay.classList.remove("show");
+      confirmButton.onclick = null;
+      cancelButton.onclick = null;
+      overlay.onclick = null;
+    }
+
+    confirmButton.onclick = function () {
+      closeModal();
+      if (typeof onConfirm === "function") {
+        onConfirm();
+      }
+    };
+
+    cancelButton.onclick = closeModal;
+    overlay.onclick = function (event) {
+      if (event.target === overlay) {
+        closeModal();
+      }
+    };
+
+    overlay.classList.add("show");
+  }
+
+  function restoreReturnedBook(book) {
+    const collectionEntries = getStoredCollections();
+    const alreadyExists = collectionEntries.some(function (entry) {
+      return normalizeKey(getCollectionTitle(entry)) === normalizeKey(book.title);
+    });
+
+    if (alreadyExists) {
+      showToast('"' + book.title + '" is already in your collection.');
+      return;
+    }
+
+    if (isCollectionLimitReached(collectionEntries)) {
+      showToast(getLimitReachedMessage());
+      return;
+    }
+
+    collectionEntries.unshift(normalizeCollectionEntry(book));
+    saveStoredCollections(collectionEntries);
+    clearRecentlyRemoved(book.title);
+    rerender();
+    showToast('Restored "' + book.title + '" to your collection.');
+  }
+
+  function returnBookFlow(book, cardElement) {
+    const collectionEntries = getStoredCollections();
+    const filteredEntries = collectionEntries.filter(function (item) {
+      return normalizeKey(getCollectionTitle(item)) !== normalizeKey(book.title);
+    });
+
+    if (cardElement) {
+      cardElement.classList.add("is-returning");
+    }
+
+    showFakeLoading("Processing return...", 950, function () {
+      saveStoredCollections(filteredEntries);
+      markRecentlyRemoved(book.title);
+      rerender();
+      showToast({
+        text: 'Done. "' + book.title + '" was returned from your collection.',
+        actionLabel: "Undo",
+        onAction: function () {
+          restoreReturnedBook(book);
+        }
+      });
+    });
+  }
+
+  function showFakeLoading(message, duration, onDone) {
+    let overlay = document.getElementById("collectionsLoadingOverlay");
+
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "collectionsLoadingOverlay";
+      overlay.setAttribute("aria-live", "polite");
+      overlay.style.position = "fixed";
+      overlay.style.inset = "0";
+      overlay.style.background = "rgba(12, 15, 15, 0.34)";
+      overlay.style.backdropFilter = "blur(6px)";
+      overlay.style.webkitBackdropFilter = "blur(6px)";
+      overlay.style.display = "grid";
+      overlay.style.placeItems = "center";
+      overlay.style.zIndex = "95";
+
+      const card = document.createElement("div");
+      card.style.background = "rgba(246, 247, 255, 0.9)";
+      card.style.border = "1px solid rgba(172, 179, 180, 0.45)";
+      card.style.borderRadius = "14px";
+      card.style.padding = "14px 16px";
+      card.style.minWidth = "220px";
+      card.style.display = "flex";
+      card.style.alignItems = "center";
+      card.style.gap = "10px";
+      card.style.color = "#2d3435";
+      card.style.fontWeight = "700";
+
+      const spinner = document.createElement("span");
+      spinner.style.width = "16px";
+      spinner.style.height = "16px";
+      spinner.style.border = "2px solid rgba(0, 95, 175, 0.3)";
+      spinner.style.borderTopColor = "#005faf";
+      spinner.style.borderRadius = "50%";
+      spinner.style.animation = "brainrootSpin 0.8s linear infinite";
+
+      const text = document.createElement("span");
+      text.id = "collectionsLoadingText";
+
+      card.appendChild(spinner);
+      card.appendChild(text);
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+    }
+
+    if (!document.getElementById("brainrootLoadingSpinStyle")) {
+      const style = document.createElement("style");
+      style.id = "brainrootLoadingSpinStyle";
+      style.textContent = "@keyframes brainrootSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }";
+      document.head.appendChild(style);
+    }
+
+    const textNode = document.getElementById("collectionsLoadingText");
+    if (textNode) {
+      textNode.textContent = message || "Loading...";
+    }
+
+    overlay.style.display = "grid";
+    setTimeout(function () {
+      overlay.style.display = "none";
+      if (typeof onDone === "function") {
+        onDone();
+      }
+    }, typeof duration === "number" ? duration : 1200);
   }
 
   function getStoredCollections() {
     const savedValue = localStorage.getItem(collectionKey);
 
     if (savedValue === null) {
-      localStorage.setItem(collectionKey, JSON.stringify(defaultCollections));
-      return defaultCollections.slice();
+      const seeded = defaultCollections.map(normalizeCollectionEntry).filter(Boolean);
+      localStorage.setItem(collectionKey, JSON.stringify(seeded));
+      return seeded;
     }
 
     try {
@@ -337,20 +674,70 @@ document.addEventListener("DOMContentLoaded", function () {
         return [];
       }
 
-      return parsed.filter(function (item, index, items) {
-        return Boolean(item) && items.indexOf(item) === index;
+      const unique = [];
+      const seen = new Set();
+
+      parsed.forEach(function (item) {
+        const normalized = normalizeCollectionEntry(item);
+        if (!normalized) {
+          return;
+        }
+
+        const key = normalizeKey(normalized.title);
+        if (!key || seen.has(key)) {
+          return;
+        }
+
+        seen.add(key);
+        unique.push(normalized);
       });
+
+      if (JSON.stringify(parsed) !== JSON.stringify(unique)) {
+        saveStoredCollections(unique);
+      }
+
+      return unique;
     } catch (error) {
       return [];
     }
   }
 
   function saveStoredCollections(items) {
-    localStorage.setItem(collectionKey, JSON.stringify(items));
+    const unique = [];
+    const seen = new Set();
+
+    (Array.isArray(items) ? items : []).forEach(function (item) {
+      const normalized = normalizeCollectionEntry(item);
+      if (!normalized) {
+        return;
+      }
+
+      const key = normalizeKey(normalized.title);
+      if (!key || seen.has(key)) {
+        return;
+      }
+
+      seen.add(key);
+      unique.push(normalized);
+    });
+
+    localStorage.setItem(collectionKey, JSON.stringify(unique));
   }
 
   function getWishlistTitles() {
-    return readJson(wishlistKey, []);
+    return readJson(wishlistKey, [])
+      .map(function (entry) {
+        if (typeof entry === "string") {
+          return entry;
+        }
+
+        if (entry && typeof entry === "object") {
+          return entry.title;
+        }
+
+        return "";
+      })
+      .filter(Boolean);
   }
 
   function readRemovalHistory() {
@@ -385,7 +772,7 @@ document.addEventListener("DOMContentLoaded", function () {
     saveRemovalHistory(history);
   }
 
-  function getPreferenceWeights(collectionTitles) {
+  function getPreferenceWeights(collectionEntries) {
     const weights = Object.create(null);
     const behavior = window.brainrootLibraryBehavior ? window.brainrootLibraryBehavior.getBookBehavior() : { views: [] };
     const recentViews = Array.isArray(behavior.views) ? behavior.views.slice(0, 12) : [];
@@ -404,8 +791,8 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    collectionTitles.forEach(function (title, index) {
-      const book = catalogByTitle[normalizeKey(title)];
+    collectionEntries.forEach(function (entry, index) {
+      const book = normalizeCollectionEntry(entry);
       if (!book) {
         return;
       }
@@ -424,8 +811,14 @@ document.addEventListener("DOMContentLoaded", function () {
     return weights;
   }
 
-  function getAvailableRecommendations(collectionTitles) {
-    const collectionSet = new Set(collectionTitles.map(normalizeKey));
+  function getAvailableRecommendations(collectionEntries) {
+    const collectionSet = new Set(
+      collectionEntries
+        .map(function (entry) {
+          return normalizeKey(getCollectionTitle(entry));
+        })
+        .filter(Boolean)
+    );
     const wishlistSet = new Set(getWishlistTitles().map(normalizeKey));
     const recentRemovalSet = new Set(
       readRemovalHistory()
@@ -436,7 +829,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return normalizeKey(entry.title);
         })
     );
-    const preferenceWeights = getPreferenceWeights(collectionTitles);
+    const preferenceWeights = getPreferenceWeights(collectionEntries);
 
     return bookCatalog
       .filter(function (book) {
@@ -468,33 +861,40 @@ document.addEventListener("DOMContentLoaded", function () {
       .slice(0, recommendationLimit);
   }
 
-  function getBookMeta(title) {
-    return catalogByTitle[normalizeKey(title)] || {
+  function getBookMeta(entryOrTitle) {
+    const normalized = normalizeCollectionEntry(entryOrTitle);
+    if (normalized) {
+      return normalized;
+    }
+
+    const title = getCollectionTitle(entryOrTitle) || "Untitled Book";
+    return {
       title: title,
       author: "Unknown",
       category: "General",
-      image: "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=700&q=80",
+      image: getFallbackCoverForTitle(title),
       summary: "A saved title from your library.",
       progress: 32,
       importance: 60,
-      tags: ["general"]
+      tags: ["general"],
+      access: window.brainrootAuth?.getBookAccess?.(title) || "free"
     };
   }
 
-  function renderCollections(collectionTitles) {
+  function renderCollections(collectionEntries) {
     if (!collectionsList) {
       return;
     }
 
     collectionsList.innerHTML = "";
-    collectionsEmptyState.classList.toggle("hidden", collectionTitles.length > 0);
+    collectionsEmptyState.classList.toggle("hidden", collectionEntries.length > 0);
 
-    if (collectionTitles.length === 0) {
+    if (collectionEntries.length === 0) {
       return;
     }
 
-    collectionTitles.forEach(function (title, index) {
-      const book = getBookMeta(title);
+    collectionEntries.forEach(function (entry, index) {
+      const book = getBookMeta(entry);
       const article = document.createElement("article");
       article.className = "collection-card";
       article.setAttribute("data-book-title", book.title);
@@ -528,7 +928,7 @@ document.addEventListener("DOMContentLoaded", function () {
         '%"></span></div>' +
         '<div class="collection-actions">' +
         '<button type="button" data-collection-action="read" class="collection-action">Read Book</button>' +
-        '<button type="button" data-collection-action="remove" class="collection-action collection-action--ghost">Remove</button>' +
+        '<button type="button" data-collection-action="return" class="collection-action collection-action--ghost">Return</button>' +
         '</div>' +
         '</div>';
 
@@ -536,12 +936,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function renderRecommendations(collectionTitles) {
+  function renderRecommendations(collectionEntries) {
     if (!recommendationsList) {
       return;
     }
 
-    const recommendations = getAvailableRecommendations(collectionTitles);
+    const recommendations = getAvailableRecommendations(collectionEntries);
     recommendationsList.innerHTML = "";
 
     if (recommendations.length === 0) {
@@ -587,9 +987,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function rerender() {
-    const collectionTitles = getStoredCollections();
-    renderCollections(collectionTitles);
-    renderRecommendations(collectionTitles);
+    const collectionEntries = getStoredCollections();
+    renderCollectionLimitNote(collectionEntries);
+    renderCollections(collectionEntries);
+    renderRecommendations(collectionEntries);
   }
 
   document.addEventListener("click", function (event) {
@@ -618,7 +1019,9 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
-      showToast("Opening reader for " + book.title + ".");
+      showFakeLoading("Opening reader...", 1200, function () {
+        showToast("Reader is ready for \"" + book.title + "\".");
+      });
       return;
     }
 
@@ -628,10 +1031,19 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
-      const collectionTitles = getStoredCollections();
-      if (collectionTitles.map(normalizeKey).indexOf(normalizeKey(book.title)) === -1) {
-        collectionTitles.push(book.title);
-        saveStoredCollections(collectionTitles);
+      const collectionEntries = getStoredCollections();
+      const existing = collectionEntries.some(function (entry) {
+        return normalizeKey(getCollectionTitle(entry)) === normalizeKey(book.title);
+      });
+
+      if (!existing && isCollectionLimitReached(collectionEntries)) {
+        showToast(getLimitReachedMessage());
+        return;
+      }
+
+      if (!existing) {
+        collectionEntries.push(normalizeCollectionEntry(book));
+        saveStoredCollections(collectionEntries);
       }
 
       clearRecentlyRemoved(book.title);
@@ -646,20 +1058,14 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       rerender();
-      showToast(book.title + " added to your collection.");
+      showToast("Great choice. \"" + book.title + "\" is now in your collection.");
       return;
     }
 
-    if (action === "remove") {
-      const collectionTitles = getStoredCollections();
-      const filteredTitles = collectionTitles.filter(function (item) {
-        return normalizeKey(item) !== normalizeKey(book.title);
+    if (action === "return") {
+      openReturnModal(book, function () {
+        returnBookFlow(book, card);
       });
-
-      saveStoredCollections(filteredTitles);
-      markRecentlyRemoved(book.title);
-      rerender();
-      showToast(book.title + " removed from your collection.");
     }
   });
 

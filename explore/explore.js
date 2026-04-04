@@ -921,7 +921,23 @@ function syncAllBooksCollectionBadges() {
 function getCollectionsTitles() {
   try {
     const parsed = JSON.parse(localStorage.getItem("brainrootCollections") || "[]");
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed
+      .map(function (entry) {
+        if (typeof entry === "string") {
+          return entry;
+        }
+
+        if (entry && typeof entry === "object") {
+          return entry.title;
+        }
+
+        return "";
+      })
+      .filter(Boolean);
   } catch (error) {
     return [];
   }
@@ -1347,9 +1363,11 @@ function openBookModal(title, author, description, status, imageUrl) {
   const borrowBtn = document.getElementById("borrowBtn");
   const loginMsg = document.getElementById("loginMessage");
   const paidLocked = getBookAccess(title) === "paid" && !isPaidSubscriber();
+  const borrowedTitles = JSON.parse(localStorage.getItem("brainrootBorrowed") || "[]");
+  const alreadyBorrowed = borrowedTitles.indexOf(title) !== -1;
 
-  if (status === "Borrowed") {
-    borrowBtn.textContent = "ON HOLD (Coming Soon)";
+  if (alreadyBorrowed || status === "Borrowed") {
+    borrowBtn.textContent = "Already Borrowed ✓";
     borrowBtn.disabled = true;
     borrowBtn.classList.add("opacity-50", "cursor-not-allowed");
     loginMsg.classList.add("hidden");
@@ -1389,16 +1407,26 @@ function borrowBook() {
   }
 
   const title = document.getElementById("modalBookTitle").textContent;
+  const borrowed = JSON.parse(localStorage.getItem("brainrootBorrowed") || "[]");
+
+  if (borrowed.includes(title)) {
+    showInlineExploreMessage("This book is already in your borrowed list.");
+    const borrowBtn = document.getElementById("borrowBtn");
+    if (borrowBtn) {
+      borrowBtn.textContent = "Already Borrowed ✓";
+      borrowBtn.disabled = true;
+      borrowBtn.classList.add("opacity-50", "cursor-not-allowed");
+    }
+    return;
+  }
+
   if (getBookAccess(title) === "paid" && !isPaidSubscriber()) {
     showInlineExploreMessage("This is a paid book. Upgrade your plan from Profile to borrow it.");
     return;
   }
 
-  const borrowed = JSON.parse(localStorage.getItem("brainrootBorrowed") || "[]");
-  if (!borrowed.includes(title)) {
-    borrowed.push(title);
-    localStorage.setItem("brainrootBorrowed", JSON.stringify(borrowed));
-  }
+  borrowed.push(title);
+  localStorage.setItem("brainrootBorrowed", JSON.stringify(borrowed));
 
   showExploreToast(title + " has been added to your borrowed books. Due date: 14 days from now.");
   closeBookModal();

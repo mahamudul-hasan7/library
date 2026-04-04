@@ -84,7 +84,6 @@ function showToast(title, message, variant) {
     toast.setAttribute("role", "status");
     toast.setAttribute("aria-live", "polite");
     toast.innerHTML = ""
-      + '<img src="../Assets/verify badge.png" alt="Verified" class="profile-toast-icon"/>'
       + '<div class="profile-toast-text">'
       + '  <p id="profileToastTitle" class="profile-toast-title"></p>'
       + '  <p id="profileToastMessage" class="profile-toast-message"></p>'

@@ -664,6 +664,99 @@
     book.style.cursor = "pointer";
   });
 
+  // RECOMMENDED FOR YOU SECTION
+  function renderRecommendedBooks() {
+    const recommendedGrid = document.getElementById("recommendedGrid");
+    if (!recommendedGrid) {
+      return;
+    }
+
+    // Get a random selection of books from featured + extra catalog
+    const allRecommended = globalCatalog.slice().sort(() => 0.5 - Math.random()).slice(0, 6);
+
+    recommendedGrid.innerHTML = "";
+
+    allRecommended.forEach(function (book) {
+      const article = document.createElement("article");
+      article.className = "recommended-book-card";
+
+      const title = book.title || "";
+      const author = book.author || "";
+      const category = book.category || "";
+      const image = book.image || getCategoryFallbackImage(category);
+      const access = getBookAccess(title);
+
+      article.innerHTML =
+        '<img src="' + image + '" alt="' + title + '">' +
+        '<span class="badge ' + access + '">' + access.toUpperCase() + '</span>' +
+        '<p class="cat">' + category + '</p>' +
+        '<h3>' + title + '</h3>' +
+        '<p class="author">' + author + '</p>' +
+        '<div class="card-actions">' +
+        '<button class="btn-view-book" type="button">View Book</button>' +
+        '<button class="btn-borrow" type="button">Borrow</button>' +
+        '</div>';
+
+      const viewBtn = article.querySelector(".btn-view-book");
+      const borrowBtn = article.querySelector(".btn-borrow");
+
+      // View Book button - opens modal
+      viewBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        openBookModalFromData(book);
+      });
+
+      // Borrow button - direct borrow
+      borrowBtn.addEventListener("click", function (e) {
+        e.stopPropagation();
+
+        // Check login
+        if (window.brainrootAuth && !window.brainrootAuth.isLoggedIn()) {
+          const loginUrl = window.brainrootAuth.buildLoginUrl(new URL("../explore/explore.html", window.location.href).href);
+          window.location.href = loginUrl;
+          return;
+        }
+
+        // Check if already borrowed
+        const borrowed = JSON.parse(localStorage.getItem("brainrootBorrowed") || "[]");
+        if (borrowed.includes(title)) {
+          borrowBtn.textContent = "Already Borrowed ✓";
+          borrowBtn.disabled = true;
+          borrowBtn.style.opacity = "0.6";
+          borrowBtn.style.pointerEvents = "none";
+          showHomeCollectionToast("This book is already in your borrowed list.");
+          return;
+        }
+
+        // Check if paid subscriber access required
+        if (access === "paid" && !isPaidSubscriber()) {
+          borrowBtn.textContent = "Subscription Required";
+          borrowBtn.disabled = true;
+          borrowBtn.style.opacity = "0.6";
+          borrowBtn.style.pointerEvents = "none";
+          showHomeCollectionToast("This is a paid book. Upgrade your plan to borrow it.");
+          return;
+        }
+
+        // Add to borrowed
+        borrowed.push(title);
+        localStorage.setItem("brainrootBorrowed", JSON.stringify(borrowed));
+
+        // Update button state
+        borrowBtn.textContent = "Borrowed ✓";
+        borrowBtn.disabled = true;
+        borrowBtn.style.opacity = "0.6";
+        borrowBtn.style.pointerEvents = "none";
+
+        showHomeCollectionToast('"' + title + '" added to your borrowed books. Due date: 14 days from now.');
+      });
+
+      recommendedGrid.appendChild(article);
+    });
+  }
+
+  renderRecommendedBooks();
+
   window.addEventListener("storage", function (event) {
     if (event.key === "brainrootSubscription" || event.key === "brainrootSubscriptionsByUser") {
       refreshOpenModalSubscriptionState();

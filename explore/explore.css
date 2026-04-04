@@ -220,3 +220,18 @@ button:hover {
 .text-on-surface { color: #2d3435; }
 .text-on-surface-variant { color: #596061; }
 .border-outline-variant { border-color: #acb3b4; }
+
+/* Borrow button styling */
+.bg-success {
+  background-color: #2e7d32;
+}
+
+#recommendedHeroBorrowBtn:disabled {
+  background-color: #b3b3b3;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+#recommendedHeroBorrowBtn:disabled:hover {
+  opacity: 0.7;
+}

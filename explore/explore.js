@@ -1005,9 +1005,10 @@ function renderRecommendedHero(book) {
   const imageEl = document.getElementById("recommendedHeroImage");
   const badgeEl = document.getElementById("recommendedHeroAccessBadge");
   const reserveBtn = document.getElementById("recommendedHeroReserveBtn");
+  const borrowBtn = document.getElementById("recommendedHeroBorrowBtn");
   const detailsBtn = document.getElementById("recommendedHeroDetailsBtn");
 
-  if (!titleEl || !descriptionEl || !imageEl || !badgeEl || !reserveBtn || !detailsBtn || !book) {
+  if (!titleEl || !descriptionEl || !imageEl || !badgeEl || !reserveBtn || !borrowBtn || !detailsBtn || !book) {
     return;
   }
 
@@ -1018,11 +1019,52 @@ function renderRecommendedHero(book) {
   badgeEl.textContent = "";
   badgeEl.className = "hidden";
 
+  // Check if already borrowed and update borrow button state
+  const borrowedTitles = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
+  const alreadyBorrowed = borrowedTitles.indexOf(book.title) !== -1 || book.status === "Borrowed";
+  if (alreadyBorrowed) {
+    borrowBtn.textContent = "Already Borrowed ✓";
+    borrowBtn.disabled = true;
+  } else {
+    borrowBtn.textContent = "Borrow";
+    borrowBtn.disabled = false;
+  }
+
   function openCurrentRecommendedBook() {
     openBookModal(book.title, book.author, book.description, book.status || "Available", book.imageUrl || RECOMMENDED_FALLBACK_IMAGE);
   }
 
+  function borrowRecommendedBook() {
+    const title = book.title;
+    const status = book.status || "Available";
+    
+    // Check if already borrowed
+    const borrowedTitles = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
+    if (borrowedTitles.indexOf(title) !== -1 || status === "Borrowed") {
+      showExploreToast("This book is already in your borrowed collection.", "neutral");
+      return;
+    }
+    
+    // Check if available
+    if (status !== "Available") {
+      showExploreToast("This book is not available for borrowing.", "neutral");
+      return;
+    }
+    
+    // Add to borrowed list
+    borrowedTitles.push(title);
+    localStorage.setItem("brainrootBorrowed", JSON.stringify(borrowedTitles));
+    
+    // Update button state
+    borrowBtn.textContent = "Already Borrowed ✓";
+    borrowBtn.disabled = true;
+    
+    // Show success message
+    showExploreToast("Successfully borrowed: " + title, "success");
+  }
+
   reserveBtn.onclick = openCurrentRecommendedBook;
+  borrowBtn.onclick = borrowRecommendedBook;
   detailsBtn.onclick = openCurrentRecommendedBook;
 }
 

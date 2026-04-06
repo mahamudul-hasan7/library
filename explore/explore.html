@@ -109,17 +109,15 @@
         </div>
       </section>
 
-      <section class="mb-20" data-section-name="Trending Books">
+      <section class="mb-20 carousel-section" data-carousel-name="Trending Books">
         <div class="flex justify-between items-end mb-8">
           <div>
             <h2 class="text-xl font-semibold tracking-tight">Trending Books</h2>
             <div class="h-1 w-12 bg-primary mt-2"></div>
           </div>
           <div class="flex items-center gap-4">
-            <div class="flex gap-2" data-carousel-controls="trending">
-              <button class="carousel-nav-btn carousel-btn-trending" title="Previous" aria-label="Previous books">‹</button>
-              <button class="carousel-nav-btn carousel-btn-trending" title="Next" aria-label="Next books">›</button>
-            </div>
+            <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
             <a class="text-sm font-medium text-primary hover:underline" href="#">View All</a>
           </div>
         </div>
@@ -127,28 +125,24 @@
       </section>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
-        <section data-section-name="Top Reading">
+        <section class="carousel-section" data-carousel-name="Top Reading">
           <div class="flex justify-between items-end mb-8">
             <h2 class="text-xl font-semibold tracking-tight">Top Reading</h2>
             <div class="flex items-center gap-4">
-              <div class="flex gap-2" data-carousel-controls="topReading">
-                <button class="carousel-nav-btn carousel-btn-topReading" title="Previous" aria-label="Previous books">‹</button>
-                <button class="carousel-nav-btn carousel-btn-topReading" title="Next" aria-label="Next books">›</button>
-              </div>
+              <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+              <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
               <a class="text-sm font-medium text-primary hover:underline" href="#">Full List</a>
             </div>
           </div>
           <div class="flex overflow-x-auto hide-scrollbar gap-6 pb-4"></div>
         </section>
 
-        <section data-section-name="Most Liked">
+        <section class="carousel-section" data-carousel-name="Most Liked">
           <div class="flex justify-between items-end mb-8">
             <h2 class="text-xl font-semibold tracking-tight">Most Liked</h2>
             <div class="flex items-center gap-4">
-              <div class="flex gap-2" data-carousel-controls="mostLiked">
-                <button class="carousel-nav-btn carousel-btn-mostLiked" title="Previous" aria-label="Previous books">‹</button>
-                <button class="carousel-nav-btn carousel-btn-mostLiked" title="Next" aria-label="Next books">›</button>
-              </div>
+              <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+              <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
               <a class="text-sm font-medium text-primary hover:underline" href="#">Explore More</a>
             </div>
           </div>

@@ -99,58 +99,40 @@ button:hover {
   background: #d3dbdd;
 }
 
-/* Carousel Navigation */
+/* Carousel Navigation Buttons */
 .carousel-nav-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: 2px solid currentColor;
-  background: transparent;
+  width: 36px;
+  height: 36px;
+  background: #005faf;
+  color: #ffffff;
+  border: none;
   border-radius: 4px;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 180ms ease;
+  transition: all 160ms ease;
 }
 
 .carousel-nav-btn:hover {
-  transform: scale(1.08) translateY(-1px);
+  background: #00539a;
+  box-shadow: 0 4px 12px rgba(0, 95, 175, 0.2);
+  transform: translateY(-2px);
 }
 
 .carousel-nav-btn:active {
-  transform: scale(0.96);
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(0, 95, 175, 0.15);
 }
 
-/* Trending Books - Orange/Amber */
-.carousel-btn-trending {
-  color: #ff9800;
-}
-
-.carousel-btn-trending:hover {
-  background: rgba(255, 152, 0, 0.1);
-  border-color: #ff9800;
-}
-
-/* Top Reading - Purple/Violet */
-.carousel-btn-topReading {
-  color: #9c27b0;
-}
-
-.carousel-btn-topReading:hover {
-  background: rgba(156, 39, 176, 0.1);
-  border-color: #9c27b0;
-}
-
-/* Most Liked - Pink/Red */
-.carousel-btn-mostLiked {
-  color: #e91e63;
-}
-
-.carousel-btn-mostLiked:hover {
-  background: rgba(233, 30, 99, 0.1);
-  border-color: #e91e63;
+.carousel-nav-btn:disabled {
+  background: #d3dbdd;
+  color: #acb3b4;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .explore-search-item-copy {

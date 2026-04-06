@@ -772,6 +772,55 @@ function syncExploreBookLibrary() {
   syncHorizontalShowcaseSection("Top Reading", exploreBookLibrary.topReading);
   syncHorizontalShowcaseSection("Most Liked", exploreBookLibrary.mostLiked);
   syncAllBooksCollectionBadges();
+  setupCarouselNavigation();
+}
+
+function setupCarouselNavigation() {
+  const carouselSections = document.querySelectorAll(".carousel-section");
+  
+  carouselSections.forEach(function(section) {
+    const prevBtn = section.querySelector(".carousel-prev-btn");
+    const nextBtn = section.querySelector(".carousel-next-btn");
+    const scrollContainer = section.querySelector(".flex.overflow-x-auto");
+    
+    if (!prevBtn || !nextBtn || !scrollContainer) {
+      return;
+    }
+    
+    function updateButtonStates() {
+      const scrollLeft = scrollContainer.scrollLeft;
+      const scrollWidth = scrollContainer.scrollWidth;
+      const clientWidth = scrollContainer.clientWidth;
+      
+      prevBtn.disabled = scrollLeft <= 0;
+      nextBtn.disabled = scrollLeft >= scrollWidth - clientWidth - 10;
+    }
+    
+    prevBtn.addEventListener("click", function() {
+      const cardWidth = 220;
+      const gap = 32;
+      scrollContainer.scrollBy({
+        left: -(cardWidth + gap),
+        behavior: "smooth"
+      });
+      setTimeout(updateButtonStates, 300);
+    });
+    
+    nextBtn.addEventListener("click", function() {
+      const cardWidth = 220;
+      const gap = 32;
+      scrollContainer.scrollBy({
+        left: cardWidth + gap,
+        behavior: "smooth"
+      });
+      setTimeout(updateButtonStates, 300);
+    });
+    
+    scrollContainer.addEventListener("scroll", updateButtonStates);
+    window.addEventListener("resize", updateButtonStates);
+    
+    setTimeout(updateButtonStates, 100);
+  });
 }
 
 function syncAllBooksCollectionBadges() {
@@ -1563,87 +1612,10 @@ window.closeBookModal = closeBookModal;
 window.borrowBook = borrowBook;
 window.addToWishlist = addToWishlist;
 
-/* Carousel Navigation State */
-const carouselState = {
-  trending: { currentIndex: 0, itemsPerView: 3 },
-  topReading: { currentIndex: 0, itemsPerView: 3 },
-  mostLiked: { currentIndex: 0, itemsPerView: 3 }
-};
-
-function rotateCarouselSection(sectionKey, direction) {
-  const books = exploreBookLibrary[sectionKey];
-  if (!books || books.length === 0) {
-    return;
-  }
-
-  const state = carouselState[sectionKey];
-  if (!state) {
-    return;
-  }
-
-  const itemsPerView = state.itemsPerView;
-  const totalBooks = books.length;
-
-  if (direction === "next") {
-    state.currentIndex = (state.currentIndex + 1) % totalBooks;
-  } else {
-    state.currentIndex = (state.currentIndex - 1 + totalBooks) % totalBooks;
-  }
-
-  // Get the slice of books to display starting from currentIndex
-  const displayBooks = [];
-  for (let i = 0; i < itemsPerView && i < totalBooks; i++) {
-    displayBooks.push(books[(state.currentIndex + i) % totalBooks]);
-  }
-
-  // Render the new books
-  const sectionTitles = {
-    trending: "Trending Books",
-    topReading: "Top Reading",
-    mostLiked: "Most Liked"
-  };
-
-  syncHorizontalShowcaseSection(sectionTitles[sectionKey], displayBooks);
-  markExploreCardsByAccess();
-}
-
-function initializeCarouselControls() {
-  const sectionMappings = {
-    trending: "trending",
-    topReading: "topReading",
-    mostLiked: "mostLiked"
-  };
-
-  Object.entries(sectionMappings).forEach(function (entry) {
-    const htmlAttr = entry[0];
-    const stateKey = entry[1];
-    const controls = document.querySelector("[data-carousel-controls=\"" + htmlAttr + "\"]");
-    if (!controls) {
-      return;
-    }
-
-    const buttons = controls.querySelectorAll(".carousel-nav-btn");
-    if (buttons.length < 2) {
-      return;
-    }
-
-    // First button is previous
-    buttons[0].addEventListener("click", function () {
-      rotateCarouselSection(stateKey, "prev");
-    });
-
-    // Second button is next
-    buttons[1].addEventListener("click", function () {
-      rotateCarouselSection(stateKey, "next");
-    });
-  });
-}
-
 function initializeExplorePage() {
   syncExploreBookLibrary();
   initializeExploreSearch();
   initializeRecommendedHero();
-  initializeCarouselControls();
   markExploreCardsByAccess();
 
   document.addEventListener("click", function (event) {

@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const wishlistKey = "brainrootWishlist";
   const removalKey = "brainrootCollectionRotations";
   const toastId = "collectionsToast";
-  const recommendationLimit = 4;
+  const recommendationLimit = 8;
+  const initialRecommendationVisibleCount = 3;
   const defaultCollections = [
     "Metropolitan Tunnels",
     "Concrete Poetry",
@@ -278,6 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const recommendationsList = document.getElementById("recommendationsList");
   const collectionsEmptyState = document.getElementById("collectionsEmptyState");
   const collectionsRootColumn = collectionsList ? collectionsList.parentElement : null;
+  let recommendationsExpanded = false;
 
   function getPlanType() {
     if (window.brainrootAuth && typeof window.brainrootAuth.getPlanType === "function") {
@@ -958,6 +960,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const recommendations = getAvailableRecommendations(collectionEntries);
+    const visibleRecommendations = recommendationsExpanded
+      ? recommendations
+      : recommendations.slice(0, initialRecommendationVisibleCount);
+
     recommendationsList.innerHTML = "";
 
     if (recommendations.length === 0) {
@@ -966,8 +972,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    recommendations.forEach(function (book) {
+    visibleRecommendations.forEach(function (book) {
       const lockedBySubscription = isPaidBook(book) && !isPaidSubscriber();
+      const accessLevel = String(book.access || "free").toLowerCase();
+      const accessClassName = "book-access-" + accessLevel.replace(/[^a-z0-9-]/g, "");
       const article = document.createElement("article");
       article.className = "recommendation-card";
       article.setAttribute("data-book-title", book.title);
@@ -979,9 +987,14 @@ document.addEventListener("DOMContentLoaded", function () {
         '"></div>' +
         '<div class="recommendation-body">' +
         '<span class="recommendation-meta">' +
+        '<span class="recommendation-category-label">' +
         escapeHtml(book.category) +
-          ' | ' +
+        '</span>' +
+        '<span class="recommendation-access ' +
+        escapeHtml(accessClassName) +
+        '">' +
         escapeHtml(String(book.access || "free").toUpperCase()) +
+        '</span>' +
         '</span>' +
         '<div class="recommendation-topline">' +
         '<h4 class="recommendation-title">' +
@@ -1000,6 +1013,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       recommendationsList.appendChild(article);
     });
+
+    if (recommendations.length > initialRecommendationVisibleCount) {
+      const seeMoreButton = document.createElement("button");
+      seeMoreButton.type = "button";
+      seeMoreButton.className = "recommendations-see-more";
+      seeMoreButton.setAttribute("data-collection-action", "recommendations-toggle");
+      seeMoreButton.textContent = recommendationsExpanded ? "See Less" : "See More";
+      recommendationsList.appendChild(seeMoreButton);
+    }
   }
 
   function rerender() {
@@ -1019,6 +1041,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const card = actionButton.closest("[data-book-title]");
     const title = card ? card.getAttribute("data-book-title") || "book" : "book";
     const book = getBookMeta(title);
+
+    if (action === "recommendations-toggle") {
+      recommendationsExpanded = !recommendationsExpanded;
+      renderRecommendations(getStoredCollections());
+      return;
+    }
 
     if (action === "read") {
       if (isPaidBook(book) && !isPaidSubscriber()) {

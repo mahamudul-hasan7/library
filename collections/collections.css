@@ -11,6 +11,10 @@ body {
   color: #2d3435;
 }
 
+.hidden {
+  display: none !important;
+}
+
 /* Collections Navigation */
 .collections-nav {
   position: fixed;
@@ -29,10 +33,9 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0 32px;
+  padding: 0 96px;
   height: 64px;
-  max-width: 1280px;
-  margin: 0 auto;
+  max-width: none;
 }
 
 .collections-brand {
@@ -50,8 +53,9 @@ body {
 .collections-nav-menu {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 40px;
   height: 100%;
+  margin-left: auto;
 }
 
 .collections-nav-link {
@@ -75,9 +79,9 @@ body {
 }
 
 .collections-nav-link-active {
-  color: #005faf;
-  border-bottom: 2px solid #005faf;
-  padding-bottom: 4px;
+  color: #2d3435;
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .collections-login-link {
@@ -321,10 +325,12 @@ body {
 .collections-recommendations {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
 }
 
 .recommendation-card {
+  display: flex;
+  align-items: stretch;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.04);
   box-shadow: 0 1px 2px rgba(20, 24, 28, 0.02);
@@ -339,8 +345,9 @@ body {
 }
 
 .recommendation-cover {
-  width: 100%;
-  aspect-ratio: 2 / 3;
+  width: 92px;
+  min-width: 92px;
+  height: 132px;
   overflow: hidden;
   background: #dde4e5;
 }
@@ -353,7 +360,10 @@ body {
 }
 
 .recommendation-body {
-  padding: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
 }
 
 .recommendation-category {
@@ -374,15 +384,72 @@ body {
   font-weight: 700;
   color: #2d3435;
   line-height: 1.3;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .recommendation-meta {
-  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.66rem;
   color: #596061;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 0;
+}
+
+.recommendation-category-label {
+  color: #596061;
+}
+
+.recommendation-access {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: Segoe UI, Arial, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.book-access-free {
+  color: #216a3a;
+  background: #e8f6ee;
+  border-color: #c2e9d0;
+}
+
+.book-access-default {
+  color: #445057;
+  background: #eef2f3;
+  border-color: #d5dde0;
+}
+
+.book-access-premium {
+  color: #7a4f00;
+  background: #fff4d9;
+  border-color: #f6dfac;
+}
+
+.book-access-paid {
+  color: #7b2f00;
+  background: #ffe9dc;
+  border-color: #f7ccb6;
+}
+
+.recommendation-copy {
+  font-size: 0.8rem;
+  color: #596061;
+  line-height: 1.45;
+  margin: 0;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .recommendation-button {
@@ -390,13 +457,31 @@ body {
   border: none;
   color: #005faf;
   padding: 0;
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 160ms ease;
   text-decoration: none;
+  align-self: flex-start;
+}
+
+.recommendations-see-more {
+  border: 1px solid rgba(0, 95, 175, 0.28);
+  background: #ffffff;
+  color: #005faf;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 160ms ease;
+}
+
+.recommendations-see-more:hover {
+  background: rgba(0, 95, 175, 0.08);
 }
 
 .recommendation-button:hover {
@@ -627,7 +712,7 @@ body {
   }
 
   .collections-nav-inner {
-    padding: 0 16px;
+    padding: 0 32px;
   }
 }
 
@@ -646,6 +731,10 @@ body {
 
   .collections-nav-menu {
     gap: 16px;
+  }
+
+  .collections-nav-inner {
+    padding: 0 16px;
   }
 
   .collection-card {

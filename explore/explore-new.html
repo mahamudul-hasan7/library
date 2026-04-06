@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>BrainRoot Architectural Library - Explore</title>
+    <link href="./explore.css" rel="stylesheet" />
+    <script src="./explore.js"></script>
+  </head>
+  <body class="explore-body">
+    <nav class="explore-nav">
+      <div class="explore-nav-inner">
+        <div class="explore-nav-brand-section">
+          <span class="explore-brand">
+            <a href="../index/index.html" style="color: inherit; text-decoration: none">BrainRoot</a>
+          </span>
+          <div class="explore-nav-menu">
+            <a class="explore-nav-link" href="../index/index.html" data-auth="public">Home</a>
+            <a class="explore-nav-link explore-nav-link-active" href="../explore/explore.html" data-auth="public">Explore</a>
+            <a class="explore-nav-link" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+            <a class="explore-nav-link" href="../collections/collections.html" data-auth="private">Collections</a>
+          </div>
+        </div>
+
+        <div class="explore-nav-actions">
+          <div id="exploreSearchShell" class="explore-search-shell">
+            <img src="../Assets/search.png" alt="Search" class="explore-search-icon" />
+            <input
+              id="exploreSearchInput"
+              class="explore-search-input"
+              placeholder="Search the archive..."
+              type="text"
+            />
+            <div id="exploreSearchPanel" class="explore-search-panel hidden" aria-live="polite">
+              <div class="explore-search-panel-header">
+                <p class="explore-search-panel-title">Live Results</p>
+                <span id="exploreSearchCount" class="explore-search-panel-count">0 results</span>
+              </div>
+              <div id="exploreSearchResults" class="explore-search-results"></div>
+            </div>
+          </div>
+
+          <a
+            href="../login/login.html"
+            data-auth="login"
+            data-auth-login-slot="true"
+            class="explore-nav-link"
+            title="Login"
+          >Login</a>
+          <a
+            href="../profile/profile.html"
+            data-auth="profile"
+            class="explore-profile-icon"
+            title="Profile"
+            style="display: none"
+          >
+            <img src="../Assets/profile icon.png" alt="Profile" />
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="explore-main">
+      <section id="recommendedHeroSection" class="explore-hero-section">
+        <div class="explore-hero-container">
+          <div class="explore-hero-content">
+            <span class="explore-hero-kicker">Recommended for You</span>
+            <div class="explore-hero-badge-slot">
+              <span id="recommendedHeroAccessBadge" class="hidden"></span>
+            </div>
+            <h1 id="recommendedHeroTitle" class="explore-hero-title">Featured Book</h1>
+            <p id="recommendedHeroDescription" class="explore-hero-description">
+              A curated read from the archive. Book details will load from the current library selection.
+            </p>
+            <div class="explore-hero-actions">
+              <button id="recommendedHeroReserveBtn" class="explore-btn explore-btn-primary">
+                View Book
+              </button>
+              <button id="recommendedHeroBorrowBtn" class="explore-btn explore-btn-success">
+                Borrow
+              </button>
+              <button id="recommendedHeroDetailsBtn" class="explore-btn explore-btn-text">
+                Details <span>→</span>
+              </button>
+            </div>
+          </div>
+          <div class="explore-hero-image-container">
+            <img
+              id="recommendedHeroImage"
+              class="explore-hero-image"
+              data-alt="Featured book cover"
+              src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1200&q=80"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section class="explore-carousel-section carousel-section" data-carousel-name="Trending Books">
+        <div class="explore-section-header">
+          <div>
+            <h2 class="explore-section-title">Trending Books</h2>
+            <div class="explore-section-underline"></div>
+          </div>
+          <div class="explore-carousel-controls">
+            <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+            <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
+            <a class="explore-link" href="#">View All</a>
+          </div>
+        </div>
+        <div class="explore-carousel-container"></div>
+      </section>
+
+      <div class="explore-grid-2col">
+        <section class="explore-carousel-section carousel-section" data-carousel-name="Top Reading">
+          <div class="explore-section-header">
+            <h2 class="explore-section-title">Top Reading</h2>
+            <div class="explore-carousel-controls">
+              <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+              <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
+              <a class="explore-link" href="#">Full List</a>
+            </div>
+          </div>
+          <div class="explore-carousel-container"></div>
+        </section>
+
+        <section class="explore-carousel-section carousel-section" data-carousel-name="Most Liked">
+          <div class="explore-section-header">
+            <h2 class="explore-section-title">Most Liked</h2>
+            <div class="explore-carousel-controls">
+              <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+              <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
+              <a class="explore-link" href="#">Explore More</a>
+            </div>
+          </div>
+          <div class="explore-carousel-container"></div>
+        </section>
+      </div>
+
+      <section class="explore-collection-section">
+        <div class="explore-collection-header">
+          <div>
+            <h2 class="explore-collection-title">All Books Collection</h2>
+            <p class="explore-collection-subtitle">Browse our entire curated archive by metadata.</p>
+          </div>
+          <div class="explore-collection-controls">
+            <button class="explore-btn explore-btn-filter">Filter</button>
+            <button class="explore-btn explore-btn-filter">Sort by Date</button>
+          </div>
+        </div>
+        <div class="explore-collection-list"></div>
+        <div class="explore-collection-footer">
+          <button class="explore-link explore-link-large">Load More From Archive</button>
+        </div>
+      </section>
+    </main>
+
+    <div id="bookModal" class="explore-modal hidden">
+      <div class="explore-modal-content">
+        <div class="explore-modal-body">
+          <div class="explore-modal-image-section">
+            <img id="modalBookImage" class="explore-modal-image" src="" alt="book" />
+            <div class="explore-modal-archive-no">ARCHIVE NO. 842</div>
+          </div>
+
+          <div class="explore-modal-details">
+            <div class="explore-modal-header">
+              <div>
+                <div id="modalStatus" class="explore-badge explore-badge-primary">AVAILABLE</div>
+                <h2 id="modalBookTitle" class="explore-modal-title">Book Title</h2>
+                <p id="modalBookAuthor" class="explore-modal-author">Author Name</p>
+                <div class="explore-modal-rating">
+                  <p id="modalBookRatingSummary" class="explore-modal-rating-text">Book Rating: 0.0 (0 ratings)</p>
+                  <div id="modalUserRatingStars" class="explore-modal-stars" aria-label="Rate this book">
+                    <button type="button" class="explore-rating-star" data-rating-value="1" aria-label="Rate 1 star">★</button>
+                    <button type="button" class="explore-rating-star" data-rating-value="2" aria-label="Rate 2 stars">★</button>
+                    <button type="button" class="explore-rating-star" data-rating-value="3" aria-label="Rate 3 stars">★</button>
+                    <button type="button" class="explore-rating-star" data-rating-value="4" aria-label="Rate 4 stars">★</button>
+                    <button type="button" class="explore-rating-star" data-rating-value="5" aria-label="Rate 5 stars">★</button>
+                  </div>
+                  <p id="modalUserRatingText" class="explore-modal-user-rating">Your Rating: Not rated</p>
+                </div>
+              </div>
+              <button onclick="closeBookModal()" class="explore-modal-close">&times;</button>
+            </div>
+
+            <div class="explore-modal-about">
+              <h3 class="explore-modal-about-title">About This Book</h3>
+              <p id="modalBookDescription" class="explore-modal-about-text">Book description goes here</p>
+            </div>
+
+            <div class="explore-modal-meta">
+              <div class="explore-meta-item">
+                <p class="explore-meta-label">PUBLISHED</p>
+                <p class="explore-meta-value">2023</p>
+              </div>
+              <div class="explore-meta-item">
+                <p class="explore-meta-label">LANGUAGE</p>
+                <p class="explore-meta-value">English</p>
+              </div>
+              <div class="explore-meta-item">
+                <p class="explore-meta-label">FORMAT</p>
+                <p class="explore-meta-value">Hardcover</p>
+              </div>
+              <div class="explore-meta-item">
+                <p class="explore-meta-label">PAGES</p>
+                <p class="explore-meta-value">412</p>
+              </div>
+            </div>
+
+            <div class="explore-modal-actions">
+              <button id="borrowBtn" onclick="borrowBook()" class="explore-btn explore-btn-primary explore-btn-large">
+                Borrow Book
+              </button>
+              <button onclick="addToWishlist()" class="explore-btn explore-btn-outline explore-btn-large">
+                + Add to Wishlist
+              </button>
+              <p id="loginMessage" class="hidden explore-modal-error">Please login to borrow books</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="explore-footer">
+      <div class="explore-footer-inner">
+        <div class="explore-footer-brand">
+          <span class="explore-footer-brand-text">BrainRoot Architectural Library</span>
+          <p class="explore-footer-copyright">© 2024 BrainRoot Architectural Library</p>
+        </div>
+        <div class="explore-footer-links">
+          <a class="explore-footer-link" href="#">Privacy Policy</a>
+          <a class="explore-footer-link" href="#">Terms of Service</a>
+          <a class="explore-footer-link" href="#">Archive Rules</a>
+          <a class="explore-footer-link" href="#">Contact</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="../auth.js"></script>
+  </body>
+</html>

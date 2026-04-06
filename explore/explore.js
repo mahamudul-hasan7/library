@@ -650,7 +650,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     return;
   }
 
-  const scrollContainer = section.querySelector(".flex.overflow-x-auto");
+  const scrollContainer = section.querySelector(".explore-carousel-container");
   if (!scrollContainer) {
     return;
   }
@@ -663,7 +663,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     scrollContainer.innerHTML = "";
     books.forEach(function (book) {
       const card = document.createElement("div");
-      card.className = "flex-none w-64 group cursor-pointer hover-lift";
+      card.className = "flex-none w-52 group cursor-pointer hover-lift";
 
       card.innerHTML =
         '<div class="relative aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">' +
@@ -781,7 +781,7 @@ function setupCarouselNavigation() {
   carouselSections.forEach(function(section) {
     const prevBtn = section.querySelector(".carousel-prev-btn");
     const nextBtn = section.querySelector(".carousel-next-btn");
-    const scrollContainer = section.querySelector(".flex.overflow-x-auto");
+    const scrollContainer = section.querySelector(".explore-carousel-container");
     
     if (!prevBtn || !nextBtn || !scrollContainer) {
       return;
@@ -838,10 +838,10 @@ function syncAllBooksCollectionBadges() {
   }
 
   const collectionBooks = exploreBookLibrary.collection;
-  let rows = Array.from(section.querySelectorAll(".space-y-4 > div"));
+  let rows = Array.from(section.querySelectorAll(".explore-collection-list > div"));
 
   if (!rows.length) {
-    const listContainer = section.querySelector(".space-y-4");
+    const listContainer = section.querySelector(".explore-collection-list");
     if (!listContainer) {
       return;
     }
@@ -866,7 +866,7 @@ function syncAllBooksCollectionBadges() {
       listContainer.appendChild(row);
     });
 
-    rows = Array.from(section.querySelectorAll(".space-y-4 > div"));
+    rows = Array.from(section.querySelectorAll(".explore-collection-list > div"));
   }
 
   rows.forEach(function (row, index) {

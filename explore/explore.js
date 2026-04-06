@@ -650,7 +650,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     return;
   }
 
-  const scrollContainer = section.querySelector(".explore-carousel-container");
+  const scrollContainer = section.querySelector(".flex.overflow-x-auto");
   if (!scrollContainer) {
     return;
   }
@@ -663,7 +663,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     scrollContainer.innerHTML = "";
     books.forEach(function (book) {
       const card = document.createElement("div");
-      card.className = "flex-none w-52 group cursor-pointer hover-lift";
+      card.className = "flex-none w-64 group cursor-pointer hover-lift";
 
       card.innerHTML =
         '<div class="relative aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">' +
@@ -777,48 +777,59 @@ function syncExploreBookLibrary() {
 
 function setupCarouselNavigation() {
   const carouselSections = document.querySelectorAll(".carousel-section");
-  
+
   carouselSections.forEach(function(section) {
     const prevBtn = section.querySelector(".carousel-prev-btn");
     const nextBtn = section.querySelector(".carousel-next-btn");
-    const scrollContainer = section.querySelector(".explore-carousel-container");
-    
+    const scrollContainer = section.querySelector(".flex.overflow-x-auto");
+
     if (!prevBtn || !nextBtn || !scrollContainer) {
       return;
     }
-    
+
+    if (section.dataset.carouselBound === "true") {
+      return;
+    }
+    section.dataset.carouselBound = "true";
+
+    function getScrollStep() {
+      const firstCard = scrollContainer.querySelector(".flex-none");
+      const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 220;
+      const styles = window.getComputedStyle(scrollContainer);
+      const gapValue = parseFloat(styles.columnGap || styles.gap || "0") || 0;
+      return Math.max(160, Math.round(cardWidth + gapValue));
+    }
+
     function updateButtonStates() {
       const scrollLeft = scrollContainer.scrollLeft;
       const scrollWidth = scrollContainer.scrollWidth;
       const clientWidth = scrollContainer.clientWidth;
-      
+
       prevBtn.disabled = scrollLeft <= 0;
       nextBtn.disabled = scrollLeft >= scrollWidth - clientWidth - 10;
     }
-    
+
     prevBtn.addEventListener("click", function() {
-      const cardWidth = 220;
-      const gap = 32;
+      const step = getScrollStep();
       scrollContainer.scrollBy({
-        left: -(cardWidth + gap),
+        left: -step,
         behavior: "smooth"
       });
       setTimeout(updateButtonStates, 300);
     });
-    
+
     nextBtn.addEventListener("click", function() {
-      const cardWidth = 220;
-      const gap = 32;
+      const step = getScrollStep();
       scrollContainer.scrollBy({
-        left: cardWidth + gap,
+        left: step,
         behavior: "smooth"
       });
       setTimeout(updateButtonStates, 300);
     });
-    
+
     scrollContainer.addEventListener("scroll", updateButtonStates);
     window.addEventListener("resize", updateButtonStates);
-    
+
     setTimeout(updateButtonStates, 100);
   });
 }
@@ -838,10 +849,10 @@ function syncAllBooksCollectionBadges() {
   }
 
   const collectionBooks = exploreBookLibrary.collection;
-  let rows = Array.from(section.querySelectorAll(".explore-collection-list > div"));
+  let rows = Array.from(section.querySelectorAll(".space-y-4 > div"));
 
   if (!rows.length) {
-    const listContainer = section.querySelector(".explore-collection-list");
+    const listContainer = section.querySelector(".space-y-4");
     if (!listContainer) {
       return;
     }
@@ -866,7 +877,7 @@ function syncAllBooksCollectionBadges() {
       listContainer.appendChild(row);
     });
 
-    rows = Array.from(section.querySelectorAll(".explore-collection-list > div"));
+    rows = Array.from(section.querySelectorAll(".space-y-4 > div"));
   }
 
   rows.forEach(function (row, index) {
@@ -1016,13 +1027,32 @@ function getExploreCatalogByTitle() {
 function buildFallbackRecommendedBook(title) {
   const cleanedTitle = String(title || "").trim();
   const category = exploreBookCategories[cleanedTitle] || "General";
+  const computedImage = getRelatableCoverImage(category, cleanedTitle || "Untitled Book");
 
   return {
     title: cleanedTitle || "Untitled Book",
     author: "Unknown Author",
     description: "A curated book from your collection in " + category + ".",
     status: "Available",
-    imageUrl: RECOMMENDED_FALLBACK_IMAGE
+    imageUrl: computedImage || RECOMMENDED_FALLBACK_IMAGE
+  };
+}
+
+function getNormalizedRecommendedBook(book) {
+  if (!book || typeof book !== "object") {
+    return buildFallbackRecommendedBook("Untitled Book");
+  }
+
+  const normalizedTitle = String(book.title || "Untitled Book").trim();
+  const category = getBookCategory(normalizedTitle);
+  const resolvedImage = String(book.imageUrl || "").trim();
+
+  return {
+    title: normalizedTitle,
+    author: String(book.author || "Unknown Author"),
+    description: String(book.description || ("A curated book from your collection in " + category + ".")),
+    status: String(book.status || "Available"),
+    imageUrl: resolvedImage || getRelatableCoverImage(category, normalizedTitle) || RECOMMENDED_FALLBACK_IMAGE
   };
 }
 
@@ -1157,7 +1187,8 @@ function getDefaultRecommendedBooks() {
 
 function refreshRecommendedHeroFromCollections() {
   const recommended = getRecommendedBooksFromCollections();
-  recommendedHeroItems = recommended.length ? recommended : getDefaultRecommendedBooks();
+  const sourceItems = recommended.length ? recommended : getDefaultRecommendedBooks();
+  recommendedHeroItems = sourceItems.map(getNormalizedRecommendedBook);
   recommendedHeroIndex = 0;
   setRecommendedHeroVisibility(true);
   renderRecommendedHero(recommendedHeroItems[recommendedHeroIndex]);

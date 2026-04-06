@@ -7,11 +7,6 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="./explore.css" rel="stylesheet" />
     <script src="./explore.js"></script>
-    <style>
-      body, html, * {
-        font-family: Segoe UI, Arial, sans-serif !important;
-      }
-    </style>
   </head>
   <body class="bg-surface text-on-surface antialiased">
     <nav class="top-nav fixed top-0 w-full z-50 backdrop-blur-md border-b border-outline-variant/15">
@@ -121,8 +116,8 @@
             <div class="h-1 w-12 bg-primary mt-2"></div>
           </div>
           <div class="flex items-center gap-4">
-            <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
-            <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
+            <button type="button" class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+            <button type="button" class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
             <a class="text-sm font-medium text-primary hover:underline" href="#">View All</a>
           </div>
         </div>
@@ -134,8 +129,8 @@
           <div class="flex justify-between items-end mb-8">
             <h2 class="text-xl font-semibold tracking-tight">Top Reading</h2>
             <div class="flex items-center gap-4">
-              <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
-              <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
+              <button type="button" class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+              <button type="button" class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
               <a class="text-sm font-medium text-primary hover:underline" href="#">Full List</a>
             </div>
           </div>
@@ -146,8 +141,8 @@
           <div class="flex justify-between items-end mb-8">
             <h2 class="text-xl font-semibold tracking-tight">Most Liked</h2>
             <div class="flex items-center gap-4">
-              <button class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
-              <button class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
+              <button type="button" class="carousel-nav-btn carousel-prev-btn" aria-label="Previous">←</button>
+              <button type="button" class="carousel-nav-btn carousel-next-btn" aria-label="Next">→</button>
               <a class="text-sm font-medium text-primary hover:underline" href="#">Explore More</a>
             </div>
           </div>
@@ -260,7 +255,7 @@
       <div class="flex flex-col md:flex-row justify-between items-center px-12 w-full max-w-[1440px] mx-auto">
         <div class="mb-8 md:mb-0">
           <span class="footer-brand text-sm font-bold">BrainRoot Architectural Library</span>
-          <p class="footer-copy text-[0.75rem] font-semibold uppercase tracking-widest mt-2">&copy; 2026 BrainRoot Architectural Library</p>
+          <p class="footer-copy text-[0.75rem] font-semibold uppercase tracking-widest mt-2">© 2026 BrainRoot Architectural Library</p>
         </div>
         <div class="flex gap-8 items-center text-[0.75rem] font-semibold uppercase tracking-widest">
           <a class="footer-link" href="#">Privacy Policy</a>

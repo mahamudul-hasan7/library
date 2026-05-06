@@ -1,12 +1,10 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const storage = window.brainrootStorage;
+document.addEventListener("DOMContentLoaded", async function () {
+  const api = window.brainrootAPI;
   if (!window.brainrootAuth || !window.brainrootAuth.requireLogin("Please login to access your wishlist.")) {
     return;
   }
 
-  const collectionsKey = "brainrootCollections";
   const wishlistContainer = document.querySelector(".wish-list");
-  const wishlistKey = "brainrootWishlist";
   const wishlistItems = readWishlistItems();
   let feedbackTimer = null;
 
@@ -41,12 +39,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function readWishlistItems() {
-    const parsed = storage.readJson(wishlistKey, []);
-    return Array.isArray(parsed) ? parsed : [];
+    // Now handled by API - this is deprecated
+    return [];
   }
 
   function saveWishlistItems(items) {
-    storage.writeJson(wishlistKey, items);
+    // Now handled by API - this is deprecated
   }
 
   function findWishlistItemIndex(items, title) {
@@ -199,13 +197,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }, typeof duration === "number" ? duration : 1200);
   }
 
-  function removeFromWishlistStorage(bookTitle) {
-    const updatedWishlist = readWishlistItems();
-    const idx = findWishlistItemIndex(updatedWishlist, bookTitle);
-    if (idx > -1) {
-      updatedWishlist.splice(idx, 1);
-      saveWishlistItems(updatedWishlist);
-    }
+  async function removeFromWishlistStorage(bookTitle) {
+    await api.removeFromWishlist(bookTitle);
   }
 
   function renderEmptyWishlist() {
@@ -225,13 +218,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function getCollections() {
-    const parsed = storage.readJson(collectionsKey, []);
-    return Array.isArray(parsed) ? parsed : [];
+  async function getCollections() {
+    return await api.getCollections();
   }
 
-  function saveCollections(items) {
-    storage.writeJson(collectionsKey, items);
+  async function saveCollections(items) {
+    // Collections now managed by API
   }
 
   function getCollectionTitle(item) {
@@ -317,141 +309,136 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   
-  wishlistContainer.replaceChildren();
-
-  if (wishlistItems.length === 0) {
-    renderEmptyWishlist();
-    return;
-  }
-
-  
-  const defaultBooks = {
-    "Concrete Poetry": { image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=320&q=80", category: "Theory", year: "2023", author: "Tadao Ando" },
-    "The Kite Runner": { image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=320&q=80", category: "Drama", year: "2003", author: "Khaled Hosseini" },
-    "Atomic Habits": { image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=320&q=80", category: "Motivational", year: "2018", author: "James Clear" },
-    "The Silent Patient": { image: "https://images.unsplash.com/photo-1474932430478-367dbb6832c1?auto=format&fit=crop&w=320&q=80", category: "Mystery", year: "2019", author: "Alex Michaelides" },
-    "Educated": { image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=320&q=80", category: "Educational", year: "2018", author: "Tara Westover" },
-    "Why We Sleep": { image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=320&q=80", category: "Health", year: "2017", author: "Matthew Walker" },
-    "Dune": { image: "https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=320&q=80", category: "Sci-Fi", year: "1965", author: "Frank Herbert" }
-  };
-
-  const behaviorCatalog = getBehaviorCatalog();
-
-  wishlistItems.forEach((item, index) => {
-    const bookTitle = getWishlistItemTitle(item);
-    if (!bookTitle) {
+  async function renderWishlist() {
+    wishlistContainer.replaceChildren();
+    const wishlistItems = await api.getWishlist();
+    
+    if (!wishlistItems || wishlistItems.length === 0) {
+      renderEmptyWishlist();
       return;
     }
 
-    const storedData = item && typeof item === "object" ? item : {};
-    const behaviorData = behaviorCatalog[normalizeTitleKey(bookTitle)] || {};
-    const defaultData = defaultBooks[bookTitle] || {};
-    const bookData = {
-      image: storedData.image || defaultData.image || getFallbackCoverImage(bookTitle),
-      category: storedData.category || behaviorData.category || defaultData.category || "General",
-      year: storedData.year || defaultData.year || "2023",
-      author: storedData.author || behaviorData.author || defaultData.author || "Unknown Author"
+    const collections = await getCollections();
+    const defaultBooks = {
+      "Concrete Poetry": { image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=320&q=80", category: "Theory", year: "2023", author: "Tadao Ando" },
+      "The Kite Runner": { image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=320&q=80", category: "Drama", year: "2003", author: "Khaled Hosseini" },
+      "Atomic Habits": { image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=320&q=80", category: "Motivational", year: "2018", author: "James Clear" },
+      "Dune": { image: "https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=320&q=80", category: "Sci-Fi", year: "1965", author: "Frank Herbert" }
     };
-    
-    const article = document.createElement("article");
-    const indexNode = document.createElement("b");
-    indexNode.textContent = String(index + 1).padStart(2, "0");
-    const image = document.createElement("img");
-    image.src = bookData.image;
-    image.alt = bookTitle;
-    const copy = document.createElement("div");
-    const meta = document.createElement("small");
-    meta.textContent = bookData.category + " · " + bookData.year;
-    const title = document.createElement("h3");
-    title.textContent = bookTitle;
-    const author = document.createElement("p");
-    author.textContent = bookData.author;
-    const addLink = document.createElement("a");
-    addLink.href = "#";
-    addLink.className = "add-btn";
-    addLink.textContent = "Add to Collection";
-    const removeLink = document.createElement("a");
-    removeLink.href = "#";
-    removeLink.className = "remove-btn";
-    removeLink.textContent = "Remove";
 
-    copy.appendChild(meta);
-    copy.appendChild(title);
-    copy.appendChild(author);
-    copy.appendChild(addLink);
-    copy.appendChild(document.createTextNode(" "));
-    copy.appendChild(removeLink);
-    article.appendChild(indexNode);
-    article.appendChild(image);
-    article.appendChild(copy);
-    
-    const removeBtn = article.querySelector(".remove-btn");
-    removeBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      removeFromWishlistStorage(bookTitle);
+    wishlistItems.forEach((item, index) => {
+      const bookTitle = getWishlistItemTitle(item);
+      if (!bookTitle) return;
 
-      article.classList.add("is-removing");
-      setTimeout(function () {
-        article.remove();
-        showEmptyWishlistIfNeeded();
-      }, 220);
+      const storedData = item && typeof item === "object" ? item : {};
+      const defaultData = defaultBooks[bookTitle] || {};
+      const bookData = {
+        image: storedData.image || defaultData.image || getFallbackCoverImage(bookTitle),
+        category: storedData.category || defaultData.category || "General",
+        year: storedData.year || defaultData.year || "2023",
+        author: storedData.author || defaultData.author || "Unknown Author"
+      };
+      
+      const article = document.createElement("article");
+      const indexNode = document.createElement("b");
+      indexNode.textContent = String(index + 1).padStart(2, "0");
+      const image = document.createElement("img");
+      image.src = bookData.image;
+      image.alt = bookTitle;
+      const copy = document.createElement("div");
+      const meta = document.createElement("small");
+      meta.textContent = bookData.category + " · " + bookData.year;
+      const title = document.createElement("h3");
+      title.textContent = bookTitle;
+      const author = document.createElement("p");
+      author.textContent = bookData.author;
+      const addLink = document.createElement("a");
+      addLink.href = "#";
+      addLink.className = "add-btn";
+      addLink.textContent = "Add to Collection";
+      const removeLink = document.createElement("a");
+      removeLink.href = "#";
+      removeLink.className = "remove-btn";
+      removeLink.textContent = "Remove";
 
-      showFeedback(`Removed "${bookTitle}" from wishlist.`);
-    });
-
-    const addBtn = article.querySelector(".add-btn");
-    if (addBtn) {
-      const paidLocked = getBookAccess(bookTitle) === "paid" && !isPaidSubscriber();
-      setAddedState(addBtn, isBookAlreadyInCollections(getCollections(), bookTitle), paidLocked);
-
-      addBtn.addEventListener("click", function (e) {
+      copy.appendChild(meta);
+      copy.appendChild(title);
+      copy.appendChild(author);
+      copy.appendChild(addLink);
+      copy.appendChild(document.createTextNode(" "));
+      copy.appendChild(removeLink);
+      article.appendChild(indexNode);
+      article.appendChild(image);
+      article.appendChild(copy);
+      
+      const removeBtn = article.querySelector(".remove-btn");
+      removeBtn.addEventListener("click", async function (e) {
         e.preventDefault();
-
-        if (getBookAccess(bookTitle) === "paid" && !isPaidSubscriber()) {
-          showFeedback("This is a paid book. Upgrade your plan in Profile first.");
-          return;
-        }
-
-        if (!window.brainrootAuth.requireLogin("Please login to add books to collections.")) {
-          return;
-        }
-
-        const collections = getCollections();
-        const limit = getCollectionLimit();
-        if (Number.isFinite(limit) && collections.length >= limit) {
-          showFeedback("Collection limit reached for " + getPlanDisplayName(getPlanType()) + " plan (" + limit + " books). Upgrade plan from Profile.");
-          return;
-        }
-
-        if (!isBookAlreadyInCollections(collections, bookTitle)) {
-          collections.push({
-            title: bookTitle,
-            author: bookData.author,
-            category: bookData.category,
-            image: bookData.image,
-            access: getBookAccess(bookTitle)
-          });
-          saveCollections(collections);
-        }
-
-        removeFromWishlistStorage(bookTitle);
+        await removeFromWishlistStorage(bookTitle);
         article.classList.add("is-removing");
-
         setTimeout(function () {
           article.remove();
           showEmptyWishlistIfNeeded();
         }, 220);
-
-        const displayTitle = getDisplayBookTitle(bookTitle);
-        showFeedback(`Great choice. "${displayTitle}" is now in your collection. Open Collections to continue reading.`, {
-          showGoToCollection: true,
-          duration: 5000
-        });
+        showFeedback(`Removed "${bookTitle}" from wishlist.`);
       });
-    }
 
-    wishlistContainer.appendChild(article);
-  });
+      const addBtn = article.querySelector(".add-btn");
+      if (addBtn) {
+        const paidLocked = getBookAccess(bookTitle) === "paid" && !isPaidSubscriber();
+        setAddedState(addBtn, isBookAlreadyInCollections(collections, bookTitle), paidLocked);
+
+        addBtn.addEventListener("click", async function (e) {
+          e.preventDefault();
+
+          if (getBookAccess(bookTitle) === "paid" && !isPaidSubscriber()) {
+            showFeedback("This is a paid book. Upgrade your plan in Profile first.");
+            return;
+          }
+
+          if (!window.brainrootAuth.requireLogin("Please login to add books to collections.")) {
+            return;
+          }
+
+          const currentCollections = await getCollections();
+          const limit = getCollectionLimit();
+          if (Number.isFinite(limit) && currentCollections.length >= limit) {
+            showFeedback("Collection limit reached. Upgrade plan from Profile.");
+            return;
+          }
+
+          if (!isBookAlreadyInCollections(currentCollections, bookTitle)) {
+            await api.addToCollection({
+              title: bookTitle,
+              author: bookData.author,
+              category: bookData.category,
+              image: bookData.image,
+              access: getBookAccess(bookTitle)
+            });
+          }
+
+          await removeFromWishlistStorage(bookTitle);
+          article.classList.add("is-removing");
+
+          setTimeout(function () {
+            article.remove();
+            showEmptyWishlistIfNeeded();
+          }, 220);
+
+          const displayTitle = getDisplayBookTitle(bookTitle);
+          showFeedback(`Added "${displayTitle}" to collection.`, {
+            showGoToCollection: true,
+            duration: 5000
+          });
+        });
+      }
+
+      wishlistContainer.appendChild(article);
+    });
+  }
+
+  // Initial render
+  await renderWishlist();
 });
 
 

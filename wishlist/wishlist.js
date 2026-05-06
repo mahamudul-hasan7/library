@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   const wishlistContainer = document.querySelector(".wish-list");
-  const wishlistItems = readWishlistItems();
   let feedbackTimer = null;
 
   function normalizeTitleKey(value) {
@@ -16,42 +15,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (typeof item === "string") {
       return item.trim();
     }
-
     if (item && typeof item === "object") {
       return String(item.title || "").trim();
     }
-
     return "";
   }
 
   function getDisplayBookTitle(title) {
     const cleaned = String(title || "").trim();
-    if (!cleaned) {
-      return "Selected book";
-    }
-
-    const normalized = cleaned.toLowerCase();
-    if (normalized === "any book" || normalized === "book") {
-      return "Selected book";
-    }
-
-    return cleaned;
-  }
-
-  function readWishlistItems() {
-    // Now handled by API - this is deprecated
-    return [];
-  }
-
-  function saveWishlistItems(items) {
-    // Now handled by API - this is deprecated
-  }
-
-  function findWishlistItemIndex(items, title) {
-    const key = normalizeTitleKey(title);
-    return items.findIndex(function (entry) {
-      return normalizeTitleKey(getWishlistItemTitle(entry)) === key;
-    });
+    return cleaned || "Selected book";
   }
 
   function hashTitle(value) {
@@ -68,33 +40,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       "https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=320&q=80",
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=320&q=80"
     ];
-
     return fallbackCovers[hashTitle(title) % fallbackCovers.length];
-  }
-
-  function getBehaviorCatalog() {
-    if (!window.brainrootLibraryBehavior || typeof window.brainrootLibraryBehavior.getBookBehavior !== "function") {
-      return Object.create(null);
-    }
-
-    const behavior = window.brainrootLibraryBehavior.getBookBehavior();
-    const views = behavior && Array.isArray(behavior.views) ? behavior.views : [];
-    const catalog = Object.create(null);
-
-    views.forEach(function (view) {
-      const title = String(view && view.title || "").trim();
-      const key = normalizeTitleKey(title);
-      if (!key) {
-        return;
-      }
-
-      catalog[key] = {
-        author: String(view.author || "").trim(),
-        category: String(view.category || "").trim()
-      };
-    });
-
-    return catalog;
   }
 
   function showFeedback(message, options) {
@@ -150,11 +96,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     feedback.classList.add("show");
-
-    if (feedbackTimer) {
-      clearTimeout(feedbackTimer);
-    }
-
+    if (feedbackTimer) clearTimeout(feedbackTimer);
     feedbackTimer = setTimeout(function () {
       feedback.classList.remove("show");
     }, typeof config.duration === "number" ? config.duration : 5000);
@@ -184,16 +126,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     const textNode = document.getElementById("wishlistLoadingText");
-    if (textNode) {
-      textNode.textContent = message || "Loading...";
-    }
-
+    if (textNode) textNode.textContent = message || "Loading...";
     overlay.classList.add("show");
+
     setTimeout(function () {
       overlay.classList.remove("show");
-      if (typeof onDone === "function") {
-        onDone();
-      }
+      if (typeof onDone === "function") onDone();
     }, typeof duration === "number" ? duration : 1200);
   }
 
@@ -222,19 +160,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     return await api.getCollections();
   }
 
-  async function saveCollections(items) {
-    // Collections now managed by API
-  }
-
   function getCollectionTitle(item) {
     if (typeof item === "string") {
       return item;
     }
-
     if (item && typeof item === "object") {
       return item.title;
     }
-
     return "";
   }
 
@@ -249,7 +181,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (window.brainrootAuth && typeof window.brainrootAuth.getCollectionLimit === "function") {
       return window.brainrootAuth.getCollectionLimit();
     }
-
     return 8;
   }
 
@@ -257,21 +188,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (window.brainrootAuth && typeof window.brainrootAuth.getPlanType === "function") {
       return window.brainrootAuth.getPlanType();
     }
-
     return "free";
   }
 
   function getPlanDisplayName(type) {
     const normalized = String(type || "free").toLowerCase();
-    if (normalized === "basic") {
-      return "Basic";
-    }
-    if (normalized === "standard") {
-      return "Standard";
-    }
-    if (normalized === "premium") {
-      return "Premium";
-    }
+    if (normalized === "basic") return "Basic";
+    if (normalized === "standard") return "Standard";
+    if (normalized === "premium") return "Premium";
     return "Free";
   }
 
@@ -279,7 +203,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (window.brainrootAuth && typeof window.brainrootAuth.isPaidSubscriber === "function") {
       return window.brainrootAuth.isPaidSubscriber();
     }
-
     return false;
   }
 
@@ -287,32 +210,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (window.brainrootAuth && typeof window.brainrootAuth.getBookAccess === "function") {
       return window.brainrootAuth.getBookAccess(title);
     }
-
     return "free";
   }
 
   function setAddedState(button, isAdded, isLocked) {
-    if (!button) {
-      return;
-    }
-
+    if (!button) return;
     if (isLocked) {
       button.textContent = "Subscription Required";
       button.classList.add("wishlist-action-locked");
       button.classList.remove("wishlist-action-added");
       return;
     }
-
     button.textContent = isAdded ? "Added" : "Add to Collection";
     button.classList.toggle("wishlist-action-added", isAdded);
     button.classList.remove("wishlist-action-locked");
   }
 
-  
   async function renderWishlist() {
     wishlistContainer.replaceChildren();
     const wishlistItems = await api.getWishlist();
-    
+
     if (!wishlistItems || wishlistItems.length === 0) {
       renderEmptyWishlist();
       return;
@@ -338,7 +255,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         year: storedData.year || defaultData.year || "2023",
         author: storedData.author || defaultData.author || "Unknown Author"
       };
-      
+
       const article = document.createElement("article");
       const indexNode = document.createElement("b");
       indexNode.textContent = String(index + 1).padStart(2, "0");
@@ -370,7 +287,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       article.appendChild(indexNode);
       article.appendChild(image);
       article.appendChild(copy);
-      
+
       const removeBtn = article.querySelector(".remove-btn");
       removeBtn.addEventListener("click", async function (e) {
         e.preventDefault();
@@ -440,5 +357,3 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Initial render
   await renderWishlist();
 });
-
-

@@ -1,44 +1,38 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrainRoot</title>
   <link rel="stylesheet" href="./index.css">
 </head>
+
 <body>
-  <!-- HEADER/NAVIGATION SECTION -->
-  <!-- This is the top bar visible on every page -->
   <header class="topbar">
-    <!-- Brand/Logo that links to homepage -->
-    <div class="brand"><a href="../index/index.html" style="color: inherit; text-decoration: none;">BrainRoot</a></div>
-    <!-- Navigation menu - same on all pages for consistency -->
+    <div class="brand"><a href="../index/index.html">BrainRoot</a></div>
     <nav>
-      <a class="active" href="../index/index.html" data-auth="public">Home</a> <!-- active = this page -->
+      <a class="active" href="../index/index.html" data-auth="public">Home</a>
       <a href="../explore/explore.html" data-auth="public">Explore</a>
       <a href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
       <a href="../collections/collections.html" data-auth="private">Collections</a>
-      <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
-      <a href="../profile/profile.html" data-auth="profile" class="profile-icon" style="display: none;" title="Profile">
+      <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="login-link"
+        title="Login">Login</a>
+      <a href="../profile/profile.html" data-auth="profile" class="profile-icon auth-profile-link" title="Profile">
         <img src="../Assets/profile icon.png" alt="Profile">
       </a>
     </nav>
   </header>
 
-  <!-- MAIN CONTENT SECTION -->
   <main class="container">
-    <!-- HERO SECTION: Large welcome area with search and categories -->
     <section class="hero">
       <h1>Search the architectural archive.</h1>
-      <!-- Search box with icon and input field -->
       <div class="search-box">
-        <span class="icon">&#128269;</span> <!-- Magnifying glass emoji -->
+        <span class="icon">&#128269;</span>
         <input type="text" placeholder="Title, author, or subject matter...">
       </div>
-      <!-- Category discovery section -->
       <p class="discover">OR DISCOVER BY CATEGORY</p>
       <div class="chips">
-        <!-- Category buttons - styled to look like "chips" -->
         <button>HISTORY</button>
         <button>PHILOSOPHY</button>
         <button>SCIENCE</button>
@@ -46,37 +40,128 @@
       </div>
     </section>
 
-    <!-- FEATURED BOOKS SECTION: Displays curated books in a grid -->
     <section class="featured">
-      <!-- Header for this section with title and browse link -->
       <div class="section-top">
         <div>
-          <p class="label">CURATION</p> <!-- Small label above title -->
+          <p class="label">CURATION</p>
           <h2>Featured Books</h2>
         </div>
-        <a class="browse" href="../explore/explore.html">Browse Books</a> <!-- CTA button -->
+        <a class="browse" href="../explore/explore.html">Browse Books</a>
       </div>
 
-      <!-- Grid layout: 3 columns on desktop, 1 on mobile (see CSS) -->
       <div class="grid">
-        <!-- Each book is an <article> tag (semantic HTML) with image, category, title, author -->
-        <article class="book"><img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge free">FREE</span><p class="cat">ARCHITECTURE</p><h3>The Form of Space</h3><p class="author">Elena Rossi</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1449844908441-8829872d2607?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge paid">PAID</span><p class="cat">SOCIOLOGY</p><h3>Urban Rhythms</h3><p class="author">Marcus Thorne</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1470114716159-e389f8712fda?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge free">FREE</span><p class="cat">PHILOSOPHY</p><h3>The Digital Archive</h3><p class="author">Sarah Chen</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge paid">PAID</span><p class="cat">HISTORY</p><h3>Lost Collections</h3><p class="author">Julian Vane</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge paid">PAID</span><p class="cat">DESIGN</p><h3>Minimalist Logic</h3><p class="author">Dieter Klein</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge free">FREE</span><p class="cat">TECHNOLOGY</p><h3>Future Structures</h3><p class="author">Amara Okafor</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge free">FREE</span><p class="cat">LANDSCAPE</p><h3>Green Horizons</h3><p class="author">Victoria Park</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge paid">PAID</span><p class="cat">URBAN PLANNING</p><h3>Cities in Motion</h3><p class="author">Robert Chen</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge free">FREE</span><p class="cat">SUSTAINABILITY</p><h3>Building Tomorrow</h3><p class="author">Lisa Anderson</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1452587925148-ce544e77e70d?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge paid">PAID</span><p class="cat">MATERIALS</p><h3>Structure & Form</h3><p class="author">David Wright</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1561837583165-bc64eb266fe0?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge free">FREE</span><p class="cat">DIGITAL ART</p><h3>Virtual Spaces</h3><p class="author">Maya Patel</p></article>
-        <article class="book"><img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=80" alt="book"><span class="badge paid">PAID</span><p class="cat">HERITAGE</p><h3>Preservation Arts</h3><p class="author">James Mitchell</p></article>
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge free">FREE</span>
+          <p class="cat">PROGRAMMING</p>
+          <h3>Clean Code</h3>
+          <p class="author">Robert C. Martin</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge paid">PAID</span>
+          <p class="cat">SELF DEVELOPMENT</p>
+          <h3>Atomic Habits</h3>
+          <p class="author">James Clear</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge free">FREE</span>
+          <p class="cat">HISTORY</p>
+          <h3>Sapiens</h3>
+          <p class="author">Yuval Noah Harari</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge paid">PAID</span>
+          <p class="cat">NURSING</p>
+          <h3>Fundamentals of Nursing</h3>
+          <p class="author">Patricia Potter</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge free">FREE</span>
+          <p class="cat">PRODUCTIVITY</p>
+          <h3>Deep Work</h3>
+          <p class="author">Cal Newport</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge paid">PAID</span>
+          <p class="cat">TECHNOLOGY</p>
+          <h3>Python Crash Course</h3>
+          <p class="author">Eric Matthes</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge free">FREE</span>
+          <p class="cat">SCIENCE</p>
+          <h3>A Brief History of Time</h3>
+          <p class="author">Stephen Hawking</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge paid">PAID</span>
+          <p class="cat">FINANCE</p>
+          <h3>The Psychology of Money</h3>
+          <p class="author">Morgan Housel</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge free">FREE</span>
+          <p class="cat">MEDICAL</p>
+          <h3>Anatomy & Physiology</h3>
+          <p class="author">Elaine Marieb</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge paid">PAID</span>
+          <p class="cat">ARCHITECTURE</p>
+          <h3>The Architecture of Happiness</h3>
+          <p class="author">Alain de Botton</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge free">FREE</span>
+          <p class="cat">BUSINESS</p>
+          <h3>Rich Dad Poor Dad</h3>
+          <p class="author">Robert Kiyosaki</p>
+        </article>
+
+        <article class="book">
+          <img src="https://images.unsplash.com/photo-1519791883288-dc8bd696e667?auto=format&fit=crop&w=600&q=80"
+            alt="book">
+          <span class="badge paid">PAID</span>
+          <p class="cat">FICTION</p>
+          <h3>Dune</h3>
+          <p class="author">Frank Herbert</p>
+        </article>
       </div>
+
     </section>
   </main>
 
-  <!-- BOOK DETAILS MODAL -->
   <div id="bookModal" class="book-modal hidden">
     <div class="modal-backdrop"></div>
     <div class="modal-content">
@@ -85,12 +170,13 @@
         <img id="modalBookImage" src="" alt="book" class="modal-image">
         <div class="modal-info">
           <p id="modalBookCategory" class="modal-category">CATEGORY</p>
-          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-            <h2 id="modalBookTitle" style="margin: 0;">Book Title</h2>
+          <div class="modal-title-row">
+            <h2 id="modalBookTitle" class="modal-title-heading">Book Title</h2>
             <span id="modalAccessBadge" class="access-badge">FREE</span>
           </div>
           <p id="modalBookAuthor" class="modal-author">Author Name</p>
-          <p id="modalBookDesc" class="modal-description">A curated architectural work exploring modern design principles and spatial innovation.</p>
+          <p id="modalBookDesc" class="modal-description">A curated architectural work exploring modern design
+            principles and spatial innovation.</p>
           <p id="modalAccessNote" class="modal-access-note hidden" aria-live="polite"></p>
           <div class="modal-actions">
             <button id="addToCollectionBtn" class="btn-primary">Add to Collection</button>
@@ -102,9 +188,7 @@
     </div>
   </div>
 
-  <!-- STATISTICS SECTION: Shows key metrics about the library -->
   <section class="stats">
-    <!-- Each stat item displays a metric with description and explanation -->
     <div>
       <h4>12.4k</h4>
       <p>DIGITAL VOLUMES</p>
@@ -122,19 +206,20 @@
     </div>
   </section>
 
-  <!-- FOOTER SECTION: Same on all pages for consistency -->
   <footer class="footer">
     <strong>BrainRoot</strong>
     <p>&copy; 2026 BrainRoot. The Architectural Librarian.</p>
-    <!-- Footer navigation links -->
     <div class="links">
       <a href="../login/login.html">Sign In</a>
-      <a href="../register/register.html">Create Account</a>
+      <a href="../register/register.html">Sign Up</a>
       <a href="../collections/collections.html">Collections</a>
     </div>
   </footer>
-  <!-- JavaScript file for interactivity (currently minimal) -->
+  <script src="../storage.js"></script>
   <script src="../auth.js"></script>
   <script src="./index.js"></script>
 </body>
+
 </html>
+
+

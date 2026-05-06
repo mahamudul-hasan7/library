@@ -1,4 +1,4 @@
-/* Global Styles */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -15,7 +15,6 @@ body {
   display: none !important;
 }
 
-/* Collections Navigation */
 .collections-nav {
   position: fixed;
   top: 0;
@@ -111,6 +110,14 @@ body {
   cursor: pointer;
 }
 
+.collections-profile-icon.auth-profile-link {
+  display: none;
+}
+
+.is-auth-hidden {
+  display: none !important;
+}
+
 .collections-profile-icon img {
   width: 100%;
   height: 100%;
@@ -119,7 +126,6 @@ body {
   opacity: 0.82;
 }
 
-/* Main Layout */
 .collections-main {
   max-width: 1280px;
   margin: 0 auto;
@@ -144,7 +150,6 @@ body {
   top: 128px;
 }
 
-/* Headers */
 .collections-header {
   margin-bottom: 48px;
 }
@@ -187,7 +192,6 @@ body {
   margin: 0;
 }
 
-/* Collections List */
 .collections-list {
   display: flex;
   flex-direction: column;
@@ -204,7 +208,6 @@ body {
   line-height: 1.6;
 }
 
-/* Collection Card */
 .collection-card {
   display: flex;
   gap: 16px;
@@ -289,6 +292,59 @@ body {
   background: #005faf;
 }
 
+.progress-width-10 span { width: 10%; }
+.progress-width-20 span { width: 20%; }
+.progress-width-30 span { width: 30%; }
+.progress-width-40 span { width: 40%; }
+.progress-width-50 span { width: 50%; }
+.progress-width-60 span { width: 60%; }
+.progress-width-70 span { width: 70%; }
+.progress-width-80 span { width: 80%; }
+.progress-width-90 span { width: 90%; }
+.progress-width-100 span { width: 100%; }
+
+.collections-loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  z-index: 95;
+  background: rgba(12, 15, 15, 0.34);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.collections-loading-overlay.show {
+  display: grid;
+}
+
+.loading-card {
+  min-width: 220px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(172, 179, 180, 0.45);
+  border-radius: 14px;
+  background: rgba(246, 247, 255, 0.9);
+  color: #2d3435;
+  font-weight: 700;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 95, 175, 0.3);
+  border-top-color: #005faf;
+  border-radius: 50%;
+  animation: brainrootSpin 0.8s linear infinite;
+}
+
+@keyframes brainrootSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .collection-actions {
   display: flex;
   flex-wrap: wrap;
@@ -323,7 +379,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Recommendations */
 .collections-recommendations {
   display: flex;
   flex-direction: column;
@@ -492,7 +547,6 @@ body {
   color: #00539a;
 }
 
-/* Modals */
 .return-modal-overlay {
   position: fixed;
   inset: 0;
@@ -590,7 +644,6 @@ body {
   border-color: #00539a;
 }
 
-/* Toast Notification */
 .collections-toast {
   position: fixed;
   left: 50%;
@@ -642,7 +695,6 @@ body {
   background: rgba(0, 95, 175, 0.16);
 }
 
-/* Footer */
 .collections-footer {
   background: #f9f9f9;
   width: 100%;
@@ -696,7 +748,6 @@ body {
   color: rgba(45, 52, 53, 0.6);
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .collections-main {
     flex-direction: column;
@@ -762,3 +813,5 @@ body {
     flex-wrap: wrap;
   }
 }
+
+

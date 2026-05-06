@@ -1,4 +1,5 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
+  const storage = window.brainrootStorage;
   const form = document.querySelector("form");
   if (!form) {
     return;
@@ -44,7 +45,7 @@
     });
   }
 
-  const alreadyLoggedIn = JSON.parse(localStorage.getItem("brainrootCurrentUser") || "null");
+  const alreadyLoggedIn = storage.readJson("brainrootCurrentUser", null);
   if (alreadyLoggedIn) {
     const returnTo = new URLSearchParams(window.location.search).get("returnTo");
     window.location.href = returnTo || "../index/index.html";
@@ -79,13 +80,10 @@
       return;
     }
 
-    localStorage.setItem(
-      "brainrootCurrentUser",
-      JSON.stringify({
-        email: email,
-        loggedInAt: new Date().toISOString()
-      })
-    );
+    storage.writeJson("brainrootCurrentUser", {
+      email: email,
+      loggedInAt: new Date().toISOString()
+    });
 
     showMessage("success", "Login successful. Redirecting...");
     const returnTo = new URLSearchParams(window.location.search).get("returnTo");
@@ -94,4 +92,5 @@
     }, 500);
   });
 });
+
 

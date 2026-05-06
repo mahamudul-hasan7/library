@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const storage = window.brainrootStorage;
   if (!window.brainrootAuth || !window.brainrootAuth.requireLogin("Please login to access your wishlist.")) {
     return;
   }
@@ -40,16 +41,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function readWishlistItems() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(wishlistKey) || "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      return [];
-    }
+    const parsed = storage.readJson(wishlistKey, []);
+    return Array.isArray(parsed) ? parsed : [];
   }
 
   function saveWishlistItems(items) {
-    localStorage.setItem(wishlistKey, JSON.stringify(items));
+    storage.writeJson(wishlistKey, items);
   }
 
   function findWishlistItemIndex(items, title) {
@@ -137,9 +134,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (ctaLink) {
       if (config.showGoToCollection) {
         ctaLink.textContent = "Open Collections";
-        ctaLink.style.display = "inline-block";
+        ctaLink.classList.remove("is-hidden");
       } else {
-        ctaLink.style.display = "none";
+        ctaLink.classList.add("is-hidden");
       }
 
       if (!ctaLink.dataset.loaderBound) {
@@ -171,34 +168,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!overlay) {
       overlay = document.createElement("div");
       overlay.id = "wishlistLoadingOverlay";
-      overlay.style.position = "fixed";
-      overlay.style.inset = "0";
-      overlay.style.background = "rgba(12, 15, 15, 0.34)";
-      overlay.style.backdropFilter = "blur(6px)";
-      overlay.style.webkitBackdropFilter = "blur(6px)";
-      overlay.style.display = "grid";
-      overlay.style.placeItems = "center";
-      overlay.style.zIndex = "95";
+      overlay.className = "wishlist-loading-overlay";
 
       const card = document.createElement("div");
-      card.style.background = "rgba(246, 247, 255, 0.9)";
-      card.style.border = "1px solid rgba(172, 179, 180, 0.45)";
-      card.style.borderRadius = "14px";
-      card.style.padding = "14px 16px";
-      card.style.minWidth = "220px";
-      card.style.display = "flex";
-      card.style.alignItems = "center";
-      card.style.gap = "10px";
-      card.style.color = "#2d3435";
-      card.style.fontWeight = "700";
+      card.className = "loading-card";
 
       const spinner = document.createElement("span");
-      spinner.style.width = "16px";
-      spinner.style.height = "16px";
-      spinner.style.border = "2px solid rgba(0, 95, 175, 0.3)";
-      spinner.style.borderTopColor = "#005faf";
-      spinner.style.borderRadius = "50%";
-      spinner.style.animation = "brainrootSpin 0.8s linear infinite";
+      spinner.className = "loading-spinner";
 
       const text = document.createElement("span");
       text.id = "wishlistLoadingText";
@@ -209,21 +185,14 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.appendChild(overlay);
     }
 
-    if (!document.getElementById("brainrootLoadingSpinStyle")) {
-      const style = document.createElement("style");
-      style.id = "brainrootLoadingSpinStyle";
-      style.textContent = "@keyframes brainrootSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }";
-      document.head.appendChild(style);
-    }
-
     const textNode = document.getElementById("wishlistLoadingText");
     if (textNode) {
       textNode.textContent = message || "Loading...";
     }
 
-    overlay.style.display = "grid";
+    overlay.classList.add("show");
     setTimeout(function () {
-      overlay.style.display = "none";
+      overlay.classList.remove("show");
       if (typeof onDone === "function") {
         onDone();
       }
@@ -239,23 +208,30 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  function renderEmptyWishlist() {
+    const empty = document.createElement("p");
+    empty.className = "wishlist-empty";
+    empty.textContent = "Your wishlist is empty. ";
+    const link = document.createElement("a");
+    link.href = "../explore/explore.html";
+    link.textContent = "Explore books";
+    empty.appendChild(link);
+    wishlistContainer.replaceChildren(empty);
+  }
+
   function showEmptyWishlistIfNeeded() {
     if (!wishlistContainer.querySelector("article")) {
-      wishlistContainer.innerHTML = "<p style='text-align: center; padding: 40px; color: #596061;'>Your wishlist is empty. <a href='../explore/explore.html' style='color: #005faf;'>Explore books</a></p>";
+      renderEmptyWishlist();
     }
   }
 
   function getCollections() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(collectionsKey) || "[]");
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (error) {
-      return [];
-    }
+    const parsed = storage.readJson(collectionsKey, []);
+    return Array.isArray(parsed) ? parsed : [];
   }
 
   function saveCollections(items) {
-    localStorage.setItem(collectionsKey, JSON.stringify(items));
+    storage.writeJson(collectionsKey, items);
   }
 
   function getCollectionTitle(item) {
@@ -330,25 +306,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (isLocked) {
       button.textContent = "Subscription Required";
-      button.style.opacity = "0.65";
-      button.style.pointerEvents = "none";
+      button.classList.add("wishlist-action-locked");
+      button.classList.remove("wishlist-action-added");
       return;
     }
 
     button.textContent = isAdded ? "Added" : "Add to Collection";
-    button.style.opacity = isAdded ? "0.65" : "1";
-    button.style.pointerEvents = isAdded ? "none" : "auto";
+    button.classList.toggle("wishlist-action-added", isAdded);
+    button.classList.remove("wishlist-action-locked");
   }
 
-  // Clear existing items and reload from storage
-  wishlistContainer.innerHTML = "";
+  
+  wishlistContainer.replaceChildren();
 
   if (wishlistItems.length === 0) {
-    wishlistContainer.innerHTML = "<p style='text-align: center; padding: 40px; color: #596061;'>Your wishlist is empty. <a href='../explore/explore.html' style='color: #005faf;'>Explore books</a></p>";
+    renderEmptyWishlist();
     return;
   }
 
-  // Default book data for display
+  
   const defaultBooks = {
     "Concrete Poetry": { image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=320&q=80", category: "Theory", year: "2023", author: "Tadao Ando" },
     "The Kite Runner": { image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=320&q=80", category: "Drama", year: "2003", author: "Khaled Hosseini" },
@@ -378,17 +354,36 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     
     const article = document.createElement("article");
-    article.innerHTML = `
-      <b>${String(index + 1).padStart(2, "0")}</b>
-      <img src="${bookData.image}" alt="${bookTitle}">
-      <div>
-        <small>${bookData.category} · ${bookData.year}</small>
-        <h3>${bookTitle}</h3>
-        <p>${bookData.author}</p>
-        <a href="#" class="add-btn">Add to Collection</a>
-        <a href="#" class="remove-btn">Remove</a>
-      </div>
-    `;
+    const indexNode = document.createElement("b");
+    indexNode.textContent = String(index + 1).padStart(2, "0");
+    const image = document.createElement("img");
+    image.src = bookData.image;
+    image.alt = bookTitle;
+    const copy = document.createElement("div");
+    const meta = document.createElement("small");
+    meta.textContent = bookData.category + " · " + bookData.year;
+    const title = document.createElement("h3");
+    title.textContent = bookTitle;
+    const author = document.createElement("p");
+    author.textContent = bookData.author;
+    const addLink = document.createElement("a");
+    addLink.href = "#";
+    addLink.className = "add-btn";
+    addLink.textContent = "Add to Collection";
+    const removeLink = document.createElement("a");
+    removeLink.href = "#";
+    removeLink.className = "remove-btn";
+    removeLink.textContent = "Remove";
+
+    copy.appendChild(meta);
+    copy.appendChild(title);
+    copy.appendChild(author);
+    copy.appendChild(addLink);
+    copy.appendChild(document.createTextNode(" "));
+    copy.appendChild(removeLink);
+    article.appendChild(indexNode);
+    article.appendChild(image);
+    article.appendChild(copy);
     
     const removeBtn = article.querySelector(".remove-btn");
     removeBtn.addEventListener("click", function (e) {
@@ -458,3 +453,5 @@ document.addEventListener("DOMContentLoaded", function () {
     wishlistContainer.appendChild(article);
   });
 });
+
+

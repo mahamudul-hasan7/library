@@ -4,9 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BrainRoot | Profile</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E?v=2" />
-  <link rel="shortcut icon" href="data:," />
-  <link rel="apple-touch-icon" href="data:," />
   <link rel="stylesheet" href="./profile.css" />
 </head>
 <body class="profile-page">
@@ -28,7 +25,7 @@
 
         <div class="profile-actions">
           <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="profile-login-link" title="Login">Login</a>
-          <a href="../profile/profile.html" data-auth="profile" class="profile-icon profile-icon-button" title="Profile" style="display: none;">
+          <a href="../profile/profile.html" data-auth="profile" class="profile-icon profile-icon-button auth-profile-link" title="Profile">
             <img src="../Assets/profile icon.png" alt="Profile" class="profile-icon-image" />
           </a>
         </div>
@@ -113,7 +110,7 @@
               <div class="profile-plan-details">
                 <div class="profile-detail-row">
                   <span class="profile-detail-label">Renewal Date</span>
-                  <span id="renewalDateValue" class="profile-detail-value">October 14, 2024</span>
+                  <span id="renewalDateValue" class="profile-detail-value">October 14, 2026</span>
                 </div>
                 <div class="profile-detail-row">
                   <span class="profile-detail-label">Account Type</span>
@@ -121,7 +118,7 @@
                 </div>
               </div>
 
-              <button onclick="openPlanSelector()" class="profile-upgrade-button">Manage Subscription</button>
+              <button id="openPlanSelectorBtn" type="button" class="profile-upgrade-button">Manage Subscription</button>
             </div>
           </section>
 
@@ -160,7 +157,7 @@
           <h2 class="profile-section-title profile-modal-section-title">Subscription Plans</h2>
           <div class="profile-title-bar"></div>
         </div>
-        <button onclick="closePlanSelector()" class="profile-close-button" aria-label="Close plans popup">×</button>
+        <button type="button" data-plan-close class="profile-close-button" aria-label="Close plans popup">×</button>
       </header>
 
       <div class="profile-plan-row">
@@ -176,7 +173,7 @@
             <li>Standard reading queue</li>
             <li>Community support</li>
           </ul>
-          <button data-plan-button="free" onclick="selectPlan('free', 0)" class="profile-plan-button">Select Plan</button>
+          <button data-plan-button="free" data-plan-price="0" type="button" class="profile-plan-button">Select Plan</button>
         </div>
 
         <div class="profile-plan-card">
@@ -191,7 +188,7 @@
             <li>30 books/month max</li>
             <li>Basic support</li>
           </ul>
-          <button data-plan-button="basic" onclick="selectPlan('basic', 199)" class="profile-plan-button">Select Plan</button>
+          <button data-plan-button="basic" data-plan-price="199" type="button" class="profile-plan-button">Select Plan</button>
         </div>
 
         <div class="profile-plan-card profile-plan-card-featured">
@@ -207,7 +204,7 @@
             <li>34 books/month max</li>
             <li>Priority support</li>
           </ul>
-          <button data-plan-button="standard" onclick="selectPlan('standard', 299)" class="profile-plan-button profile-plan-button-active">Select Plan</button>
+          <button data-plan-button="standard" data-plan-price="299" type="button" class="profile-plan-button profile-plan-button-active">Select Plan</button>
         </div>
 
         <div class="profile-plan-card">
@@ -222,7 +219,7 @@
             <li>40 books/month max</li>
             <li>24/7 Premium support</li>
           </ul>
-          <button data-plan-button="premium" onclick="selectPlan('premium', 399)" class="profile-plan-button">Select Plan</button>
+          <button data-plan-button="premium" data-plan-price="399" type="button" class="profile-plan-button">Select Plan</button>
         </div>
       </div>
 
@@ -237,7 +234,7 @@
     <div class="profile-modal">
       <div class="profile-modal-header">
         <h2 class="profile-modal-title">Confirm Subscription</h2>
-        <button onclick="closeSubscriptionModal()" class="profile-close-button">×</button>
+        <button type="button" data-subscription-close class="profile-close-button">×</button>
       </div>
 
       <div class="profile-modal-body">
@@ -249,7 +246,7 @@
 
         <div>
           <label class="profile-select-label">Billing Cycle</label>
-          <select onchange="updateBillingCycle()" id="billingCycle" class="profile-select">
+          <select id="billingCycle" class="profile-select">
             <option value="monthly">Monthly (Full Price)</option>
             <option value="annual">Annual (25% Discount)</option>
           </select>
@@ -263,8 +260,8 @@
       </div>
 
       <div class="profile-modal-actions">
-        <button onclick="closeSubscriptionModal()" class="profile-cancel-button">Cancel</button>
-        <button onclick="confirmSubscription()" class="profile-confirm-button">Confirm Payment</button>
+        <button type="button" data-subscription-close class="profile-cancel-button">Cancel</button>
+        <button id="confirmSubscriptionBtn" type="button" class="profile-confirm-button">Confirm Payment</button>
       </div>
     </div>
   </div>
@@ -279,11 +276,14 @@
         <a class="profile-footer-link" href="#">Contact</a>
       </div>
 
-      <div class="profile-footer-copy">© 2024 BrainRoot. The Architectural Librarian.</div>
+      <div class="profile-footer-copy">© 2026 BrainRoot. The Architectural Librarian.</div>
     </div>
   </footer>
 
+  <script src="../storage.js"></script>
   <script src="../auth.js"></script>
   <script src="./profile.js"></script>
 </body>
 </html>
+
+

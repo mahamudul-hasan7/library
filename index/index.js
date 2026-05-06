@@ -1,4 +1,8 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
+  const storage = window.brainrootStorage;
+
+  document.body.classList.add("landing-ready");
+
   function normalizeTitleKey(value) {
     return String(value || "").trim().toLowerCase();
   }
@@ -47,34 +51,13 @@
     if (!overlay) {
       overlay = document.createElement("div");
       overlay.id = "homeLoadingOverlay";
-      overlay.style.position = "fixed";
-      overlay.style.inset = "0";
-      overlay.style.background = "rgba(12, 15, 15, 0.34)";
-      overlay.style.backdropFilter = "blur(6px)";
-      overlay.style.webkitBackdropFilter = "blur(6px)";
-      overlay.style.display = "grid";
-      overlay.style.placeItems = "center";
-      overlay.style.zIndex = "95";
+      overlay.className = "home-loading-overlay";
 
       const card = document.createElement("div");
-      card.style.background = "rgba(246, 247, 255, 0.9)";
-      card.style.border = "1px solid rgba(172, 179, 180, 0.45)";
-      card.style.borderRadius = "14px";
-      card.style.padding = "14px 16px";
-      card.style.minWidth = "220px";
-      card.style.display = "flex";
-      card.style.alignItems = "center";
-      card.style.gap = "10px";
-      card.style.color = "#2d3435";
-      card.style.fontWeight = "700";
+      card.className = "loading-card";
 
       const spinner = document.createElement("span");
-      spinner.style.width = "16px";
-      spinner.style.height = "16px";
-      spinner.style.border = "2px solid rgba(0, 95, 175, 0.3)";
-      spinner.style.borderTopColor = "#005faf";
-      spinner.style.borderRadius = "50%";
-      spinner.style.animation = "brainrootSpin 0.8s linear infinite";
+      spinner.className = "loading-spinner";
 
       const text = document.createElement("span");
       text.id = "homeLoadingText";
@@ -85,21 +68,14 @@
       document.body.appendChild(overlay);
     }
 
-    if (!document.getElementById("brainrootLoadingSpinStyle")) {
-      const style = document.createElement("style");
-      style.id = "brainrootLoadingSpinStyle";
-      style.textContent = "@keyframes brainrootSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }";
-      document.head.appendChild(style);
-    }
-
     const textNode = document.getElementById("homeLoadingText");
     if (textNode) {
       textNode.textContent = message || "Loading...";
     }
 
-    overlay.style.display = "grid";
+    overlay.classList.add("show");
     setTimeout(function () {
-      overlay.style.display = "none";
+      overlay.classList.remove("show");
       if (typeof onDone === "function") {
         onDone();
       }
@@ -113,7 +89,7 @@
     searchBox.appendChild(searchPanel);
   }
 
-  // Book descriptions mapping
+  
   const bookDescriptions = {
     "The Form of Space": "Explore the fundamental principles of spatial design and how form shapes human experience in architectural spaces.",
     "Urban Rhythms": "A sociological study of how cities function as living organisms, driven by patterns of human behavior and interaction.",
@@ -233,8 +209,7 @@
 
     button.textContent = defaultText;
     button.disabled = false;
-    button.style.opacity = "";
-    button.style.pointerEvents = "";
+    button.classList.remove("is-action-disabled", "is-action-locked");
   }
 
   function applyFilters() {
@@ -249,7 +224,7 @@
       const matchesQuery =
         !query || title.includes(query) || author.includes(query) || category.includes(query);
 
-      book.style.display = matchesCategory && matchesQuery ? "block" : "none";
+      book.hidden = !(matchesCategory && matchesQuery);
     });
   }
 
@@ -262,7 +237,7 @@
     const access = getBookAccess(title);
     const paidBookLocked = access === "paid" && !isPaidSubscriber();
 
-    // Populate modal
+    
     document.getElementById("modalBookTitle").textContent = title;
     document.getElementById("modalBookAuthor").textContent = author;
     document.getElementById("modalBookCategory").textContent = category;
@@ -274,7 +249,7 @@
     const modal = document.getElementById("bookModal");
     modal.dataset.bookAccess = access;
 
-    // Update access badge
+    
     const accessBadge = document.getElementById("modalAccessBadge");
     accessBadge.textContent = access.toUpperCase();
     accessBadge.className = "access-badge";
@@ -289,7 +264,6 @@
 
     if (upgradePlanBtn) {
       upgradePlanBtn.classList.add("hidden");
-      upgradePlanBtn.onclick = null;
     }
 
     if (accessNote) {
@@ -300,14 +274,10 @@
     if (addCollectionBtn && paidBookLocked) {
       addCollectionBtn.textContent = "Subscription Required";
       addCollectionBtn.disabled = true;
-      addCollectionBtn.style.opacity = "0.65";
-      addCollectionBtn.style.pointerEvents = "none";
+      addCollectionBtn.classList.add("is-action-locked");
 
       if (upgradePlanBtn) {
         upgradePlanBtn.classList.remove("hidden");
-        upgradePlanBtn.onclick = function () {
-          window.location.href = "../profile/profile.html";
-        };
       }
 
       if (accessNote) {
@@ -316,7 +286,7 @@
       }
     }
 
-    // Show modal
+    
     document.getElementById("bookModal").classList.remove("hidden");
   }
 
@@ -334,7 +304,7 @@
   function hideLiveSearchPanel() {
     if (searchPanel) {
       searchPanel.classList.remove("show");
-      searchPanel.innerHTML = "";
+      searchPanel.replaceChildren();
     }
   }
 
@@ -354,7 +324,7 @@
       return text.includes(q);
     }).slice(0, 8);
 
-    searchPanel.innerHTML = "";
+    searchPanel.replaceChildren();
 
     if (!matches.length) {
       const empty = document.createElement("div");
@@ -369,12 +339,25 @@
       const button = document.createElement("button");
       button.type = "button";
       button.className = "search-live-item";
-      button.innerHTML =
-        '<img src="' + item.image + '" alt="' + item.title + '">' +
-        '<div class="search-live-copy">' +
-        '<p class="search-live-title">' + item.title + '</p>' +
-        '<p class="search-live-meta">' + item.author + ' · ' + item.category + '</p>' +
-        '</div>';
+      const image = document.createElement("img");
+      image.src = item.image;
+      image.alt = item.title;
+
+      const copy = document.createElement("div");
+      copy.className = "search-live-copy";
+
+      const title = document.createElement("p");
+      title.className = "search-live-title";
+      title.textContent = item.title;
+
+      const meta = document.createElement("p");
+      meta.className = "search-live-meta";
+      meta.textContent = item.author + " � " + item.category;
+
+      copy.appendChild(title);
+      copy.appendChild(meta);
+      button.appendChild(image);
+      button.appendChild(copy);
       button.addEventListener("click", function () {
         openBookModalFromData(item);
         searchInput.value = item.title;
@@ -406,8 +389,7 @@
     if (access === "paid" && !isPaidSubscriber()) {
       addCollectionBtn.textContent = "Subscription Required";
       addCollectionBtn.disabled = true;
-      addCollectionBtn.style.opacity = "0.65";
-      addCollectionBtn.style.pointerEvents = "none";
+      addCollectionBtn.classList.add("is-action-locked");
       if (upgradePlanBtn) {
         upgradePlanBtn.classList.remove("hidden");
       }
@@ -419,7 +401,7 @@
       return;
     }
 
-    if (addCollectionBtn.textContent !== "Added to Collection ✓") {
+    if (addCollectionBtn.textContent !== "Added to Collection ?") {
       resetActionButtonState(addCollectionBtn, "Add to Collection");
     }
 
@@ -434,20 +416,27 @@
     }
   }
 
-  // Modal close button
+  
   const closeBtn = document.querySelector(".modal-close");
   if (closeBtn) {
     closeBtn.addEventListener("click", closeBookModal);
   }
 
-  // Modal backdrop click
+  
   const modal = document.getElementById("bookModal");
   const backdrop = document.querySelector(".modal-backdrop");
   if (backdrop) {
     backdrop.addEventListener("click", closeBookModal);
   }
 
-  // Add to Collection button
+  const upgradePlanButton = document.getElementById("upgradePlanBtn");
+  if (upgradePlanButton) {
+    upgradePlanButton.addEventListener("click", function () {
+      window.location.href = "../profile/profile.html";
+    });
+  }
+
+  
   const addCollectionBtn = document.getElementById("addToCollectionBtn");
   if (addCollectionBtn) {
     addCollectionBtn.addEventListener("click", function () {
@@ -471,8 +460,8 @@
         return;
       }
 
-      // Get current collections
-      const collections = JSON.parse(localStorage.getItem("brainrootCollections") || "[]");
+      
+      const collections = storage.readJson("brainrootCollections", []);
       const normalizedTitle = String(title || "").trim().toLowerCase();
 
       function getCollectionEntryTitle(entry) {
@@ -517,7 +506,7 @@
         return "Free";
       }
 
-      // Check if already added
+      
       if (collections.some(function (entry) { return String(getCollectionEntryTitle(entry) || "").trim().toLowerCase() === normalizedTitle; })) {
         const accessNote = document.getElementById("modalAccessNote");
         if (accessNote) {
@@ -537,7 +526,7 @@
         return;
       }
 
-      // Add to collection
+      
       const bookImage = document.getElementById("modalBookImage")?.getAttribute("src") || "";
       collections.push({
         title: title,
@@ -546,9 +535,9 @@
         image: bookImage,
         access: access
       });
-      localStorage.setItem("brainrootCollections", JSON.stringify(collections));
+      storage.writeJson("brainrootCollections", collections);
 
-      // Record behavior
+      
       if (window.brainrootLibraryBehavior) {
         window.brainrootLibraryBehavior.recordBookView({
           title: title,
@@ -558,14 +547,13 @@
         });
       }
 
-      // Provide feedback
-      addCollectionBtn.textContent = "Added to Collection ✓";
+      
+      addCollectionBtn.textContent = "Added to Collection ?";
       addCollectionBtn.disabled = true;
-      addCollectionBtn.style.opacity = "0.6";
-      addCollectionBtn.style.pointerEvents = "none";
+      addCollectionBtn.classList.add("is-action-disabled");
       showHomeCollectionToast("Great choice. \"" + title + "\" is now in your collection.");
 
-      // Redirect after delay
+      
       setTimeout(function () {
         showFakeLoading("Opening Collections...", 1200, function () {
           window.location.href = "../collections/collections.html";
@@ -574,7 +562,7 @@
     });
   }
 
-  // Add to Wishlist button
+  
   const addWishlistBtn = document.getElementById("addToWishlistBtn");
   if (addWishlistBtn) {
     addWishlistBtn.addEventListener("click", function () {
@@ -586,10 +574,10 @@
 
       const title = document.getElementById("modalBookTitle").textContent;
 
-      // Get current wishlist
-      const wishlist = JSON.parse(localStorage.getItem("brainrootWishlist") || "[]");
+      
+      const wishlist = storage.readJson("brainrootWishlist", []);
 
-      // Check if already added
+      
       if (wishlist.includes(title)) {
         const accessNote = document.getElementById("modalAccessNote");
         if (accessNote) {
@@ -599,15 +587,14 @@
         return;
       }
 
-      // Add to wishlist
+      
       wishlist.push(title);
-      localStorage.setItem("brainrootWishlist", JSON.stringify(wishlist));
+      storage.writeJson("brainrootWishlist", wishlist);
 
-      // Provide feedback
-      addWishlistBtn.textContent = "Added to Wishlist ✓";
+      
+      addWishlistBtn.textContent = "Added to Wishlist ?";
       addWishlistBtn.disabled = true;
-      addWishlistBtn.style.opacity = "0.6";
-      addWishlistBtn.style.pointerEvents = "none";
+      addWishlistBtn.classList.add("is-action-disabled");
     });
   }
 
@@ -641,7 +628,7 @@
       chipButtons.forEach(function (chip) {
         const isActive = chip === button && activeCategory;
         chip.setAttribute("aria-pressed", String(Boolean(isActive)));
-        chip.style.opacity = isActive ? "1" : "0.75";
+        chip.classList.toggle("is-muted", !isActive);
       });
 
       applyFilters();
@@ -661,7 +648,6 @@
 
       openBookModal(book);
     });
-    book.style.cursor = "pointer";
   });
 
   window.addEventListener("storage", function (event) {
@@ -680,5 +666,6 @@
     refreshOpenModalSubscriptionState();
   });
 });
+
 
 

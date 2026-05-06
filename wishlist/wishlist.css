@@ -10,6 +10,11 @@ body {
   color: #2d3435;
 }
 
+.hidden,
+.is-hidden {
+  display: none !important;
+}
+
 .topbar {
   position: fixed;
   top: 0;
@@ -186,7 +191,6 @@ h1 {
   color: #005faf;
 }
 
-/* Profile Icon */
 nav a.profile-icon {
   display: inline-flex;
   align-items: center;
@@ -200,6 +204,14 @@ nav a.profile-icon {
   cursor: pointer;
   border-bottom: none;
   padding-bottom: 0;
+}
+
+nav a.profile-icon.auth-profile-link {
+  display: none;
+}
+
+.is-auth-hidden {
+  display: none !important;
 }
 
 nav a.profile-icon img {
@@ -219,7 +231,6 @@ nav a.profile-icon.active {
   padding-bottom: 0;
 }
 
-/* Responsive Design */
 @media (max-width: 1024px) {
   .topbar {
     padding: 0 32px;
@@ -286,7 +297,7 @@ nav a.profile-icon.active {
   }
 }
 
-  /* Wishlist interaction polish */
+  
   .wish-list article {
     transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease, opacity 220ms ease;
     border: 1px solid transparent;
@@ -374,8 +385,66 @@ nav a.profile-icon.active {
     box-shadow: 0 12px 22px rgba(11, 86, 178, 0.28);
   }
 
-  /* Wishlist login link - semantic styling */
-  /* Wishlist login link - semantic styling */
+  .wishlist-empty {
+    padding: 40px;
+    text-align: center;
+    color: #596061;
+  }
+
+  .wishlist-empty a {
+    color: #005faf;
+  }
+
+  .wishlist-loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    place-items: center;
+    z-index: 95;
+    background: rgba(12, 15, 15, 0.34);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  .wishlist-loading-overlay.show {
+    display: grid;
+  }
+
+  .loading-card {
+    min-width: 220px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(172, 179, 180, 0.45);
+    border-radius: 14px;
+    background: rgba(246, 247, 255, 0.9);
+    color: #2d3435;
+    font-weight: 700;
+  }
+
+  .loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 95, 175, 0.3);
+    border-top-color: #005faf;
+    border-radius: 50%;
+    animation: brainrootSpin 0.8s linear infinite;
+  }
+
+  .wishlist-action-locked,
+  .wishlist-action-added {
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  @keyframes brainrootSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  
+  
   .wishlist-login-link {
     color: rgba(45, 52, 53, 0.6);
     font-weight: 500;
@@ -387,3 +456,5 @@ nav a.profile-icon.active {
   .wishlist-login-link:hover {
     color: #005faf;
   }
+
+

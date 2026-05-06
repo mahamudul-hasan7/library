@@ -1,4 +1,5 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
+  const storage = window.brainrootStorage;
   const form = document.querySelector("form");
   if (!form) {
     return;
@@ -140,7 +141,7 @@
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem("brainrootUsers") || "[]");
+    const users = storage.readJson("brainrootUsers", []);
     const exists = users.some(function (user) {
       return user.email === email;
     });
@@ -159,11 +160,12 @@
       createdAt: new Date().toISOString()
     });
 
-    localStorage.setItem("brainrootUsers", JSON.stringify(users));
+    storage.writeJson("brainrootUsers", users);
     showMessage("success", "Account created successfully. Redirecting to login...");
     window.setTimeout(function () {
       window.location.href = "../login/login.html";
     }, 650);
   });
 });
+
 

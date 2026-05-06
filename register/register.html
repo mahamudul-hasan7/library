@@ -1,73 +1,151 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BrainRoot - Register</title>
+  <title>BrainRoot - Create Archive Account</title>
   <link rel="stylesheet" href="./register.css">
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><a href="../index/index.html" style="color: inherit; text-decoration: none;">BrainRoot</a></div>
+    <div class="brand"><a href="../index/index.html">BrainRoot</a></div>
     <nav>
       <a href="../index/index.html">Home</a>
       <a href="../explore/explore.html">Explore</a>
       <a href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
       <a href="../collections/collections.html" data-auth="private">Collections</a>
-      <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="text-[#2d3435]/60 hover:text-[#005faf] transition-colors font-medium text-[0.875rem] tracking-tight" title="Login">Login</a>
-      <a href="../profile/profile.html" data-auth="profile" class="profile-icon" style="display: none;" title="Profile">
+      <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="login-link" title="Login">Login</a>
+      <a href="../profile/profile.html" data-auth="profile" class="profile-icon auth-profile-link" title="Profile">
         <img src="../Assets/profile icon.png" alt="Profile">
       </a>
     </nav>
   </header>
-  <main class="container">
-    <p class="kicker">Access The Archive</p>
-    <h1>Create Account</h1>
-    <form>
-      <label for="fullName">Full Name</label>
-      <input id="fullName" name="fullName" placeholder="E.g. Julian Barnes" autocomplete="name">
-      <label for="emailAddress">Email Address</label>
-      <input id="emailAddress" name="emailAddress" type="email" placeholder="archive@brainroot.org" autocomplete="email">
-      <label for="institute">Institute</label>
-      <select id="institute" name="institute">
-        <option value="">Select your institute</option>
-        <option value="University of Dhaka">University of Dhaka</option>
-        <option value="BUET">BUET</option>
-        <option value="BRAC University">BRAC University</option>
-        <option value="North South University">North South University</option>
-        <option value="Daffodil International University">Daffodil International University</option>
-        <option value="Independent University, Bangladesh">Independent University, Bangladesh</option>
-        <option value="Jahangirnagar University">Jahangirnagar University</option>
-        <option value="Other">Other Institute</option>
-      </select>
-      <input id="customInstitute" name="customInstitute" class="is-hidden" placeholder="Type your institute name">
-      <label for="role">Role</label>
-      <select id="role" name="role">
-        <option value="Student">Student</option>
-        <option value="Researcher">Researcher</option>
-        <option value="Faculty">Faculty</option>
-        <option value="Reader">Reader</option>
-      </select>
-      <label for="password">Password</label>
-      <input id="password" name="password" type="password" placeholder="At least 8 characters" autocomplete="new-password">
-      <label class="check-row" for="termsAccepted">
-        <input id="termsAccepted" name="termsAccepted" type="checkbox">
-        <span>I agree to archive access terms</span>
-      </label>
-      <button type="submit">Create Account</button>
-    </form>
-    <p>Already have an account? <a href="../login/login.html">Sign In</a></p>
+
+  <main class="register-shell">
+    <section class="archive-panel" aria-label="BrainRoot register overview">
+      <div class="archive-card">
+        <p class="kicker">Architectural Library Access</p>
+        <h1>Build your private research archive.</h1>
+        <p class="intro">Create a BrainRoot account to save books, borrow titles, track reading history, and unlock a library experience made for architecture learners and researchers.</p>
+
+        <div class="archive-preview" aria-hidden="true">
+          <div class="preview-book preview-book-main"></div>
+          <div class="preview-book preview-book-small"></div>
+          <div class="preview-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <div class="benefit-list">
+          <article>
+            <span class="benefit-index">01</span>
+            <div>
+              <h2>Curated book shelf</h2>
+              <p>Save architecture, urbanism, design, history, and theory books in one personal collection.</p>
+            </div>
+          </article>
+          <article>
+            <span class="benefit-index">02</span>
+            <div>
+              <h2>Borrowing access</h2>
+              <p>Track borrowed books, due flow, wishlist items, and plan-based access from the same account.</p>
+            </div>
+          </article>
+          <article>
+            <span class="benefit-index">03</span>
+            <div>
+              <h2>Research identity</h2>
+              <p>Connect your institute and role so your archive profile feels project-ready and academic.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="signup-card">
+      <div class="signup-card-head">
+        <p class="card-eyebrow">Create Account</p>
+        <h2>Start reading with BrainRoot</h2>
+        <p>Use your name, email, institute, and role to open your architectural library profile.</p>
+      </div>
+
+      <form novalidate>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="fullName">Full Name</label>
+            <input id="fullName" name="fullName" placeholder="E.g. Mahamudul Hasan" autocomplete="name" required>
+          </div>
+
+          <div class="form-field">
+            <label for="emailAddress">Email Address</label>
+            <input id="emailAddress" name="emailAddress" type="email" placeholder="student@institute.edu" autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="institute">Institute</label>
+          <select id="institute" name="institute" required>
+            <option value="">Select your institute</option>
+            <option value="University of Dhaka">University of Dhaka</option>
+            <option value="BUET">BUET</option>
+            <option value="BRAC University">BRAC University</option>
+            <option value="North South University">North South University</option>
+            <option value="Daffodil International University">Daffodil International University</option>
+            <option value="Independent University, Bangladesh">Independent University, Bangladesh</option>
+            <option value="Jahangirnagar University">Jahangirnagar University</option>
+            <option value="Other">Other Institute</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <input id="customInstitute" name="customInstitute" class="is-hidden" placeholder="Type your institute name" aria-hidden="true">
+        </div>
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="role">Role</label>
+            <select id="role" name="role" required>
+              <option value="Student">Student</option>
+              <option value="Researcher">Researcher</option>
+              <option value="Faculty">Faculty</option>
+              <option value="Reader">Reader</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password" placeholder="At least 8 characters" autocomplete="new-password" required>
+          </div>
+        </div>
+
+        <label class="check-row" for="termsAccepted">
+          <input id="termsAccepted" name="termsAccepted" type="checkbox">
+          <span>I agree to BrainRoot archive access terms</span>
+        </label>
+
+        <button type="submit">Create Archive Account</button>
+      </form>
+
+      <p class="secondary-link">Already have an account? <a href="../login/login.html">Sign In</a></p>
+    </section>
   </main>
+
   <footer class="footer">
     <strong>BrainRoot</strong>
     <p>&copy; 2026 BrainRoot. The Architectural Librarian.</p>
     <div class="links">
       <a href="../login/login.html">Sign In</a>
-      <a href="../register/register.html">Create Account</a>
+      <a href="../register/register.html">Sign Up</a>
       <a href="../collections/collections.html">Collections</a>
     </div>
   </footer>
+
+  <script src="../storage.js"></script>
   <script src="../auth.js"></script>
   <script src="./register.js"></script>
 </body>
 </html>
+
+

@@ -73,6 +73,17 @@ body {
   transform: translateY(-1px);
 }
 
+.topbar nav a.login-link {
+  color: rgba(45, 52, 53, 0.6);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.topbar nav a.login-link:hover {
+  color: var(--brand);
+}
+
 .topbar nav a.profile-icon {
   width: 36px;
   height: 36px;
@@ -80,6 +91,14 @@ body {
   padding: 0;
   margin-left: 0.45rem;
   border: 0;
+}
+
+.topbar nav a.profile-icon.auth-profile-link {
+  display: none;
+}
+
+.is-auth-hidden {
+  display: none !important;
 }
 
 .topbar nav a.profile-icon img {
@@ -117,6 +136,11 @@ body {
   font-size: clamp(2.2rem, 4vw, 3.9rem);
   margin-bottom: 0.25rem;
   letter-spacing: -0.03em;
+}
+
+.left h1 a {
+  color: inherit;
+  text-decoration: none;
 }
 
 .left p {
@@ -191,27 +215,43 @@ input.is-invalid {
   background: #fff9f9;
 }
 
-button {
+form button[type="submit"] {
   margin-top: 0.9rem;
-  padding: 0.88rem;
+  width: 100%;
+  padding: 0.95rem 1rem;
   border: 0;
-  background: linear-gradient(90deg, #005faf, #0077c8);
+  border-radius: 0.9rem;
+  background: linear-gradient(90deg, #005faf 0%, #0a7ad0 100%);
   color: #ffffff;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+  box-shadow: 0 14px 30px rgba(0, 95, 175, 0.22);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease, opacity 0.16s ease;
 }
 
-button:hover {
+form button[type="submit"]:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(0, 95, 175, 0.28);
+  box-shadow: 0 18px 34px rgba(0, 95, 175, 0.3);
+  filter: saturate(1.03);
 }
 
-button:active {
+form button[type="submit"]:active {
   transform: translateY(0);
+  box-shadow: 0 10px 22px rgba(0, 95, 175, 0.2);
+}
+
+form button[type="submit"]:focus-visible {
+  outline: 3px solid rgba(0, 95, 175, 0.22);
+  outline-offset: 3px;
+}
+
+form button[type="submit"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  box-shadow: none;
 }
 
 .right p:last-child {
@@ -315,3 +355,5 @@ a:hover {
     flex-wrap: wrap;
   }
 }
+
+

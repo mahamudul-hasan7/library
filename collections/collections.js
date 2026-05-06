@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const storage = window.brainrootStorage;
+
   if (!window.brainrootAuth || !window.brainrootAuth.requireLogin("Please login to access collections.")) {
     return;
   }
@@ -28,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Metropolitan Tunnels",
       author: "Urban Systems Review",
       category: "Architecture",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDQL6jcWXTbkZ-qr6cLdsCAr-1U-i8Tdv_aTE30Ela35Y1Ewl9Qay1U9U881DUQo_Y76Q0nkhQttRDoQm82DA7kYNhwSYJdWItOf_qP_lcO422Wt6qeO-PcHjd_JWM9OISmyebIz9RN_fcAnJuiwKA5Hse8Ixnyy20pl_n5zr87WjhbfHPA8HHyNQ9-W8dAoC2JrL2EZUFAXdc9C9wh3ZwZ-X1-s4wKGhxoZFy8C4xN-10EuLNtNdqxXRXaZF01P7t0BjfJKv-siVs",
+      image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=700&q=80",
       summary: "Exploration of underground infrastructure and transit systems in modern cities.",
       progress: 60,
       importance: 88,
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Concrete Poetry",
       author: "Tadao Ando",
       category: "Theory",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDX8fh70OBv6XTWBoiyXnIHeSg4P0MKSIWlHRGB1X_lqvFw94twrIW0ZHxCt2AoG3VMKg4YG7QVVfkevN8soq_chf6Rp7BSRLEfqS0h1yZJ4I8F08hE4Apaeo1EozuxpOKuBG3y81QrYmqzmDn63DXTAImekDtgO_Bn1r8pBpqvAISCtpgTxWFVx205t-VPisA7v9ew7WLMOGaNxjXLUuvSK00Z8VJyvPbo_2t_y5bOR885_EamKfEPy7nwiGf3Q7tDEIy0RYKXoOg",
+      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=700&q=80",
       summary: "Study of concrete as both material and metaphor in contemporary architecture.",
       progress: 40,
       importance: 86,
@@ -48,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Vascular Cities",
       author: "Urban Planning Journal",
       category: "Urbanism",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBiu2SIWHFt85iFuHBohcZj5CnXbF3N0nDdSA3cn-CgoFSQqvdcanUPzoRhi8fJ4zn2wFkxlnQ604uwPdNO3mjhSNF9ZzIz6O1O5DVcaxSI8LTsAQfViiuI9QQ5ngEoBdMBxn_Q4LYIOdWMNP7A8WOxeJMYZijyKAcXVyUbjyUCrgLZHvWb5hLuA1rLL-1EMaxiB_9CMU7lwZADTYeIMRBECcPi7P_HI6t5FP-IQBUmfkYm6eX2eFDX8y-lCmFUhCY2NShL8H2PtA0",
+      image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=700&q=80",
       summary: "Urban planning through the lens of organic systems and circulatory networks.",
       progress: 80,
       importance: 83,
@@ -58,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Silent Archives",
       author: "Curation Lab",
       category: "History",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAHoS6mMiYFZd6NZ4m2EOZh_wnT4KnkS35b4m_EQp2gfluc-1QhGDArytE5YRDdQxBXKmqtTbpL6kRyaDw8CpTe6Wl2SGjWoCwztSR1QJXSIbTJ0uecmE5FnZcuUQbF2bqU58KVupMB3nsFW7YMwp7hSKa1fjnLQkKSu6ds8z3GCI3YTGGQh-NWIE4TBX55pxYkCU0pw2m4omK4o4SE_mTMb9me615ZDbJLoCU98WDYzQdmhfL-TK92sMg3aJy8sXeA0cherWeZ3ng",
+      image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=700&q=80",
       summary: "Curation practices and archival theory in the digital age.",
       progress: 25,
       importance: 77,
@@ -78,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Structure & Light",
       author: "Louis Kahn",
       category: "Architecture",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAuYYgWRa7zpoBIFs2k8tY222LUw0mG4VKU5BPEXFQxd5A1La8wi0wHXsHOYEE-u_TQ4K6HDWkhvlsmjxFlezP1hNLN4JwgbCWsLQnvsFjvtwQCvkTN8C7wYOxC0QsSjgNOlfGSQz0ws5__AHYSS1tJacaXYF2nGzWKH4yDQbzWlTaqe4mSfbtO2pADem1FzJMiZcjd4ypf1Y3MuQkMGf2RGWQdp3XLr3VBFJrdkKt92QlXq0O1BvHVT4WVQYCDZpQ1LrE49elHiuE",
+      image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=700&q=80",
       summary: "The definitive study of structure, light, and spiritual form in architecture.",
       progress: 68,
       importance: 92,
@@ -88,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Urban Metabolism",
       author: "Kenzo Tange",
       category: "Urbanism",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCMwtY1PcedjzXjUthZ6eKRmDKDVQhtjcxlXyOmUbWP618xvj__HkiMvvWB3rIe2eTPa-TxPod2oM9Syj8JIBpHN3o1soLNN5X-bDqv95Bd-uZp4JVItMt2YNwNMfCtabKJMJLg6eO9zGPsxcw_KzMuXT3DWcwrIW_hh-xes7oQNhtfMFKiScgU2O5M0fe5MOMUipQqfuKC-alXbRKNZ0hkq0A_agvixl5Fw4_TknaXM9znuRnl3tqNYeszJHxbKo0q2gAyrSWBpC8",
+      image: "https://images.unsplash.com/photo-1469122312224-c5846569feb1?auto=format&fit=crop&w=700&q=80",
       summary: "A groundbreaking exploration of mega-structure design and urban renewal.",
       progress: 34,
       importance: 91,
@@ -98,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "The Modular Man",
       author: "Le Corbusier",
       category: "Design",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuD1IFmk4YJE_moKcvALJatTeiM8hNAxnq5Y4_AJGD2moL34N4zpvkw00cxdTZ0plyhA8ZIyzG2L4fEoR4qlhE1LM7upfQKPJcvCwrj-YEljWkuGizoAAUxNoY02xi0oFa8G3RUe6ZQRucyaou3gkJLgEyjiUXgoQEq_icNLR0e78KDC8aKupr-Z5w45joaqn6ehDCavrGL3YXlkgdadGUvxrpbySfIQzXCOJPN5uoASAnDjISWOW3BR-8TlRZN40K0YzAT5YKenFmU",
+      image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=700&q=80",
       summary: "A foundational text on proportion systems and the human scale in design.",
       progress: 47,
       importance: 89,
@@ -108,7 +110,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Nordic Pavilions",
       author: "Alvar Aalto",
       category: "Architecture",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBU7qa0-P3Kbc3ht4Hvud0A3N-O0qo8gxp7lsW6Ud7hLZ42o9vxgjl8wvIcEifjqt42Dbo8GFRxtOL0ATvJRddGZ1pVwndL3q7ZS0RbOM7jLMpGWT2bFwgVWdoJUcvlKjpkvNVLBm8qvPeuo8wkw9Qs3g21Wx5vNCF9V4etjg4xirLhqdpqbzchkw6jLmfjdbuT0APJfJcJUl1M_LxwxxmuloRM3rv-AKswNETegvRR--evXwC341Q0fMwsFQQdwaXAmyK9bcfeSYw",
+      image: "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=700&q=80",
       summary: "A detailed study of pavilion design and humanistic modernism in the Nordic region.",
       progress: 72,
       importance: 85,
@@ -118,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "The Grid System in Digital Ethics",
       author: "Mara Feld",
       category: "Design",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAHoS6mMiYFZd6NZ4m2EOZh_wnT4KnkS35b4m_EQp2gfluc-1QhGDArytE5YRDdQxBXKmqtTbpL6kRyaDw8CpTe6Wl2SGjWoCwztSR1QJXSIbTJ0uecmE5FnZcuUQbF2bqU58KVupMB3nsFW7YMwp7hSKa1fjnLQkKSu6ds8z3GCI3YTGGQh-NWIE4TBX55pxYkCU0pw2m4omK4o4SE_mTMb9me615ZDbJLoCU98WDYzQdmhfL-TK92sMg3aJy8sXeA0cherWeZ3ng",
+      image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=700&q=80",
       summary: "A sharp look at digital order, visual systems, and ethical interface design.",
       progress: 29,
       importance: 84,
@@ -128,7 +130,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "The Alexandrian Echo",
       author: "Noura Khalil",
       category: "History",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuALuxkvOy8zCxS4DII6nCTquKwVSHfTxkXjCQMB9KWUSAA8cN6c_vhjMONDzd-iuBkTgFfW6DWO7CbTtIGb4P5gEqaWSgPCjHsT8YxlSk3yndPPNhZ5WvuIPFtOgIw2mcrnrHhDtlqLA7WKMd2P3WNNv0rEP4EoZMnHVkG7SVm0vxLKpG5gnHUMeDlYF6ROcaEKTvab7j0F2jV_0FVcg2PPT647AQOP3cA6NsZp-4uAAun-jfPl3swZXu1WX4_672BT6rNijfvDVXc",
+      image: "https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=700&q=80",
       summary: "A historical reconstruction of library culture, memory, and preservation.",
       progress: 53,
       importance: 79,
@@ -138,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Machine Learning for Curators",
       author: "J. H. Mercer",
       category: "Technology",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDaYobZQoLUN709jJUOPMz4E9M09mgLkDfzxFPzw73VrCxAruWyU6II0iRRBqNpJ1IJeGJTjdbU7f0BoJwSNbQJIRmZbIa7JX2wj9Pz8I4q4VrvTLaJGudRXCNfo_14miP2Usb8ffBq3gpY3ldkQXiowMKOnsMlhOSSHgmNdtSm86N43wstocj6eW5A2Owvad_HBxO7rpZS1dk_ERWCU2ixmMhXDn-2nFYB2yHc_VZ3EOm-80keLd840Ffaa99YR7rnI3qrJCHn7Mw",
+      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80",
       summary: "How machine intelligence can support cataloging, discovery, and curation.",
       progress: 31,
       importance: 90,
@@ -148,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Spatial Dialectics",
       author: "Unknown Author",
       category: "Theory",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuAbSU_gDoqLtdWBJfPEYZTv8M14R4nNeLzjI0W95kceALhoXXGag6-UVj6uQeDdycsqA8zxPmDBzC0zvrtxiE7iuUy9TEPQCI7ZPH552yVRsLdN5FFDMmg40Zk9gTAz-gku0oNVncDDDTUw0zXMv-V-1hFZWiW-hy2B_gPD4eKWbbgchOGOdhnkPDZSyvUFtarrc8J7VNSU_zakBZBmBbNOSajmNi-rYBpKLYatKy2JMIwkZo9oAKwd6pYX2AC_DfWbI3UiQwYeMmc",
+      image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=700&q=80",
       summary: "An exploration of spatial relationships through phenomenological lenses.",
       progress: 67,
       importance: 95,
@@ -158,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Bauhaus Theory",
       author: "Unknown Author",
       category: "History",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBrfFFwGjY8yZdtI8tiPrqDHavC1r2F8kKC-JNcxVVjvujiB-VJSmBw85eiBTxiwoSS7z1ESpXRW-ZYMbSuYc31sgB9RX9B_vEimXHz4h5jZHUOosocoCiGZsoN1CkSY8FPpOmb7GGkRdr7v_cYVrZWPrPLlEfBWq53BdLObq7bbwWqt-CbnTEN0JW2Z3Xz3geAjv6_X4jEE9atphQ1W7-swmfjpjz8ypYEzMFi_vjkak3GKvIMvqnZWU4-HW1SYqGQvoh3FCeM8Zg",
+      image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=700&q=80",
       summary: "The revolutionary design philosophy that reshaped art, architecture, and industry.",
       progress: 44,
       importance: 87,
@@ -168,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Organic Forms",
       author: "Unknown Author",
       category: "Design",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBpPSX695zZOfQxjtcObLgERrRoWnGiJztNLeg4UIzvgjCxv3VyPzBJQgUZRrEkIbd8O3AmBRndJpedb9orTzxXqDoYSJnqK34OgIGEvg4t_-tO9X3YXz4auGSdc7gKiLk1DWsB_wGSFfcxk_m7H3yL4FiiTfUBmVrecLVrJhbFW87x0rSHpahF_g6Q-zjzuYgiMAhK8C4iPWeySppfthq4-2xcnLbHOum_Ycgmdb4RXcBRMInnSMGCy8Dv7uryAC_yC1CTVldDd-4",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=700&q=80",
       summary: "Biomorphic design language and the influence of natural forms on contemporary space.",
       progress: 55,
       importance: 81,
@@ -178,7 +180,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Curvature",
       author: "Unknown Author",
       category: "Design",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuARGJmWxXCb6HVBr4T_0ZxXhUPdECsrQ2-AeyFYS-zo9RxeEtwvI5mcZN7wO23-9047HhK2vG-MC9NXQEsud2H8uRxr2FUD4jxEff5djJSEXCTBOwxSJK852tyljnX3pKzBqaO0ZmpBclG8SsxPaKGYyTICxHoSSG8544rQ6DU-etoNpGh2MlvRnkmBCJe1H3kCwclhfizbQtp2VwmckF7caZ3_MFqHjTl1pl_-EkfyXaoKyRtmL_wBLnA6sTgLy_A67uE7VuI6Qzo",
+      image: "https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=700&q=80",
       summary: "A visual exploration of curved form, movement, and architectural perception.",
       progress: 38,
       importance: 76,
@@ -188,7 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Zen Planning",
       author: "Unknown Author",
       category: "Wellness",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuDXM6PqNxFc_CWpg6-gYoc7eTUIptZNU03BrkcP9lLfAXctI7wABHQR9hp_GkvQbHUYQO9niNiiwGl8pxvO2ngD_OZ83tI7FAttJoF9pRB27PElm1ZpxNbp9PB3uxlm0PtO91OrTHBa7PN22515x1lJEJz1UGE_ewfPHs2qKu14KycMYlQLk5bu-rIb7yzgMwRAF_QOZdhJ0pkZlLv3P-dXQdsQFUfGq0FeeyDPU0rSxW4vu-ckR1RVbpqPI0aR8SWDFphaaK9yMdU",
+      image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=700&q=80",
       summary: "Minimalism and balance applied to urban design and restorative environments.",
       progress: 49,
       importance: 74,
@@ -198,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
       title: "Kinetic Cities",
       author: "Unknown Author",
       category: "Urbanism",
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuA7_gfHisY0NForaVrI9Yw9gRxC0OsRkopqF6obMk8FA7XR1XfctL6k-tAH0s7JaADuj0OHzAXPBM8wUeGaz8alzOALIkz3IhXpZeh-1rWEGv361mcRcPEIa_u_eHazccBGsdm-GM_Db28_-5vPZmb3MfXaFHxMqUxdgehhtPs6gQZfxX-_-PVkZxnQPuHJNb4kUiYQ7XwqSzgh_Zq-B0NHDqN35rJ1q9CF6TlhKbgUt6WJc5ieMzmB8lZg5miHFs68BFmvFnpydj8",
+      image: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=700&q=80",
       summary: "A study of movement, commerce, and cultural change inside living urban systems.",
       progress: 52,
       importance: 75,
@@ -267,6 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   bookCatalog.forEach(function (book) {
+    book.image = getStableImageUrl(book.image, book.title);
     book.access = window.brainrootAuth?.getBookAccess?.(book.title) || "free";
   });
 
@@ -385,12 +388,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function readJson(storageKey, fallback) {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(storageKey) || "null");
-      return Array.isArray(parsed) ? parsed : fallback;
-    } catch (error) {
-      return fallback;
-    }
+    const parsed = storage.readJson(storageKey, null);
+    return Array.isArray(parsed) ? parsed : fallback;
   }
 
   function hashValue(value) {
@@ -401,6 +400,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function getFallbackCoverForTitle(title) {
     return fallbackCollectionCovers[hashValue(title) % fallbackCollectionCovers.length];
+  }
+
+  function getProgressClass(progress) {
+    const value = Math.max(10, Math.min(100, Number(progress) || 30));
+    const rounded = Math.max(10, Math.min(100, Math.round(value / 10) * 10));
+    return "progress-width-" + rounded;
+  }
+
+  function isTemporaryImageUrl(value) {
+    return String(value || "").includes("lh3.googleusercontent.com/aida-public");
+  }
+
+  function getStableImageUrl(value, title) {
+    const source = String(value || "").trim();
+    if (!source || isTemporaryImageUrl(source)) {
+      return getFallbackCoverForTitle(title);
+    }
+
+    return source;
+  }
+
+  function applyImageFallback(image, title) {
+    if (!image) {
+      return;
+    }
+
+    const fallback = getFallbackCoverForTitle(title || image.alt || "book");
+    image.onerror = function () {
+      if (image.src !== fallback) {
+        image.src = fallback;
+      }
+    };
+
+    if (image.complete && image.naturalWidth === 0) {
+      image.src = fallback;
+    }
   }
 
   function getCollectionTitle(entry) {
@@ -423,12 +458,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const source = entry && typeof entry === "object" ? entry : {};
     const catalogMeta = catalogByTitle[normalizeKey(title)] || {};
+    const sourceImage = source.image || source.imageUrl || catalogMeta.image;
 
     return {
       title: title,
       author: String(source.author || catalogMeta.author || "Unknown").trim(),
       category: String(source.category || catalogMeta.category || "General").trim(),
-      image: String(source.image || source.imageUrl || catalogMeta.image || getFallbackCoverForTitle(title)).trim(),
+      image: String(getStableImageUrl(sourceImage, title)).trim(),
       summary: String(source.summary || catalogMeta.summary || "A saved title from your library.").trim(),
       progress: Number(source.progress || catalogMeta.progress || 32),
       access: String(source.access || catalogMeta.access || window.brainrootAuth?.getBookAccess?.(title) || "free").trim(),
@@ -451,7 +487,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.appendChild(toast);
     }
 
-    toast.innerHTML = "";
+    toast.replaceChildren();
     const textNode = document.createElement("span");
     textNode.textContent = toastMessage;
     toast.appendChild(textNode);
@@ -483,20 +519,70 @@ document.addEventListener("DOMContentLoaded", function () {
       overlay = document.createElement("div");
       overlay.id = "returnModalOverlay";
       overlay.className = "return-modal-overlay";
-      overlay.innerHTML =
-        '<div class="return-modal" role="dialog" aria-modal="true" aria-label="Return confirmation">' +
-        '<div class="return-modal-body">' +
-        '<div class="return-modal-cover"><img alt="Book cover" id="returnModalCover"></div>' +
-        '<div class="return-modal-copy">' +
-        '<h3 id="returnModalTitle">Return this book?</h3>' +
-        '<p id="returnModalMessage"></p>' +
-        '</div>' +
-        '</div>' +
-        '<div class="return-modal-actions">' +
-        '<button type="button" class="return-modal-btn" data-return-modal="cancel">Keep in Collection</button>' +
-        '<button type="button" class="return-modal-btn return-modal-btn--primary" data-return-modal="confirm">Return Book</button>' +
-        '</div>' +
-        '</div>';
+
+      const modal = document.createElement("div");
+      modal.className = "return-modal";
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-modal", "true");
+      modal.setAttribute("aria-label", "Return confirmation");
+
+      const body = document.createElement("div");
+      body.className = "return-modal-body";
+      const coverWrap = document.createElement("div");
+      coverWrap.className = "return-modal-cover";
+      const cover = document.createElement("img");
+      cover.id = "returnModalCover";
+      cover.alt = "Book cover";
+      coverWrap.appendChild(cover);
+
+      const copy = document.createElement("div");
+      copy.className = "return-modal-copy";
+      const title = document.createElement("h3");
+      title.id = "returnModalTitle";
+      title.textContent = "Return this book?";
+      const message = document.createElement("p");
+      message.id = "returnModalMessage";
+      copy.appendChild(title);
+      copy.appendChild(message);
+      body.appendChild(coverWrap);
+      body.appendChild(copy);
+
+      const actions = document.createElement("div");
+      actions.className = "return-modal-actions";
+      const cancel = document.createElement("button");
+      cancel.type = "button";
+      cancel.className = "return-modal-btn";
+      cancel.dataset.returnModal = "cancel";
+      cancel.textContent = "Keep in Collection";
+      const confirm = document.createElement("button");
+      confirm.type = "button";
+      confirm.className = "return-modal-btn return-modal-btn--primary";
+      confirm.dataset.returnModal = "confirm";
+      confirm.textContent = "Return Book";
+      actions.appendChild(cancel);
+      actions.appendChild(confirm);
+
+      modal.appendChild(body);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      cancel.addEventListener("click", function () {
+        if (typeof overlay.__closeModal === "function") {
+          overlay.__closeModal();
+        }
+      });
+      confirm.addEventListener("click", function () {
+        if (typeof overlay.__closeModal === "function") {
+          overlay.__closeModal();
+        }
+        if (typeof overlay.__confirmHandler === "function") {
+          overlay.__confirmHandler();
+        }
+      });
+      overlay.addEventListener("click", function (event) {
+        if (event.target === overlay && typeof overlay.__closeModal === "function") {
+          overlay.__closeModal();
+        }
+      });
 
       document.body.appendChild(overlay);
     }
@@ -509,11 +595,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const cover = overlay.querySelector("#returnModalCover");
     const title = overlay.querySelector("#returnModalTitle");
     const message = overlay.querySelector("#returnModalMessage");
-    const confirmButton = overlay.querySelector('[data-return-modal="confirm"]');
-    const cancelButton = overlay.querySelector('[data-return-modal="cancel"]');
 
     if (cover) {
-      cover.src = book.image || "";
+      cover.src = getStableImageUrl(book.image, book.title);
+      applyImageFallback(cover, book.title);
     }
 
     if (title) {
@@ -526,24 +611,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function closeModal() {
       overlay.classList.remove("show");
-      confirmButton.onclick = null;
-      cancelButton.onclick = null;
-      overlay.onclick = null;
+      overlay.__confirmHandler = null;
     }
 
-    confirmButton.onclick = function () {
-      closeModal();
-      if (typeof onConfirm === "function") {
-        onConfirm();
-      }
-    };
-
-    cancelButton.onclick = closeModal;
-    overlay.onclick = function (event) {
-      if (event.target === overlay) {
-        closeModal();
-      }
-    };
+    overlay.__closeModal = closeModal;
+    overlay.__confirmHandler = onConfirm;
 
     overlay.classList.add("show");
   }
@@ -568,11 +640,11 @@ document.addEventListener("DOMContentLoaded", function () {
     saveStoredCollections(collectionEntries);
     clearRecentlyRemoved(book.title);
     
-    // Add back to borrowed list if it was borrowed before
-    const borrowedBooks = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
+    
+    const borrowedBooks = storage.readJson("brainrootBorrowed", []);
     if (borrowedBooks.indexOf(book.title) === -1) {
       borrowedBooks.push(book.title);
-      localStorage.setItem("brainrootBorrowed", JSON.stringify(borrowedBooks));
+      storage.writeJson("brainrootBorrowed", borrowedBooks);
     }
     
     rerender();
@@ -581,6 +653,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function returnBookFlow(book, cardElement) {
     const collectionEntries = getStoredCollections();
+    const bookToRemove = collectionEntries.find(function (item) {
+      return normalizeKey(getCollectionTitle(item)) === normalizeKey(book.title);
+    });
     const filteredEntries = collectionEntries.filter(function (item) {
       return normalizeKey(getCollectionTitle(item)) !== normalizeKey(book.title);
     });
@@ -593,19 +668,24 @@ document.addEventListener("DOMContentLoaded", function () {
       saveStoredCollections(filteredEntries);
       markRecentlyRemoved(book.title);
       
-      // Remove from borrowed list  
-      const borrowedBooks = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
-      const filteredBorrowed = borrowedBooks.filter(function (title) {
-        return title !== book.title;
-      });
-      localStorage.setItem("brainrootBorrowed", JSON.stringify(filteredBorrowed));
+      
+      const borrowedBooks = storage.readJson("brainrootBorrowed", []);
+      const isBorrowed = borrowedBooks.indexOf(book.title) !== -1;
+      if (isBorrowed) {
+        const filteredBorrowed = borrowedBooks.filter(function (title) {
+          return title !== book.title;
+        });
+        storage.writeJson("brainrootBorrowed", filteredBorrowed);
+      }
       
       rerender();
       showToast({
         text: 'Done. "' + book.title + '" was returned from your collection.',
         actionLabel: "Undo",
         onAction: function () {
-          restoreReturnedBook(book);
+          if (bookToRemove) {
+            restoreReturnedBook(bookToRemove);
+          }
         }
       });
     });
@@ -618,34 +698,13 @@ document.addEventListener("DOMContentLoaded", function () {
       overlay = document.createElement("div");
       overlay.id = "collectionsLoadingOverlay";
       overlay.setAttribute("aria-live", "polite");
-      overlay.style.position = "fixed";
-      overlay.style.inset = "0";
-      overlay.style.background = "rgba(12, 15, 15, 0.34)";
-      overlay.style.backdropFilter = "blur(6px)";
-      overlay.style.webkitBackdropFilter = "blur(6px)";
-      overlay.style.display = "grid";
-      overlay.style.placeItems = "center";
-      overlay.style.zIndex = "95";
+      overlay.className = "collections-loading-overlay";
 
       const card = document.createElement("div");
-      card.style.background = "rgba(246, 247, 255, 0.9)";
-      card.style.border = "1px solid rgba(172, 179, 180, 0.45)";
-      card.style.borderRadius = "14px";
-      card.style.padding = "14px 16px";
-      card.style.minWidth = "220px";
-      card.style.display = "flex";
-      card.style.alignItems = "center";
-      card.style.gap = "10px";
-      card.style.color = "#2d3435";
-      card.style.fontWeight = "700";
+      card.className = "loading-card";
 
       const spinner = document.createElement("span");
-      spinner.style.width = "16px";
-      spinner.style.height = "16px";
-      spinner.style.border = "2px solid rgba(0, 95, 175, 0.3)";
-      spinner.style.borderTopColor = "#005faf";
-      spinner.style.borderRadius = "50%";
-      spinner.style.animation = "brainrootSpin 0.8s linear infinite";
+      spinner.className = "loading-spinner";
 
       const text = document.createElement("span");
       text.id = "collectionsLoadingText";
@@ -656,21 +715,14 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.appendChild(overlay);
     }
 
-    if (!document.getElementById("brainrootLoadingSpinStyle")) {
-      const style = document.createElement("style");
-      style.id = "brainrootLoadingSpinStyle";
-      style.textContent = "@keyframes brainrootSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }";
-      document.head.appendChild(style);
-    }
-
     const textNode = document.getElementById("collectionsLoadingText");
     if (textNode) {
       textNode.textContent = message || "Loading...";
     }
 
-    overlay.style.display = "grid";
+    overlay.classList.add("show");
     setTimeout(function () {
-      overlay.style.display = "none";
+      overlay.classList.remove("show");
       if (typeof onDone === "function") {
         onDone();
       }
@@ -678,11 +730,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function getStoredCollections() {
-    const savedValue = localStorage.getItem(collectionKey);
+    const savedValue = storage.getItem(collectionKey);
 
     if (savedValue === null) {
       const seeded = defaultCollections.map(normalizeCollectionEntry).filter(Boolean);
-      localStorage.setItem(collectionKey, JSON.stringify(seeded));
+      storage.writeJson(collectionKey, seeded);
       return seeded;
     }
 
@@ -739,7 +791,7 @@ document.addEventListener("DOMContentLoaded", function () {
       unique.push(normalized);
     });
 
-    localStorage.setItem(collectionKey, JSON.stringify(unique));
+    storage.writeJson(collectionKey, unique);
   }
 
   function getWishlistTitles() {
@@ -760,7 +812,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function readRemovalHistory() {
     try {
-      const parsed = JSON.parse(localStorage.getItem(removalKey) || "[]");
+      const parsed = storage.readJson(removalKey, []);
       return Array.isArray(parsed) ? parsed : [];
     } catch (error) {
       return [];
@@ -768,7 +820,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function saveRemovalHistory(items) {
-    localStorage.setItem(removalKey, JSON.stringify(items));
+    storage.writeJson(removalKey, items);
   }
 
   function markRecentlyRemoved(title) {
@@ -904,7 +956,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    collectionsList.innerHTML = "";
+    collectionsList.replaceChildren();
     collectionsEmptyState.classList.toggle("hidden", collectionEntries.length > 0);
 
     if (collectionEntries.length === 0) {
@@ -916,41 +968,66 @@ document.addEventListener("DOMContentLoaded", function () {
       const article = document.createElement("article");
       article.className = "collection-card";
       article.setAttribute("data-book-title", book.title);
-      article.innerHTML =
-        '<div class="collection-cover"><img alt="' +
-        escapeHtml(book.title) +
-        '" src="' +
-        escapeHtml(book.image) +
-        '"></div>' +
-        '<div class="collection-body">' +
-        '<div class="collection-topline">' +
-        '<div>' +
-        '<span class="collection-category">' +
-          escapeHtml(book.category) +
-          ' | ' +
-        escapeHtml(String(book.access || "free").toUpperCase()) +
-        '</span>' +
-        '<h3 class="collection-title">' +
-        escapeHtml(book.title) +
-        '</h3>' +
-        '</div>' +
-        '<span class="collection-category">Saved ' +
-        String(index + 1).padStart(2, "0") +
-        '</span>' +
-        '</div>' +
-        '<p class="collection-copy">' +
-        escapeHtml(book.summary) +
-        '</p>' +
-        '<div class="collection-progress"><span style="width:' +
-        Math.max(12, Math.min(100, book.progress || 36)) +
-        '%"></span></div>' +
-        '<div class="collection-actions">' +
-        '<button type="button" data-collection-action="read" class="collection-action">View Book</button>' +
-        '<button type="button" data-collection-action="return" class="collection-action collection-action--ghost">Return</button>' +
-        '</div>' +
-        '</div>';
+
+      const cover = document.createElement("div");
+      cover.className = "collection-cover";
+      const image = document.createElement("img");
+      image.alt = book.title;
+      image.src = book.image;
+      cover.appendChild(image);
+
+      const body = document.createElement("div");
+      body.className = "collection-body";
+      const topLine = document.createElement("div");
+      topLine.className = "collection-topline";
+      const titleGroup = document.createElement("div");
+      const category = document.createElement("span");
+      category.className = "collection-category";
+      category.textContent = book.category + " | " + String(book.access || "free").toUpperCase();
+      const title = document.createElement("h3");
+      title.className = "collection-title";
+      title.textContent = book.title;
+      titleGroup.appendChild(category);
+      titleGroup.appendChild(title);
+
+      const saved = document.createElement("span");
+      saved.className = "collection-category";
+      saved.textContent = "Saved " + String(index + 1).padStart(2, "0");
+      topLine.appendChild(titleGroup);
+      topLine.appendChild(saved);
+
+      const summary = document.createElement("p");
+      summary.className = "collection-copy";
+      summary.textContent = book.summary;
+
+      const progress = document.createElement("div");
+      progress.className = "collection-progress " + getProgressClass(book.progress);
+      progress.appendChild(document.createElement("span"));
+
+      const actions = document.createElement("div");
+      actions.className = "collection-actions";
+      const readButton = document.createElement("button");
+      readButton.type = "button";
+      readButton.dataset.collectionAction = "read";
+      readButton.className = "collection-action";
+      readButton.textContent = "View Book";
+      const returnButton = document.createElement("button");
+      returnButton.type = "button";
+      returnButton.dataset.collectionAction = "return";
+      returnButton.className = "collection-action collection-action--ghost";
+      returnButton.textContent = "Return";
+      actions.appendChild(readButton);
+      actions.appendChild(returnButton);
+
+      body.appendChild(topLine);
+      body.appendChild(summary);
+      body.appendChild(progress);
+      body.appendChild(actions);
+      article.appendChild(cover);
+      article.appendChild(body);
 
       collectionsList.appendChild(article);
+      applyImageFallback(article.querySelector(".collection-cover img"), book.title);
     });
   }
 
@@ -964,11 +1041,13 @@ document.addEventListener("DOMContentLoaded", function () {
       ? recommendations
       : recommendations.slice(0, initialRecommendationVisibleCount);
 
-    recommendationsList.innerHTML = "";
+    recommendationsList.replaceChildren();
 
     if (recommendations.length === 0) {
-      recommendationsList.innerHTML =
-        '<div class="collections-empty">No fresh recommendations right now. Browse a few more books and we will refresh this list.</div>';
+      const empty = document.createElement("div");
+      empty.className = "collections-empty";
+      empty.textContent = "No fresh recommendations right now. Browse a few more books and we will refresh this list.";
+      recommendationsList.appendChild(empty);
       return;
     }
 
@@ -979,39 +1058,54 @@ document.addEventListener("DOMContentLoaded", function () {
       const article = document.createElement("article");
       article.className = "recommendation-card";
       article.setAttribute("data-book-title", book.title);
-      article.innerHTML =
-        '<div class="recommendation-cover"><img alt="' +
-        escapeHtml(book.title) +
-        '" src="' +
-        escapeHtml(book.image) +
-        '"></div>' +
-        '<div class="recommendation-body">' +
-        '<span class="recommendation-meta">' +
-        '<span class="recommendation-category-label">' +
-        escapeHtml(book.category) +
-        '</span>' +
-        '<span class="recommendation-access ' +
-        escapeHtml(accessClassName) +
-        '">' +
-        escapeHtml(String(book.access || "free").toUpperCase()) +
-        '</span>' +
-        '</span>' +
-        '<div class="recommendation-topline">' +
-        '<h4 class="recommendation-title">' +
-        escapeHtml(book.title) +
-        '</h4>' +
-        '</div>' +
-        '<p class="recommendation-copy">' +
-        escapeHtml(book.summary) +
-        '</p>' +
-        '<button type="button" data-collection-action="add" class="recommendation-button" ' +
-        (lockedBySubscription ? 'disabled="disabled"' : "") +
-        '>' +
-        (lockedBySubscription ? "Subscription Required" : "Add to Collection") +
-        '</button>' +
-        '</div>';
+
+      const cover = document.createElement("div");
+      cover.className = "recommendation-cover";
+      const image = document.createElement("img");
+      image.alt = book.title;
+      image.src = book.image;
+      cover.appendChild(image);
+
+      const body = document.createElement("div");
+      body.className = "recommendation-body";
+      const meta = document.createElement("span");
+      meta.className = "recommendation-meta";
+      const category = document.createElement("span");
+      category.className = "recommendation-category-label";
+      category.textContent = book.category;
+      const access = document.createElement("span");
+      access.className = "recommendation-access " + accessClassName;
+      access.textContent = String(book.access || "free").toUpperCase();
+      meta.appendChild(category);
+      meta.appendChild(access);
+
+      const topLine = document.createElement("div");
+      topLine.className = "recommendation-topline";
+      const title = document.createElement("h4");
+      title.className = "recommendation-title";
+      title.textContent = book.title;
+      topLine.appendChild(title);
+
+      const summary = document.createElement("p");
+      summary.className = "recommendation-copy";
+      summary.textContent = book.summary;
+
+      const addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.dataset.collectionAction = "add";
+      addButton.className = "recommendation-button";
+      addButton.disabled = lockedBySubscription;
+      addButton.textContent = lockedBySubscription ? "Subscription Required" : "Add to Collection";
+
+      body.appendChild(meta);
+      body.appendChild(topLine);
+      body.appendChild(summary);
+      body.appendChild(addButton);
+      article.appendChild(cover);
+      article.appendChild(body);
 
       recommendationsList.appendChild(article);
+      applyImageFallback(article.querySelector(".recommendation-cover img"), book.title);
     });
 
     if (recommendations.length > initialRecommendationVisibleCount) {
@@ -1132,3 +1226,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
   rerender();
 });
+
+

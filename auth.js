@@ -1,4 +1,5 @@
 (function () {
+  const storage = window.brainrootStorage;
   const AUTH_KEY = "brainrootCurrentUser";
   const BEHAVIOR_KEY = "brainrootBookBehavior";
   const SUBSCRIPTION_KEY = "brainrootSubscription";
@@ -43,11 +44,7 @@
   };
 
   function getCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem(AUTH_KEY) || "null");
-    } catch (error) {
-      return null;
-    }
+    return storage.readJson(AUTH_KEY, null);
   }
 
   function isLoggedIn() {
@@ -64,16 +61,12 @@
   }
 
   function readSubscriptionsByUser() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(SUBSCRIPTIONS_BY_USER_KEY) || "null");
-      return parsed && typeof parsed === "object" ? parsed : {};
-    } catch (error) {
-      return {};
-    }
+    const parsed = storage.readJson(SUBSCRIPTIONS_BY_USER_KEY, null);
+    return parsed && typeof parsed === "object" ? parsed : {};
   }
 
   function writeSubscriptionsByUser(store) {
-    localStorage.setItem(SUBSCRIPTIONS_BY_USER_KEY, JSON.stringify(store || {}));
+    storage.writeJson(SUBSCRIPTIONS_BY_USER_KEY, store || {});
   }
 
   function migrateLegacySubscription(emailKey) {
@@ -86,14 +79,10 @@
       return;
     }
 
-    try {
-      const legacy = JSON.parse(localStorage.getItem(SUBSCRIPTION_KEY) || "null");
-      if (legacy && typeof legacy === "object") {
-        store[emailKey] = legacy;
-        writeSubscriptionsByUser(store);
-      }
-    } catch (error) {
-      // ignore migration errors
+    const legacy = storage.readJson(SUBSCRIPTION_KEY, null);
+    if (legacy && typeof legacy === "object") {
+      store[emailKey] = legacy;
+      writeSubscriptionsByUser(store);
     }
   }
 
@@ -106,12 +95,8 @@
       return store[emailKey];
     }
 
-    try {
-      const parsed = JSON.parse(localStorage.getItem(SUBSCRIPTION_KEY) || "null");
-      return parsed && typeof parsed === "object" ? parsed : null;
-    } catch (error) {
-      return null;
-    }
+    const parsed = storage.readJson(SUBSCRIPTION_KEY, null);
+    return parsed && typeof parsed === "object" ? parsed : null;
   }
 
   function setSubscription(subscription) {
@@ -122,7 +107,7 @@
       writeSubscriptionsByUser(store);
     }
 
-    localStorage.setItem(SUBSCRIPTION_KEY, JSON.stringify(subscription));
+    storage.writeJson(SUBSCRIPTION_KEY, subscription);
   }
 
   function isPaidSubscriber() {
@@ -188,20 +173,16 @@
   }
 
   function readBehavior() {
-    try {
-      const parsed = JSON.parse(localStorage.getItem(BEHAVIOR_KEY) || "null");
-      if (parsed && typeof parsed === "object") {
-        return parsed;
-      }
-    } catch (error) {
-      // Ignore malformed behavior data and rebuild from scratch.
+    const parsed = storage.readJson(BEHAVIOR_KEY, null);
+    if (parsed && typeof parsed === "object") {
+      return parsed;
     }
 
     return { views: [] };
   }
 
   function writeBehavior(behavior) {
-    localStorage.setItem(BEHAVIOR_KEY, JSON.stringify(behavior));
+    storage.writeJson(BEHAVIOR_KEY, behavior);
   }
 
   function recordBookView(book) {
@@ -305,6 +286,14 @@
     return false;
   }
 
+  function setAuthVisibility(element, visible) {
+    element.classList.toggle("is-auth-hidden", !visible);
+
+    if (visible) {
+      element.classList.remove("auth-profile-link");
+    }
+  }
+
   function renderNavigation() {
     const loggedIn = isLoggedIn();
     const privateLinks = document.querySelectorAll('[data-auth="private"]');
@@ -313,26 +302,24 @@
     const profileLinks = document.querySelectorAll('[data-auth="profile"]');
 
     publicLinks.forEach(function (link) {
-      link.style.display = "";
+      setAuthVisibility(link, true);
     });
 
     privateLinks.forEach(function (link) {
-      link.style.display = loggedIn ? "" : "none";
+      setAuthVisibility(link, loggedIn);
     });
 
     loginLinks.forEach(function (link) {
-      link.style.display = loggedIn ? "none" : "inline-flex";
+      setAuthVisibility(link, !loggedIn);
     });
 
     profileLinks.forEach(function (link) {
-      link.style.display = loggedIn ? "inline-flex" : "none";
+      setAuthVisibility(link, loggedIn);
     });
 
-    if (!loggedIn) {
-      document.querySelectorAll('[data-auth-login-slot="true"]').forEach(function (slot) {
-        slot.style.display = "inline-flex";
-      });
-    }
+    document.querySelectorAll('[data-auth-login-slot="true"]').forEach(function (slot) {
+      setAuthVisibility(slot, !loggedIn);
+    });
   }
 
   if (isSecurePage() && !isLoggedIn()) {
@@ -366,3 +353,5 @@
     recordBookView: recordBookView
   };
 })();
+
+

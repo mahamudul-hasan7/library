@@ -1,15 +1,3 @@
-// Keep profile-related console behavior in the same script file.
-(function () {
-  var originalWarn = console.warn;
-  console.warn = function () {
-    var firstArg = arguments[0];
-    if (typeof firstArg === "string" && firstArg.indexOf("cdn.tailwindcss.com should not be used in production") !== -1) {
-      return;
-    }
-    return originalWarn.apply(console, arguments);
-  };
-})();
-
 const subscriptionPlans = {
   free: {
     name: "Free Book",
@@ -49,6 +37,8 @@ const defaultSecuritySettings = {
   twoFactor: false
 };
 
+const storage = window.brainrootStorage;
+
 let selectedPlan = { ...subscriptionPlans.standard };
 
 let toastHideTimer = null;
@@ -83,11 +73,17 @@ function showToast(title, message, variant) {
     toast.className = "profile-toast";
     toast.setAttribute("role", "status");
     toast.setAttribute("aria-live", "polite");
-    toast.innerHTML = ""
-      + '<div class="profile-toast-text">'
-      + '  <p id="profileToastTitle" class="profile-toast-title"></p>'
-      + '  <p id="profileToastMessage" class="profile-toast-message"></p>'
-      + '</div>';
+    const toastText = document.createElement("div");
+    toastText.className = "profile-toast-text";
+    const toastTitle = document.createElement("p");
+    toastTitle.id = "profileToastTitle";
+    toastTitle.className = "profile-toast-title";
+    const toastMessage = document.createElement("p");
+    toastMessage.id = "profileToastMessage";
+    toastMessage.className = "profile-toast-message";
+    toastText.appendChild(toastTitle);
+    toastText.appendChild(toastMessage);
+    toast.appendChild(toastText);
     document.body.appendChild(toast);
   }
 
@@ -147,11 +143,7 @@ function getRenewalDateText(subscription) {
 }
 
 function readStoredValue(storageKey) {
-  try {
-    return JSON.parse(localStorage.getItem(storageKey) || "null");
-  } catch (error) {
-    return null;
-  }
+  return storage.readJson(storageKey, null);
 }
 
 function getSecuritySettings() {
@@ -159,7 +151,7 @@ function getSecuritySettings() {
 }
 
 function saveSecuritySettings(settings) {
-  localStorage.setItem("brainrootSecuritySettings", JSON.stringify(settings));
+  storage.writeJson("brainrootSecuritySettings", settings);
 }
 
 function applySecurityToggleState(toggle, isActive) {
@@ -297,9 +289,7 @@ function setActivePlanButton(planType) {
   const planButtons = document.querySelectorAll("[data-plan-button]");
   planButtons.forEach(function (button) {
     const isActive = button.getAttribute("data-plan-button") === planType;
-    button.classList.toggle("ring-2", isActive);
-    button.classList.toggle("ring-primary", isActive);
-    button.classList.toggle("ring-offset-2", isActive);
+    button.classList.toggle("profile-plan-button-active", isActive);
   });
 }
 
@@ -404,7 +394,7 @@ function confirmSubscription() {
   if (window.brainrootAuth && typeof window.brainrootAuth.setSubscription === "function") {
     window.brainrootAuth.setSubscription(nextSubscription);
   } else {
-    localStorage.setItem("brainrootSubscription", JSON.stringify(nextSubscription));
+    storage.writeJson("brainrootSubscription", nextSubscription);
   }
 
   window.dispatchEvent(new CustomEvent("brainroot:subscription-updated"));
@@ -503,6 +493,32 @@ document.addEventListener("DOMContentLoaded", function () {
     billingCycleSelect.addEventListener("change", updateBillingCycle);
   }
 
+  const openPlanSelectorBtn = document.getElementById("openPlanSelectorBtn");
+  if (openPlanSelectorBtn) {
+    openPlanSelectorBtn.addEventListener("click", openPlanSelector);
+  }
+
+  document.querySelectorAll("[data-plan-close]").forEach(function (button) {
+    button.addEventListener("click", closePlanSelector);
+  });
+
+  document.querySelectorAll("[data-plan-button]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const planType = button.getAttribute("data-plan-button") || "standard";
+      const planPrice = Number(button.getAttribute("data-plan-price") || 0);
+      selectPlan(planType, planPrice);
+    });
+  });
+
+  document.querySelectorAll("[data-subscription-close]").forEach(function (button) {
+    button.addEventListener("click", closeSubscriptionModal);
+  });
+
+  const confirmSubscriptionBtn = document.getElementById("confirmSubscriptionBtn");
+  if (confirmSubscriptionBtn) {
+    confirmSubscriptionBtn.addEventListener("click", confirmSubscription);
+  }
+
   const plansSection = document.getElementById("subscriptionPlansSection");
   if (plansSection) {
     plansSection.addEventListener("click", function (event) {
@@ -533,14 +549,14 @@ document.addEventListener("DOMContentLoaded", function () {
       institution: institutionInput?.value?.trim() || defaultProfile.institution
     };
 
-    localStorage.setItem("brainrootProfile", JSON.stringify(formData));
+    storage.writeJson("brainrootProfile", formData);
     populateProfileFields();
     showToast("Profile Updated", "Your profile changes were saved successfully.", "success");
   });
 
   if (logoutBtn) {
     logoutBtn.addEventListener("click", function () {
-      localStorage.removeItem("brainrootCurrentUser");
+      storage.removeItem("brainrootCurrentUser");
       showToast("Logged Out", "You have been signed out.", "neutral");
       window.location.href = "../login/login.html";
     });
@@ -552,3 +568,5 @@ window.addEventListener("pageshow", function () {
     syncProfilePageState();
   }
 });
+
+

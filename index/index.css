@@ -1,106 +1,84 @@
-/* 
-  BRAINROOT - Index Page Stylesheet
-  DESCRIPTION: Styles for the homepage (index.html)
-  LAYOUT SYSTEM: CSS Grid + Flexbox
-  RESPONSIVE BREAKPOINT: 760px (mobile)
-  COLOR SCHEME: Light gray background (#eeeeef), Dark text (#1f2a30), Blue accents (#0b56b2)
-  
-  STUDENT LEARNING POINTS:
-  1. CSS Reset: * selector removes default margins/padding and enables box-sizing
-  2. Flexbox: Used for header navigation and responsive layouts
-  3. CSS Grid: Used for multi-column book layouts
-  4. Media Queries: @media rule handles mobile responsiveness
-  5. Semantic Styling: Uses class names that describe purpose (not appearance)
-*/
-
-/* CSS RESET: Remove default browser margins and padding */
 * {
 	margin: 0;
 	padding: 0;
-	box-sizing: border-box; /* Includes padding/border in width calculation */
+	box-sizing: border-box; 
 }
 
-/* BODY: Global styles applied to entire page */
 body {
-	font-family: Arial, Helvetica, sans-serif; /* Font stack with fallback */
-	background: #eeeeef; /* Light gray background */
-	color: #1f2a30; /* Dark text color for readability */
+	font-family: Arial, Helvetica, sans-serif; 
+	background: #eeeeef; 
+	color: #1f2a30; 
 }
 
-/* TOP NAVIGATION BAR: Header with logo and nav links */
+.hidden {
+	display: none !important;
+}
+
 .topbar {
-	max-width: 1320px; /* Content never wider than 1320px */
-	margin: 0 auto; /* Center the navbar horizontally */
-	padding: 20px 28px; /* Internal spacing */
-	display: flex; /* Use flexbox for horizontal layout */
-	justify-content: space-between; /* Logo on left, nav on right */
-	align-items: center; /* Vertically center items */
+	max-width: 1320px; 
+	margin: 0 auto; 
+	padding: 20px 28px; 
+	display: flex; 
+	justify-content: space-between; 
+	align-items: center; 
 }
 
-/* BRAND/LOGO: BrainRoot text */
 .brand {
-	font-weight: 700; /* Make text bold */
+	font-weight: 700; 
 	font-size: 28px;
 }
 
-/* NAVIGATION LINKS: Home, Explore, Wishlist, etc. */
 nav a {
-	text-decoration: none; /* Remove underline from links */
-	color: #747b82; /* Light gray color */
+	text-decoration: none; 
+	color: #747b82; 
 	font-size: 13px;
-	margin-left: 22px; /* Space between nav items */
+	margin-left: 22px;
 }
 
-/* ACTIVE NAV LINK: Highlight current page */
 nav a.active {
-	color: #0b56b2; /* Change to blue */
-	border-bottom: 2px solid #0b56b2; /* Add blue underline */
-	padding-bottom: 4px; /* Space between text and underline */
+	color: #0b56b2; 
+	border-bottom: 2px solid #0b56b2; 
+	padding-bottom: 4px; 
 }
 
-/* MAIN CONTAINER: Wrapper for all content */
 .container {
 	max-width: 1320px;
-	margin: 0 auto; /* Center content */
-	padding: 20px 28px 60px; /* Add spacing around content */
+	margin: 0 auto;
+	padding: 20px 28px 60px;
 }
 
-/* HERO SECTION: Welcome area with search and categories */
 .hero {
-	text-align: center; /* Center all content */
-	padding: 90px 0 110px; /* Large vertical spacing */
+	text-align: center;
+	padding: 90px 0 110px;
 }
 
 .hero h1 {
-	font-size: 58px; /* Large heading for visual impact */
+	font-size: 58px;
 	margin-bottom: 38px;
 }
 
-/* SEARCH BOX: Input field with icon and border */
 .search-box {
 	position: relative;
-	width: 100%; /* Full width of container */
-	max-width: 760px; /* But never wider than 760px */
-	margin: 0 auto; /* Center horizontally */
-	border: 1px solid #dcdde0; /* Light gray border */
-	background: #f7f7f8; /* Slightly off-white background */
-	display: flex; /* Horizontal layout for icon + input */
-	align-items: center; /* Vertically center items */
+	width: 100%;
+	max-width: 760px;
+	margin: 0 auto;
+	border: 1px solid #dcdde0;
+	background: #f7f7f8;
+	display: flex;
+	align-items: center;
 	padding: 14px 16px;
 }
 
-/* SEARCH ICON: Magnifying glass emoji styling */
 .icon {
-	color: #8f959b; /* Gray color for subtle appearance */
-	margin-right: 10px; /* Space between icon and input */
+	color: #8f959b;
+	margin-right: 10px;
 }
 
-/* SEARCH INPUT: Text input field */
 .search-box input {
-	border: 0; /* No border - uses parent border instead */
-	outline: none; /* Remove browser outline on focus */
-	width: 100%; /* Fill remaining space */
-	background: transparent; /* Transparent so parent background shows */
+	border: 0;
+	outline: none;
+	width: 100%;
+	background: transparent;
 	font-size: 14px;
 }
 
@@ -203,87 +181,76 @@ nav a.active {
 	transform: translateX(-50%) translateY(0);
 }
 
-/* DISCOVER TEXT: "OR DISCOVER BY CATEGORY" label */
 .discover {
 	margin-top: 36px;
 	font-size: 12px;
-	letter-spacing: 2px; /* Wide letter spacing for emphasis */
+	letter-spacing: 2px; 
 	color: #404a52;
 }
 
-/* CATEGORY CHIPS: Flexbox layout for category buttons */
 .chips {
 	margin-top: 12px;
-	display: flex; /* Horizontal layout */
-	justify-content: center; /* Center buttons */
-	gap: 8px; /* Space between buttons */
-	flex-wrap: wrap; /* Allow wrapping on small screens */
+	display: flex; 
+	justify-content: center; 
+	gap: 8px; 
+	flex-wrap: wrap; 
 }
 
-/* CHIP BUTTONS: Category selection buttons */
 .chips button {
-	border: 1px solid #c7d8ea; /* Light blue border */
-	background: #dce9f6; /* Light blue background */
-	color: #2a3a49; /* Dark text */
+	border: 1px solid #c7d8ea; 
+	background: #dce9f6; 
+	color: #2a3a49; 
 	font-size: 11px;
 	letter-spacing: 1px;
-	padding: 7px 14px; /* Internal spacing */
+	padding: 7px 14px; 
 }
 
-/* FEATURED BOOKS SECTION HEADER */
 .section-top {
-	display: flex; /* Horizontal layout */
-	justify-content: space-between; /* Title left, button right */
-	align-items: end; /* Align items to bottom */
+	display: flex; 
+	justify-content: space-between; 
+	align-items: end; 
 	margin-bottom: 14px;
 }
 
-/* SECTION LABEL: Small colored text above heading */
 .label {
-	color: #0b56b2; /* Blue color */
+	color: #0b56b2; 
 	font-size: 11px;
 	letter-spacing: 2px;
 	margin-bottom: 6px;
 }
 
-/* SECTION HEADING: "Featured Books" heading */
 .section-top h2 {
-	font-size: 28px; /* Large heading */
+	font-size: 28px; 
 }
 
-/* BROWSE BUTTON: CTA button to view all books */
 .browse {
 	text-decoration: none;
-	background: #0b56b2; /* Blue background */
-	color: #fff; /* White text */
-	padding: 11px 24px; /* Internal spacing */
+	background: #0b56b2; 
+	color: #fff; 
+	padding: 11px 24px; 
 	font-size: 12px;
 }
 
-/* BOOK GRID: CSS Grid layout for featured books */
 .grid {
-	display: grid; /* Use CSS Grid layout system */
-	grid-template-columns: repeat(3, 1fr); /* 3 equal columns - 1fr = 1 fraction unit */
-	gap: 12px; /* Space between grid items (vertical and horizontal) */
+	display: grid; 
+	grid-template-columns: repeat(3, 1fr); 
+	gap: 12px; 
 }
 
-/* BOOK IMAGE: Cover image styling */
 .book img {
-	width: 100%; /* Fill full grid item width */
-	height: 240px; /* Fixed height for consistency */
-	object-fit: cover; /* Crop image to fit box without distortion */
+	width: 100%; 
+	height: 240px; 
+	object-fit: cover; 
 	border: 1px solid #d7d8db;
-	filter: grayscale(100%); /* Convert to black and white */
-	transition: filter 0.4s ease; /* Smooth transition effect */
+	filter: grayscale(100%); 
+	transition: filter 0.4s ease; 
 	cursor: pointer;
 }
 
-/* BOOK IMAGE HOVER: Colorful effect on hover */
 .book img:hover {
-	filter: grayscale(0%); /* Convert to full color */
+	filter: grayscale(0%); 
 }
 
-/* BOOK BADGE: Free/Paid indicator */
 .badge {
 	position: absolute;
 	top: 8px;
@@ -296,86 +263,76 @@ nav a.active {
 	z-index: 10;
 }
 
-/* FREE BADGE */
 .badge.free {
 	background: #15613c;
 	color: white;
 }
 
-/* PAID BADGE */
 .badge.paid {
 	background: #af6b00;
 	color: white;
 }
 
-/* BOOK CONTAINER: Position relative for badge positioning */
 .book {
 	position: relative;
+	cursor: pointer;
 }
 
-/* BOOK CATEGORY: "ARCHITECTURE", "PHILOSOPHY" labels */
 .cat {
 	margin-top: 8px;
 	color: #49525a;
-	font-size: 10px; /* Small text */
-	letter-spacing: 1.5px; /* Wide spacing for emphasis */
+	font-size: 10px; 
+	letter-spacing: 1.5px; 
 }
 
-/* BOOK TITLE: Book name heading */
 .book h3 {
-	font-size: 22px; /* Medium-large heading */
-	margin: 4px 0; /* Compact vertical spacing */
+	font-size: 22px; 
+	margin: 4px 0; 
 }
 
-/* AUTHOR NAME: Author styling */
 .author {
-	color: #737b83; /* Muted gray color */
-	font-style: italic; /* Italic text to distinguish from title */
+	color: #737b83; 
+	font-style: italic; 
 	font-size: 15px;
 }
 
-/* STATISTICS SECTION: Shows library metrics */
 .stats {
 	margin-top: 70px;
-	border-top: 1px solid #ddd; /* Top border line */
-	border-bottom: 1px solid #ddd; /* Bottom border line */
-	background: #ececef; /* Slightly darker background */
-	padding: 44px 28px; /* Large internal spacing */
+	border-top: 1px solid #ddd; 
+	border-bottom: 1px solid #ddd; 
+	background: #ececef; 
+	padding: 44px 28px; 
 	display: grid;
-	grid-template-columns: repeat(3, 1fr); /* 3 equal columns for stats */
+	grid-template-columns: repeat(3, 1fr); 
 	gap: 30px;
 	max-width: 1320px;
 	margin-left: auto;
 	margin-right: auto;
 }
 
-/* STAT NUMBERS: Large numbers like "12.4k", "24/7" */
 .stats h4 {
-	color: #0b56b2; /* Blue color */
-	font-size: 52px; /* Very large numbers */
+	color: #0b56b2; 
+	font-size: 52px; 
 }
 
-/* STAT LABELS: "DIGITAL VOLUMES", "GLOBAL ACCESS" */
 .stats p {
 	font-size: 11px;
-	letter-spacing: 1.5px; /* Wide spacing */
+	letter-spacing: 1.5px; 
 	margin: 8px 0;
 }
 
-/* STAT DESCRIPTIONS: Longer explanation text */
 .stats span {
-	color: #646d75; /* Muted gray */
+	color: #646d75; 
 	font-size: 13px;
-	line-height: 1.5; /* Extra line height for readability */
+	line-height: 1.5; 
 }
 
-/* FOOTER: Bottom section with copyright and links */
 .footer {
 	max-width: 1320px;
-	margin: 0 auto; /* Center footer */
-	padding: 26px 28px; /* Internal spacing */
-	display: flex; /* Horizontal layout */
-	justify-content: space-between; /* Spread items apart */
+	margin: 0 auto; 
+	padding: 26px 28px; 
+	display: flex; 
+	justify-content: space-between; 
 	align-items: center;
 	color: #666f77;
 	font-size: 11px;
@@ -383,111 +340,115 @@ nav a.active {
 	text-transform: uppercase;
 }
 
-/* FOOTER BRAND: "BrainRoot" text in footer */
 .footer strong {
-	color: #1f2a30; /* Dark color */
-	text-transform: none; /* Don't uppercase this */
-	letter-spacing: 0; /* Normal spacing */
+	color: #1f2a30; 
+	text-transform: none; 
+	letter-spacing: 0; 
 	font-size: 22px;
 }
 
-/* FOOTER LINKS: Sign In, Create Account, etc. */
 .footer .links a {
 	text-decoration: none;
 	color: #666f77;
 	margin-left: 16px;
 }
 
-/* ============================================================ */
-/* RESPONSIVE DESIGN: Media Queries for Mobile & Tablet       */
-/* These rules apply at specific screen sizes                  */
-/* ============================================================ */
 
-/* Tablet size: Max width 900px */
+
 @media (max-width: 900px) {
-	/* Grid changes from 3 columns to 2 columns */
+	
 	.grid {
-		grid-template-columns: 1fr 1fr; /* 2 equal columns */
+		grid-template-columns: 1fr 1fr; 
 	}
 
-	/* Stats stack vertically instead of 3 columns */
+	
 	.stats {
-		grid-template-columns: 1fr; /* Single column */
+		grid-template-columns: 1fr; 
 	}
 
-	/* Footer wraps content vertically */
+	
 	.footer {
-		flex-direction: column; /* Stack items vertically */
+		flex-direction: column; 
 		gap: 12px;
 		text-align: center;
 	}
 }
 
-/* Mobile size: Max width 640px */
 @media (max-width: 640px) {
-	/* Make heading smaller for mobile */
+	
 	.hero h1 {
-		font-size: 38px; /* Reduced from 58px */
+		font-size: 38px; 
 	}
 
-	/* Make section heading smaller */
+	
 	.section-top h2 {
-		font-size: 34px; /* Reduced from 42px */
+		font-size: 34px; 
 	}
 
-	/* Grid becomes single column */
+	
 	.grid {
-		grid-template-columns: 1fr; /* One book per row */
+		grid-template-columns: 1fr; 
 	}
 }
 
-/* ============================================================ */
-/* SHARED STYLES: Applied to all pages for consistency        */
-/* ============================================================ */
-/* ============================================================ */
-/* SHARED STYLES: Applied to all pages for consistency        */
-/* ============================================================ */
 
-/* BRAND LINK: Logo text styling */
+
+
 .brand a { 
-	color: inherit; /* Use parent color */
-	text-decoration: none; /* Remove underline */
+	color: inherit; 
+	text-decoration: none; 
 }
 
-/* NAVIGATION BAR: Flexbox layout for nav items */
 .topbar nav { 
-	display: flex; /* Horizontal layout */
-	align-items: center; /* Vertically center items */
-	gap: 0; /* No gap between items */
+	display: flex; 
+	align-items: center; 
+	gap: 0; 
 }
 
-/* NAV LINKS: Home, Explore, Wishlist, Collections */
 .topbar nav a { 
-	margin-left: 20px; /* Space between nav items */
-	color: #667; /* Gray text */
-	text-decoration: none; /* Remove underlines */
+	margin-left: 20px; 
+	color: #667; 
+	text-decoration: none; 
 	font-size: 14px;
 }
 
-/* ACTIVE NAV: Highlight current page */
 .topbar nav a.active { 
-	color: #0b56b2; /* Blue color for active page */
-	border-bottom: 2px solid #0b56b2; /* Blue underline */
-	padding-bottom: 4px; /* Space between text and underline */
+	color: #0b56b2; 
+	border-bottom: 2px solid #0b56b2; 
+	padding-bottom: 4px; 
 }
 
-/* PROFILE ICON: Round avatar button in navbar */
+.topbar nav a.login-link {
+	color: rgba(45, 52, 53, 0.6);
+	font-weight: 500;
+	font-size: 0.875rem;
+	letter-spacing: -0.01em;
+	transition: color 180ms ease;
+}
+
+.topbar nav a.login-link:hover {
+	color: #005faf;
+}
+
 .topbar nav a.profile-icon { 
-	width: 36px; /* Square dimensions */
+	width: 36px; 
 	height: 36px;
 	background: transparent;
-	display: inline-flex; /* Center content inside */
-	align-items: center; /* Vertical centering */
-	justify-content: center; /* Horizontal centering */
+	display: inline-flex; 
+	align-items: center; 
+	justify-content: center; 
 	overflow: hidden;
 	margin-left: 20px;
-	padding: 0; /* No padding needed */
+	padding: 0; 
 	border: 0;
+}
+
+.topbar nav a.profile-icon.auth-profile-link {
+	display: none;
+}
+
+.is-auth-hidden {
+	display: none !important;
 }
 
 .topbar nav a.profile-icon img {
@@ -498,86 +459,75 @@ nav a.active {
 	opacity: 0.82;
 }
 
-/* PROFILE ICON HOVER: Interactive feedback on mouse over */
 .topbar nav a.profile-icon:hover { 
 	background: transparent;
 }
 
-/* PROFILE ICON ACTIVE: When on profile page */
 .topbar nav a.profile-icon.active { 
 	background: transparent;
-	padding-bottom: 0; /* Remove bottom padding */
+	padding-bottom: 0; 
 }
 
-/* FOOTER: Bottom section structure */
 .footer { 
 	max-width: 1320px;
-	margin: 0 auto; /* Center footer */
-	padding: 20px 32px; /* Internal spacing */
-	border-top: 1px solid #ddd; /* Line above footer */
-	display: flex; /* Horizontal layout */
-	justify-content: space-between; /* Spread items */
+	margin: 0 auto; 
+	padding: 20px 32px; 
+	border-top: 1px solid #ddd; 
+	display: flex; 
+	justify-content: space-between; 
 	align-items: center;
-	gap: 16px; /* Space between items */
+	gap: 16px; 
 }
 
-/* ============================================================ */
-/* BOOK DETAILS MODAL: Popup for book information              */
-/* ============================================================ */
 
-/* MODAL CONTAINER: Wrapper for modal */
+
 .book-modal {
-	position: fixed; /* Fixed position on screen */
+	position: fixed; 
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	display: flex; /* Flexbox for centering */
-	align-items: center; /* Vertical centering */
-	justify-content: center; /* Horizontal centering */
-	z-index: 1000; /* Layer on top of all content */
+	display: flex; 
+	align-items: center; 
+	justify-content: center; 
+	z-index: 1000; 
 	opacity: 1;
 	visibility: visible;
 	transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* MODAL HIDDEN STATE */
 .book-modal.hidden {
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
 }
 
-/* MODAL BACKDROP: Darkened background */
 .modal-backdrop {
-	position: absolute; /* Cover entire modal */
+	position: absolute; 
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: rgba(0, 0, 0, 0.5); /* Semi-transparent black */
-	cursor: pointer; /* Indicates it's clickable */
+	background: rgba(0, 0, 0, 0.5); 
+	cursor: pointer; 
 }
 
-/* MODAL CONTENT: White card with book details */
 .modal-content {
-	position: relative; /* Position above backdrop */
+	position: relative; 
 	background: white;
 	border-radius: 8px;
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 	max-width: 600px;
-	width: 90%; /* Responsive width */
+	width: 90%; 
 	overflow: hidden;
 }
 
-/* MODAL BODY: Flex layout for image and info */
 .modal-body {
-	display: flex; /* Horizontal layout */
+	display: flex; 
 	gap: 24px;
 	padding: 32px;
 }
 
-/* MODAL IMAGE: Book cover */
 .modal-image {
 	width: 180px;
 	height: 280px;
@@ -586,7 +536,6 @@ nav a.active {
 	flex-shrink: 0;
 }
 
-/* MODAL INFO: Text content section */
 .modal-info {
 	flex: 1;
 	display: flex;
@@ -594,7 +543,17 @@ nav a.active {
 	justify-content: space-between;
 }
 
-/* MODAL CATEGORY LABEL */
+.modal-title-row {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 8px;
+}
+
+.modal-title-heading {
+	margin: 0;
+}
+
 .modal-category {
 	color: #0b56b2;
 	font-size: 11px;
@@ -603,7 +562,6 @@ nav a.active {
 	font-weight: 600;
 }
 
-/* MODAL TITLE */
 .modal-info h2 {
 	font-size: 28px;
 	margin: 0 0 12px 0;
@@ -611,7 +569,6 @@ nav a.active {
 	line-height: 1.3;
 }
 
-/* MODAL AUTHOR */
 .modal-author {
 	color: #737b83;
 	font-style: italic;
@@ -619,7 +576,6 @@ nav a.active {
 	margin-bottom: 16px;
 }
 
-/* ACCESS BADGE: Modal free/paid indicator */
 .access-badge {
 	display: inline-block;
 	padding: 4px 10px;
@@ -640,7 +596,6 @@ nav a.active {
 	color: white;
 }
 
-/* MODAL DESCRIPTION */
 .modal-description {
 	color: #55666d;
 	font-size: 13px;
@@ -648,7 +603,6 @@ nav a.active {
 	margin-bottom: 20px;
 }
 
-/* MODAL ACCESS NOTE */
 .modal-access-note {
 	padding: 12px 14px;
 	margin-bottom: 18px;
@@ -664,13 +618,11 @@ nav a.active {
 	display: none;
 }
 
-/* MODAL ACTIONS: Button container */
 .modal-actions {
 	display: flex;
 	gap: 12px;
 }
 
-/* PRIMARY BUTTON */
 .btn-primary {
 	flex: 1;
 	padding: 12px 16px;
@@ -688,7 +640,6 @@ nav a.active {
 	background: #084591;
 }
 
-/* SECONDARY BUTTON */
 .btn-secondary {
 	flex: 1;
 	padding: 12px 16px;
@@ -708,7 +659,6 @@ nav a.active {
 	color: #0b56b2;
 }
 
-/* TERTIARY BUTTON: Upgrade plan CTA */
 .btn-tertiary {
 	flex: 1;
 	padding: 12px 16px;
@@ -728,7 +678,62 @@ nav a.active {
 	color: #5f3900;
 }
 
-/* MODAL CLOSE BUTTON */
+.is-action-disabled {
+	opacity: 0.6;
+	pointer-events: none;
+}
+
+.is-action-locked {
+	opacity: 0.65;
+	pointer-events: none;
+}
+
+.chips button.is-muted {
+	opacity: 0.75;
+}
+
+.home-loading-overlay {
+	position: fixed;
+	inset: 0;
+	display: none;
+	place-items: center;
+	z-index: 95;
+	background: rgba(12, 15, 15, 0.34);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
+}
+
+.home-loading-overlay.show {
+	display: grid;
+}
+
+.loading-card {
+	min-width: 220px;
+	padding: 14px 16px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	border: 1px solid rgba(172, 179, 180, 0.45);
+	border-radius: 14px;
+	background: rgba(246, 247, 255, 0.9);
+	color: #2d3435;
+	font-weight: 700;
+}
+
+.loading-spinner {
+	width: 16px;
+	height: 16px;
+	border: 2px solid rgba(0, 95, 175, 0.3);
+	border-top-color: #005faf;
+	border-radius: 50%;
+	animation: brainrootSpin 0.8s linear infinite;
+}
+
+@keyframes brainrootSpin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
 .modal-close {
 	position: absolute;
 	top: 16px;
@@ -751,7 +756,6 @@ nav a.active {
 	color: #1f2a30;
 }
 
-/* MOBILE MODAL RESPONSIVE */
 @media (max-width: 760px) {
 	.modal-body {
 		flex-direction: column;
@@ -773,59 +777,56 @@ nav a.active {
 	}
 }
 
-/* FOOTER BRAND NAME: "BrainRoot" text */
 .footer strong { 
 	font-size: 16px;
 }
 
-/* FOOTER DESCRIPTION: Copyright text */
 .footer p { 
 	font-size: 12px;
-	color: #666; /* Gray text */
+	color: #666; 
 }
 
-/* FOOTER LINKS CONTAINER: Sign In, Create Account, etc. */
 .footer .links { 
-	display: flex; /* Horizontal layout */
+	display: flex; 
 	align-items: center;
-	gap: 14px; /* Space between footer links */
+	gap: 14px; 
 }
 
-/* FOOTER LINKS: Individual link styling */
 .footer .links a { 
 	text-decoration: none;
-	color: #666; /* Gray color */
+	color: #666; 
 	font-size: 12px;
 }
 
-/* MOBILE RESPONSIVE: Footer adjusts for screens <= 760px */
 @media (max-width: 760px) {
-	/* Navigation wraps to next line if needed */
+	
 	.topbar { 
-		flex-wrap: wrap; /* Allow wrapping */
+		flex-wrap: wrap; 
 		gap: 10px;
 	}
 
-	/* Nav items take full width on mobile */
+	
 	.topbar nav { 
 		width: 100%;
 		flex-wrap: wrap;
 	}
 
-	/* Reduce nav item spacing */
+	
 	.topbar nav a { 
-		margin-left: 0; /* Remove left margin */
-		margin-right: 14px; /* Space between items */
+		margin-left: 0; 
+		margin-right: 14px; 
 	}
 
-	/* Footer stacks vertically */
+	
 	.footer { 
-		flex-direction: column; /* Stack items vertically */
-		align-items: flex-start; /* Align to left */
+		flex-direction: column; 
+		align-items: flex-start; 
 	}
 
-	/* Footer links wrap if needed */
+	
 	.footer .links { 
 		flex-wrap: wrap;
 	}
 }
+
+

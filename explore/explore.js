@@ -1,72 +1,3 @@
-window.tailwind = {
-  config: {
-    darkMode: "class",
-    theme: {
-      extend: {
-        colors: {
-          "on-tertiary-container": "#4a4f69",
-          "primary-dim": "#00539a",
-          "tertiary-fixed": "#dadefe",
-          "primary": "#005faf",
-          "on-surface-variant": "#596061",
-          "inverse-primary": "#4e9af9",
-          "error": "#9f403d",
-          "surface-container-high": "#e4e9ea",
-          "on-secondary-container": "#46545d",
-          "surface": "#f9f9f9",
-          "on-secondary": "#f4faff",
-          "surface-container-lowest": "#ffffff",
-          "on-tertiary-fixed": "#383c55",
-          "primary-fixed-dim": "#bdd6ff",
-          "inverse-on-surface": "#9c9d9d",
-          "on-tertiary-fixed-variant": "#545873",
-          "surface-container-low": "#f2f4f4",
-          "secondary-container": "#d6e5ef",
-          "background": "#f9f9f9",
-          "on-surface": "#2d3435",
-          "tertiary-dim": "#4d526c",
-          "surface-dim": "#d3dbdd",
-          "secondary-dim": "#47555e",
-          "primary-container": "#d4e3ff",
-          "outline-variant": "#acb3b4",
-          "tertiary": "#595e78",
-          "surface-bright": "#f9f9f9",
-          "secondary-fixed-dim": "#c8d6e1",
-          "on-primary-fixed": "#004079",
-          "on-primary-container": "#005299",
-          "secondary": "#53616a",
-          "surface-variant": "#dde4e5",
-          "tertiary-container": "#dadefe",
-          "error-container": "#fe8983",
-          "on-tertiary": "#faf8ff",
-          "on-background": "#2d3435",
-          "on-error-container": "#752121",
-          "inverse-surface": "#0c0f0f",
-          "surface-container": "#ebeeef",
-          "surface-tint": "#005faf",
-          "on-secondary-fixed": "#33414a",
-          "outline": "#757c7d",
-          "on-error": "#fff7f6",
-          "secondary-fixed": "#d6e5ef",
-          "tertiary-fixed-dim": "#ccd0ef",
-          "on-secondary-fixed-variant": "#4f5d67",
-          "error-dim": "#4e0309",
-          "on-primary-fixed-variant": "#005caa",
-          "on-primary": "#f6f7ff",
-          "surface-container-highest": "#dde4e5",
-          "primary-fixed": "#d4e3ff"
-        },
-        borderRadius: {
-          "DEFAULT": "0px",
-          "lg": "0px",
-          "xl": "0px",
-          "full": "9999px"
-        }
-      }
-    }
-  }
-};
-
 const exploreBookLibrary = {
   trending: [
     {
@@ -418,10 +349,6 @@ function getRelatableCoverImage(category, title) {
   return pool[hashBookKey(title) % pool.length];
 }
 
-function escapeOnclickValue(value) {
-  return String(value || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-}
-
 function getBookDefinitionByTitle(title) {
   const normalizedTitle = normalizeTitleKey(title);
 
@@ -438,8 +365,93 @@ function getBookDefinitionByTitle(title) {
   return null;
 }
 
-function createBookOnclick(book) {
-  return "openBookModal('" + escapeOnclickValue(book.title) + "', '" + escapeOnclickValue(book.author) + "', '" + escapeOnclickValue(book.description) + "', '" + escapeOnclickValue(book.status || 'Available') + "', '" + escapeOnclickValue(book.imageUrl || getRelatableCoverImage(book.category, book.title)) + "')";
+function resetExploreSearchIndex() {
+  exploreSearchIndex = null;
+}
+
+function createClassedElement(tagName, className) {
+  const element = document.createElement(tagName);
+  if (className) {
+    element.className = className;
+  }
+  return element;
+}
+
+function getBookActionPayload(element) {
+  if (!element || !element.dataset || element.dataset.bookAction !== "open") {
+    return null;
+  }
+
+  if (!element.dataset.bookTitle) {
+    return null;
+  }
+
+  return {
+    title: element.dataset.bookTitle,
+    author: element.dataset.bookAuthor || "",
+    description: element.dataset.bookDescription || "",
+    status: element.dataset.bookStatus || "Available",
+    imageUrl: element.dataset.bookImage || RECOMMENDED_FALLBACK_IMAGE
+  };
+}
+
+function openBookActionFromElement(element) {
+  const metadata = getBookActionPayload(element);
+  if (!metadata) {
+    return;
+  }
+
+  openBookModal(metadata.title, metadata.author, metadata.description, metadata.status, metadata.imageUrl);
+}
+
+function handleBookActionClick(event) {
+  openBookActionFromElement(event.currentTarget);
+}
+
+function handleBookActionKeydown(event) {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+
+  event.preventDefault();
+  openBookActionFromElement(event.currentTarget);
+}
+
+function setBookAction(element, book) {
+  if (!element || !book) {
+    return;
+  }
+
+  const category = book.category || getBookCategory(book.title);
+  const imageUrl = book.imageUrl || getRelatableCoverImage(category, book.title);
+  element.dataset.bookAction = "open";
+  element.dataset.bookTitle = book.title || "";
+  element.dataset.bookAuthor = book.author || "";
+  element.dataset.bookDescription = book.description || "";
+  element.dataset.bookStatus = book.status || "Available";
+  element.dataset.bookImage = imageUrl;
+
+  const tagName = String(element.tagName || "").toLowerCase();
+  const needsKeyboardBinding = tagName !== "button" && tagName !== "a";
+  if (needsKeyboardBinding) {
+    if (!element.hasAttribute("role")) {
+      element.setAttribute("role", "button");
+    }
+
+    if (!element.hasAttribute("tabindex")) {
+      element.tabIndex = 0;
+    }
+  }
+
+  if (element.dataset.bookActionBound !== "true") {
+    element.addEventListener("click", handleBookActionClick);
+    if (needsKeyboardBinding) {
+      element.addEventListener("keydown", handleBookActionKeydown);
+    }
+    element.dataset.bookActionBound = "true";
+  }
+
+  resetExploreSearchIndex();
 }
 
 let exploreToastTimer = null;
@@ -456,78 +468,8 @@ let recommendedHeroItems = [];
 let recommendedHeroIndex = 0;
 let recommendedHeroTimer = null;
 
-function decodeHtmlEntities(value) {
-  const decoder = document.createElement("textarea");
-  decoder.innerHTML = String(value || "");
-  return decoder.value;
-}
-
 function normalizeTitleKey(value) {
   return String(value || "").trim().toLowerCase();
-}
-
-function parseOpenBookModalArgs(onclickValue) {
-  const callStart = String(onclickValue || "").indexOf("openBookModal(");
-  if (callStart === -1) {
-    return null;
-  }
-
-  const argumentString = String(onclickValue).slice(callStart + "openBookModal(".length, -1);
-  const args = [];
-  let index = 0;
-
-  function skipWhitespaceAndCommas() {
-    while (index < argumentString.length && /[\s,]/.test(argumentString[index])) {
-      index += 1;
-    }
-  }
-
-  while (index < argumentString.length) {
-    skipWhitespaceAndCommas();
-    if (index >= argumentString.length) {
-      break;
-    }
-
-    if (argumentString[index] !== "'") {
-      return null;
-    }
-
-    index += 1;
-    let value = "";
-
-    while (index < argumentString.length) {
-      const char = argumentString[index];
-
-      if (char === "\\" && index + 1 < argumentString.length) {
-        value += argumentString[index + 1];
-        index += 2;
-        continue;
-      }
-
-      if (char === "'") {
-        index += 1;
-        break;
-      }
-
-      value += char;
-      index += 1;
-    }
-
-    args.push(decodeHtmlEntities(value));
-    skipWhitespaceAndCommas();
-  }
-
-  if (args.length < 5) {
-    return null;
-  }
-
-  return {
-    title: args[0],
-    author: args[1],
-    description: args[2],
-    status: args[3],
-    imageUrl: args[4]
-  };
 }
 
 function getExploreSearchIndex() {
@@ -535,12 +477,20 @@ function getExploreSearchIndex() {
     return exploreSearchIndex;
   }
 
-  exploreSearchIndex = Array.from(document.querySelectorAll('[onclick*="openBookModal("]'))
+  const seenTitles = new Set();
+  exploreSearchIndex = Array.from(document.querySelectorAll('[data-book-action="open"]'))
     .map(function (element) {
-      const metadata = parseOpenBookModalArgs(element.getAttribute("onclick"));
+      const metadata = getBookActionPayload(element);
       if (!metadata) {
         return null;
       }
+
+      const titleKey = normalizeTitleKey(metadata.title);
+      if (!titleKey || seenTitles.has(titleKey)) {
+        return null;
+      }
+
+      seenTitles.add(titleKey);
 
       return {
         element: element,
@@ -563,14 +513,11 @@ function upsertExploreAccessBadge(card, title) {
   }
 
   const access = getBookAccess(title) === "paid" ? "paid" : "free";
-  const imageDiv = card.querySelector(".aspect-\\[3\\/4\\], [class*='aspect']");
-  
+  const imageDiv = card.querySelector(".book-card-media");
+
   if (!imageDiv) {
     return;
   }
-
-  card.classList.add("group");
-  imageDiv.classList.add("relative");
 
   let badge = imageDiv.querySelector("[data-access-badge]");
 
@@ -581,10 +528,7 @@ function upsertExploreAccessBadge(card, title) {
   }
 
   const accessText = access === "paid" ? "Paid" : "Free";
-  badge.className = "absolute top-2 left-2 text-[0.6rem] font-bold uppercase tracking-widest px-2.5 py-1 rounded bg-opacity-95 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none " + (access === "paid" ? "bg-primary text-on-primary" : "bg-surface-container-lowest border border-primary text-primary");
-  badge.style.position = "absolute";
-  badge.style.top = "8px";
-  badge.style.left = "8px";
+  badge.className = "access-badge " + (access === "paid" ? "access-badge-paid" : "access-badge-free");
   badge.textContent = accessText;
 }
 
@@ -630,8 +574,8 @@ function upsertExploreCardMeta(item) {
     metaEl.setAttribute("data-card-meta", "true");
   }
 
-  metaEl.className = "text-[0.7rem] text-on-surface-variant mt-1";
-  metaEl.textContent = category + " · " + availability;
+  metaEl.className = "card-meta";
+  metaEl.textContent = category + " - " + availability;
 }
 
 function markExploreCardsByAccess() {
@@ -650,37 +594,39 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     return;
   }
 
-  const scrollContainer = section.querySelector(".flex.overflow-x-auto");
+  const scrollContainer = section.querySelector(".carousel-track");
   if (!scrollContainer) {
     return;
   }
 
   let cards = Array.from(scrollContainer.children).filter(function (child) {
-    return child.classList && child.classList.contains("flex-none");
+    return child.classList && child.classList.contains("book-card");
   });
 
   if (!cards.length) {
-    scrollContainer.innerHTML = "";
+    scrollContainer.replaceChildren();
     books.forEach(function (book) {
-      const card = document.createElement("div");
-      card.className = "flex-none w-64 group cursor-pointer hover-lift";
+      const card = createClassedElement("div", "book-card hover-lift");
+      const imageWrap = createClassedElement("div", "book-card-media");
+      const image = createClassedElement("img", "book-card-cover");
+      const rating = createClassedElement("span", "book-rating-chip");
+      const category = createClassedElement("span", "book-category-chip");
+      const details = createClassedElement("div", "book-card-details");
+      const title = createClassedElement("h3", "book-card-title");
+      const author = createClassedElement("p", "book-card-author");
+      image.alt = book.coverAlt || book.title + " cover";
+      rating.setAttribute("data-image-rating", "true");
+      category.setAttribute("data-image-category", "true");
 
-      card.innerHTML =
-        '<div class="relative aspect-[3/4] bg-surface-container-highest mb-4 overflow-hidden rounded-sm">' +
-        '<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="' + (book.coverAlt || book.title + ' cover') + '" />' +
-        '<span class="absolute right-2 top-2 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-wide bg-white/90 text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" data-image-rating="true"></span>' +
-        '<span class="absolute right-2 bottom-2 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-wide bg-black/65 text-white" data-image-category="true"></span>' +
-        '</div>' +
-        '<div class="relative pl-4 border-l-2 border-transparent group-hover:border-primary transition-colors">' +
-        '<h3 class="text-sm font-semibold mb-1 truncate"></h3>' +
-        '<p class="text-[0.75rem] text-on-surface-variant uppercase tracking-wider"></p>' +
-        '</div>';
+      imageWrap.append(image, rating, category);
+      details.append(title, author);
+      card.append(imageWrap, details);
 
       scrollContainer.appendChild(card);
     });
 
     cards = Array.from(scrollContainer.children).filter(function (child) {
-      return child.classList && child.classList.contains("flex-none");
+      return child.classList && child.classList.contains("book-card");
     });
   }
 
@@ -690,7 +636,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
       return;
     }
 
-    card.className = "flex-none w-52 group cursor-pointer hover-lift";
+    card.className = "book-card hover-lift";
 
     const imageEl = card.querySelector("img");
     const imageWrap = imageEl ? imageEl.parentElement : null;
@@ -702,7 +648,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     }
 
     const coverUrl = getRelatableCoverImage(book.category, book.title);
-    const onclickValue = createBookOnclick({
+    setBookAction(card, {
       title: book.title,
       author: book.author,
       description: book.description,
@@ -710,8 +656,6 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
       imageUrl: coverUrl,
       category: book.category
     });
-
-    card.setAttribute("onclick", onclickValue);
     imageEl.src = coverUrl;
     imageEl.alt = book.coverAlt || (book.title + " cover");
 
@@ -719,7 +663,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     if (!imageCategoryEl) {
       imageCategoryEl = document.createElement("span");
       imageCategoryEl.setAttribute("data-image-category", "true");
-      imageCategoryEl.className = "absolute right-2 bottom-2 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-wide bg-black/65 text-white";
+      imageCategoryEl.className = "book-category-chip";
       imageWrap.appendChild(imageCategoryEl);
     }
     imageCategoryEl.textContent = book.category;
@@ -728,12 +672,12 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
     if (!imageRatingEl) {
       imageRatingEl = document.createElement("span");
       imageRatingEl.setAttribute("data-image-rating", "true");
-      imageRatingEl.className = "absolute right-2 top-2 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-wide bg-white/90 text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none";
+      imageRatingEl.className = "book-rating-chip";
       imageWrap.appendChild(imageRatingEl);
     }
     const cardRatingChip = getBookRatingChip(book.title);
     imageRatingEl.textContent = cardRatingChip;
-    imageRatingEl.classList.toggle("hidden", !cardRatingChip);
+    imageRatingEl.classList.toggle("is-hidden", !cardRatingChip);
 
     titleEl.textContent = book.title;
 
@@ -746,7 +690,7 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
       }
       authorEl.setAttribute("data-book-author", "true");
     }
-    authorEl.className = "text-[0.75rem] text-on-surface-variant uppercase tracking-wider";
+    authorEl.className = "book-card-author";
     authorEl.textContent = book.author;
 
     const ratingEl = detailsWrap.querySelector("[data-book-rating]");
@@ -778,10 +722,10 @@ function syncExploreBookLibrary() {
 function setupCarouselNavigation() {
   const carouselSections = document.querySelectorAll(".carousel-section");
 
-  carouselSections.forEach(function(section) {
+  carouselSections.forEach(function (section) {
     const prevBtn = section.querySelector(".carousel-prev-btn");
     const nextBtn = section.querySelector(".carousel-next-btn");
-    const scrollContainer = section.querySelector(".flex.overflow-x-auto");
+    const scrollContainer = section.querySelector(".carousel-track");
 
     if (!prevBtn || !nextBtn || !scrollContainer) {
       return;
@@ -793,7 +737,7 @@ function setupCarouselNavigation() {
     section.dataset.carouselBound = "true";
 
     function getScrollStep() {
-      const firstCard = scrollContainer.querySelector(".flex-none");
+      const firstCard = scrollContainer.querySelector(".book-card");
       const cardWidth = firstCard ? firstCard.getBoundingClientRect().width : 220;
       const styles = window.getComputedStyle(scrollContainer);
       const gapValue = parseFloat(styles.columnGap || styles.gap || "0") || 0;
@@ -809,7 +753,7 @@ function setupCarouselNavigation() {
       nextBtn.disabled = scrollLeft >= scrollWidth - clientWidth - 10;
     }
 
-    prevBtn.addEventListener("click", function() {
+    prevBtn.addEventListener("click", function () {
       const step = getScrollStep();
       scrollContainer.scrollBy({
         left: -step,
@@ -818,7 +762,7 @@ function setupCarouselNavigation() {
       setTimeout(updateButtonStates, 300);
     });
 
-    nextBtn.addEventListener("click", function() {
+    nextBtn.addEventListener("click", function () {
       const step = getScrollStep();
       scrollContainer.scrollBy({
         left: step,
@@ -849,35 +793,43 @@ function syncAllBooksCollectionBadges() {
   }
 
   const collectionBooks = exploreBookLibrary.collection;
-  let rows = Array.from(section.querySelectorAll(".space-y-4 > div"));
+  let rows = Array.from(section.querySelectorAll(".all-books-list > .all-books-row"));
 
   if (!rows.length) {
-    const listContainer = section.querySelector(".space-y-4");
+    const listContainer = section.querySelector(".all-books-list");
     if (!listContainer) {
       return;
     }
 
-    listContainer.innerHTML = "";
+    listContainer.replaceChildren();
 
     collectionBooks.forEach(function (book) {
-      const row = document.createElement("div");
-      row.className = "flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 group hover-lift";
-      row.innerHTML =
-        '<div class="flex items-center gap-7 flex-1">' +
-        '<div class="relative w-20 h-24 bg-surface-container-highest shrink-0">' +
-        '<img class="w-full h-full object-cover" alt="' + (book.coverAlt || book.title + ' cover') + '" />' +
-        '<span class="absolute right-1.5 bottom-1.5 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-wide bg-black/65 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none" data-all-books-image-rating="true"></span>' +
-        '</div>' +
-        '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">' +
-        '<div><h4 class="font-semibold text-[1rem] mb-1 group-hover:text-primary transition-colors"></h4><p class="text-sm text-on-surface-variant"></p></div>' +
-        '<div class="flex items-center"></div>' +
-        '</div>' +
-        '</div>' +
-        '<button class="border border-outline-variant/30 px-6 py-2 text-sm font-medium hover:bg-primary hover:text-on-primary transition-colors">Details</button>';
+      const row = createClassedElement("div", "all-books-row");
+      const rowContent = createClassedElement("div", "all-books-row-main");
+      const imageWrap = createClassedElement("div", "all-books-cover-wrap");
+      const image = createClassedElement("img", "all-books-cover");
+      const imageRating = createClassedElement("span", "all-books-rating-chip");
+      const grid = createClassedElement("div", "all-books-info-grid");
+      const titleWrap = createClassedElement("div", "all-books-copy");
+      const title = createClassedElement("h4", "all-books-row-title");
+      const author = createClassedElement("p", "all-books-author");
+      const badgeWrap = createClassedElement("div", "all-books-badges");
+      const detailsButton = createClassedElement("button", "all-books-details-btn");
+
+      image.alt = book.coverAlt || book.title + " cover";
+      imageRating.setAttribute("data-all-books-image-rating", "true");
+      detailsButton.type = "button";
+      detailsButton.textContent = "Details";
+
+      imageWrap.append(image, imageRating);
+      titleWrap.append(title, author);
+      grid.append(titleWrap, badgeWrap);
+      rowContent.append(imageWrap, grid);
+      row.append(rowContent, detailsButton);
       listContainer.appendChild(row);
     });
 
-    rows = Array.from(section.querySelectorAll(".space-y-4 > div"));
+    rows = Array.from(section.querySelectorAll(".all-books-list > .all-books-row"));
   }
 
   rows.forEach(function (row, index) {
@@ -887,55 +839,55 @@ function syncAllBooksCollectionBadges() {
     }
 
     const metadata = book;
-    const detailsButton = row.querySelector("button");
-    const titleEl = row.querySelector("h4");
-    const authorEl = row.querySelector(".grid div p");
-    const imageEl = row.querySelector("img");
-    const badgeWrap = row.querySelector(".grid .flex.items-center");
-    const titleWrap = row.querySelector(".grid > div");
+    const detailsButton = row.querySelector(".all-books-details-btn");
+    const titleEl = row.querySelector(".all-books-row-title");
+    const authorEl = row.querySelector(".all-books-author");
+    const imageEl = row.querySelector(".all-books-cover");
+    const badgeWrap = row.querySelector(".all-books-badges");
+    const titleWrap = row.querySelector(".all-books-copy");
     if (!badgeWrap || !titleWrap || !detailsButton || !titleEl || !authorEl || !imageEl) {
       return;
     }
 
-    row.className = "flex items-center justify-between p-6 bg-surface-container-low hover:bg-surface-container-high transition-all duration-300 group hover-lift";
-    const rowContent = row.querySelector("div.flex.items-center");
+    row.className = "all-books-row";
+    const rowContent = row.querySelector(".all-books-row-main");
     if (rowContent) {
-      rowContent.className = "flex items-center gap-7 flex-1";
+      rowContent.className = "all-books-row-main";
     }
     if (imageEl.parentElement) {
-      imageEl.parentElement.className = "relative w-20 h-24 bg-surface-container-highest shrink-0";
+      imageEl.parentElement.className = "all-books-cover-wrap";
     }
-    const gridWrap = row.querySelector(".grid");
+    const gridWrap = row.querySelector(".all-books-info-grid");
     if (gridWrap) {
-      gridWrap.className = "grid grid-cols-1 md:grid-cols-2 gap-4 w-full";
+      gridWrap.className = "all-books-info-grid";
     }
-    titleEl.className = "font-semibold text-[1rem] mb-1 group-hover:text-primary transition-colors";
-    authorEl.className = "text-sm text-on-surface-variant";
-    detailsButton.className = "border border-outline-variant/30 px-6 py-2 text-sm font-medium hover:bg-primary hover:text-on-primary transition-colors";
+    titleEl.className = "all-books-row-title";
+    authorEl.className = "all-books-author";
+    detailsButton.className = "all-books-details-btn";
 
     const coverUrl = getRelatableCoverImage(metadata.category, metadata.title);
     const availability = getBookAvailability(metadata.status);
     const access = getBookAccess(metadata.title) === "paid" ? "Paid" : "Free";
 
     const availabilityBadge = document.createElement("span");
-    availabilityBadge.className = "px-3 py-1 text-[0.72rem] font-medium " + (availability === "Available" ? "bg-secondary-container text-on-secondary-fixed" : "bg-surface-container-highest text-on-surface-variant");
+    availabilityBadge.className = "status-badge " + (availability === "Available" ? "status-badge-available" : "status-badge-unavailable");
     availabilityBadge.textContent = availability;
 
     const accessBadge = document.createElement("span");
-    accessBadge.className = "ml-2 px-3 py-1 text-[0.72rem] font-medium " + (access === "Paid" ? "bg-primary text-on-primary" : "border border-primary text-primary");
+    accessBadge.className = "access-badge " + (access === "Paid" ? "access-badge-paid" : "access-badge-free");
     accessBadge.textContent = access;
 
     let imageRatingEl = imageEl.parentElement ? imageEl.parentElement.querySelector("[data-all-books-image-rating]") : null;
     if (!imageRatingEl && imageEl.parentElement) {
       imageRatingEl = document.createElement("span");
       imageRatingEl.setAttribute("data-all-books-image-rating", "true");
-      imageRatingEl.className = "absolute right-1.5 bottom-1.5 px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-wide bg-black/65 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none";
+      imageRatingEl.className = "all-books-rating-chip";
       imageEl.parentElement.appendChild(imageRatingEl);
     }
     if (imageRatingEl) {
       const listRatingChip = getBookRatingChip(metadata.title);
       imageRatingEl.textContent = listRatingChip;
-      imageRatingEl.classList.toggle("hidden", !listRatingChip);
+      imageRatingEl.classList.toggle("is-hidden", !listRatingChip);
     }
 
     const ratingText = titleWrap.querySelector("[data-all-books-rating]");
@@ -955,26 +907,24 @@ function syncAllBooksCollectionBadges() {
       }
     }
 
-    categoryText.className = "text-[0.78rem] text-on-surface-variant mt-1";
+    categoryText.className = "all-books-category";
     categoryText.textContent = "Category: " + metadata.category;
 
     titleEl.textContent = metadata.title;
     authorEl.textContent = metadata.author;
     imageEl.src = coverUrl;
     imageEl.alt = metadata.coverAlt || (metadata.title + " cover");
-    detailsButton.setAttribute("onclick", createBookOnclick({
+    setBookAction(detailsButton, {
       title: metadata.title,
       author: metadata.author,
       description: metadata.description,
       status: metadata.status,
       imageUrl: coverUrl,
       category: metadata.category
-    }));
+    });
     detailsButton.textContent = "Details";
 
-    badgeWrap.innerHTML = "";
-    badgeWrap.appendChild(availabilityBadge);
-    badgeWrap.appendChild(accessBadge);
+    badgeWrap.replaceChildren(availabilityBadge, accessBadge);
   });
 }
 
@@ -1093,16 +1043,17 @@ function renderRecommendedHero(book) {
 
   titleEl.textContent = book.title;
   descriptionEl.textContent = book.description;
-  imageEl.src = book.imageUrl || RECOMMENDED_FALLBACK_IMAGE;
+  const imageUrl = book.imageUrl || RECOMMENDED_FALLBACK_IMAGE;
+  imageEl.src = imageUrl + (imageUrl.indexOf("?") > -1 ? "&" : "?") + "t=" + Date.now();
   imageEl.alt = book.title + " cover";
   badgeEl.textContent = "";
-  badgeEl.className = "hidden";
+  badgeEl.className = "hero-access-badge is-hidden";
 
-  // Check if already borrowed and update borrow button state
+  
   const borrowedTitles = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
   const alreadyBorrowed = borrowedTitles.indexOf(book.title) !== -1 || book.status === "Borrowed";
   if (alreadyBorrowed) {
-    borrowBtn.textContent = "Already Borrowed ✓";
+    borrowBtn.textContent = "Already Borrowed";
     borrowBtn.disabled = true;
   } else {
     borrowBtn.textContent = "Borrow";
@@ -1116,35 +1067,54 @@ function renderRecommendedHero(book) {
   function borrowRecommendedBook() {
     const title = book.title;
     const status = book.status || "Available";
+
     
-    // Check if already borrowed
     const borrowedTitles = JSON.parse(localStorage.getItem("brainrootBorrowed")) || [];
     if (borrowedTitles.indexOf(title) !== -1 || status === "Borrowed") {
       showExploreToast("This book is already in your borrowed collection.", "neutral");
       return;
     }
+
     
-    // Check if available
     if (status !== "Available") {
       showExploreToast("This book is not available for borrowing.", "neutral");
       return;
     }
+
     
-    // Add to borrowed list
     borrowedTitles.push(title);
     localStorage.setItem("brainrootBorrowed", JSON.stringify(borrowedTitles));
+
     
-    // Update button state
-    borrowBtn.textContent = "Already Borrowed ✓";
+    if (window.brainrootStorage && typeof window.brainrootStorage.readJson === "function") {
+      const collections = window.brainrootStorage.readJson("brainrootCollections", []) || [];
+      const alreadyInCollection = collections.some(function (item) {
+        return String(item?.title || "").trim().toLowerCase() === String(title || "").trim().toLowerCase();
+      });
+
+      if (!alreadyInCollection) {
+        collections.push({
+          title: title,
+          author: book.author || "Unknown Author",
+          category: book.category || "General",
+          image: book.imageUrl,
+          access: "free"
+        });
+        window.brainrootStorage.writeJson("brainrootCollections", collections);
+      }
+    }
+
+    
+    borrowBtn.textContent = "Already Borrowed";
     borrowBtn.disabled = true;
+
     
-    // Show success message
     showExploreToast("Successfully borrowed: " + title, "success");
   }
 
-  reserveBtn.onclick = openCurrentRecommendedBook;
-  borrowBtn.onclick = borrowRecommendedBook;
-  detailsBtn.onclick = openCurrentRecommendedBook;
+  setRecommendedHeroButtonAction(reserveBtn, openCurrentRecommendedBook);
+  setRecommendedHeroButtonAction(borrowBtn, borrowRecommendedBook);
+  setRecommendedHeroButtonAction(detailsBtn, openCurrentRecommendedBook);
 }
 
 function setRecommendedHeroVisibility(isVisible) {
@@ -1153,7 +1123,7 @@ function setRecommendedHeroVisibility(isVisible) {
     return;
   }
 
-  heroSection.classList.toggle("hidden", !isVisible);
+  heroSection.classList.toggle("is-hidden", !isVisible);
 }
 
 function stopRecommendedHeroRotation() {
@@ -1185,6 +1155,24 @@ function getDefaultRecommendedBooks() {
   return [buildFallbackRecommendedBook("Concrete Poetry")];
 }
 
+function runRecommendedHeroButtonAction(event) {
+  const action = event.currentTarget._recommendedHeroAction;
+  if (typeof action === "function") {
+    action();
+  }
+}
+
+function setRecommendedHeroButtonAction(button, action) {
+  button._recommendedHeroAction = action;
+
+  if (button.dataset.recommendedActionBound === "true") {
+    return;
+  }
+
+  button.addEventListener("click", runRecommendedHeroButtonAction);
+  button.dataset.recommendedActionBound = "true";
+}
+
 function refreshRecommendedHeroFromCollections() {
   const recommended = getRecommendedBooksFromCollections();
   const sourceItems = recommended.length ? recommended : getDefaultRecommendedBooks();
@@ -1213,9 +1201,9 @@ function hideExploreSearchPanel() {
     return;
   }
 
-  panel.classList.add("hidden");
+  panel.classList.add("is-hidden");
   if (exploreSearchResults) {
-    exploreSearchResults.innerHTML = "";
+    exploreSearchResults.replaceChildren();
   }
   if (exploreSearchCount) {
     exploreSearchCount.textContent = "0 results";
@@ -1251,7 +1239,7 @@ function renderExploreSearchResults(query) {
     return item.searchText.indexOf(normalizedQuery) !== -1;
   }).slice(0, EXPLORE_SEARCH_RESULT_LIMIT);
 
-  exploreSearchResults.innerHTML = "";
+  exploreSearchResults.replaceChildren();
   exploreSearchCount.textContent = matches.length + (matches.length === 1 ? " result" : " results");
 
   if (matches.length === 0) {
@@ -1259,31 +1247,35 @@ function renderExploreSearchResults(query) {
     emptyState.className = "explore-search-empty";
     emptyState.textContent = 'No books matched "' + query.trim() + '". Try a different title, author, or category.';
     exploreSearchResults.appendChild(emptyState);
-    panel.classList.remove("hidden");
+    panel.classList.remove("is-hidden");
     return;
   }
 
   matches.forEach(function (item) {
     const access = getBookAccess(item.title) === "paid" ? "Paid" : "Free";
     const category = getBookCategory(item.title);
-    const button = document.createElement("button");
+    const button = createClassedElement("button", "explore-search-item");
+    const layout = createClassedElement("div", "explore-search-item-layout");
+    const image = createClassedElement("img", "explore-search-item-thumb");
+    const copy = createClassedElement("div", "explore-search-item-copy");
+    const title = createClassedElement("p", "explore-search-item-title");
+    const meta = createClassedElement("p", "explore-search-item-meta");
+
     button.type = "button";
-    button.className = "explore-search-item";
-    button.innerHTML =
-      '<div class="explore-search-item-layout">' +
-      '<img class="explore-search-item-thumb" src="' + item.imageUrl + '" alt="' + item.title + '">' +
-      '<div class="explore-search-item-copy">' +
-      '<p class="explore-search-item-title">' + item.title + '</p>' +
-      '<p class="explore-search-item-meta">' + item.author + ' · ' + category + ' · ' + access + '</p>' +
-      '</div>' +
-      '</div>';
+    image.src = item.imageUrl;
+    image.alt = item.title;
+    title.textContent = item.title;
+    meta.textContent = item.author + " - " + category + " - " + access;
+    copy.append(title, meta);
+    layout.append(image, copy);
+    button.appendChild(layout);
     button.addEventListener("click", function () {
       openSearchResult(item);
     });
     exploreSearchResults.appendChild(button);
   });
 
-  panel.classList.remove("hidden");
+  panel.classList.remove("is-hidden");
 }
 
 function showExploreToast(message) {
@@ -1292,30 +1284,15 @@ function showExploreToast(message) {
   if (!toast) {
     toast = document.createElement("div");
     toast.id = "exploreToast";
+    toast.className = "explore-toast";
     toast.setAttribute("role", "status");
     toast.setAttribute("aria-live", "polite");
-    toast.style.position = "fixed";
-    toast.style.left = "50%";
-    toast.style.bottom = "24px";
-    toast.style.transform = "translateX(-50%)";
-    toast.style.zIndex = "60";
-    toast.style.maxWidth = "min(92vw, 540px)";
-    toast.style.padding = "14px 18px";
-    toast.style.borderRadius = "10px";
-    toast.style.background = "rgba(15, 23, 42, 0.96)";
-    toast.style.color = "#fff";
-    toast.style.boxShadow = "0 18px 40px rgba(15, 23, 42, 0.22)";
-    toast.style.fontSize = "14px";
-    toast.style.lineHeight = "1.5";
-    toast.style.opacity = "0";
-    toast.style.transition = "opacity 180ms ease, transform 180ms ease";
     document.body.appendChild(toast);
   }
 
   toast.textContent = message;
   requestAnimationFrame(function () {
-    toast.style.opacity = "1";
-    toast.style.transform = "translateX(-50%) translateY(0)";
+    toast.classList.add("is-visible");
   });
 
   if (exploreToastTimer) {
@@ -1323,8 +1300,7 @@ function showExploreToast(message) {
   }
 
   exploreToastTimer = setTimeout(function () {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateX(-50%) translateY(8px)";
+    toast.classList.remove("is-visible");
   }, 2600);
 }
 
@@ -1397,7 +1373,7 @@ function getBookRatingChip(title) {
     return "";
   }
 
-  return "★ " + record.average.toFixed(1);
+  return "* " + record.average.toFixed(1);
 }
 
 function setUserRatingForTitle(title, ratingValue) {
@@ -1489,24 +1465,24 @@ function openBookModal(title, author, description, status, imageUrl) {
   const alreadyBorrowed = borrowedTitles.indexOf(title) !== -1;
 
   if (alreadyBorrowed || status === "Borrowed") {
-    borrowBtn.textContent = "Already Borrowed ✓";
+    borrowBtn.textContent = "Already Borrowed";
     borrowBtn.disabled = true;
-    borrowBtn.classList.add("opacity-50", "cursor-not-allowed");
-    loginMsg.classList.add("hidden");
+    borrowBtn.classList.add("is-disabled");
+    loginMsg.classList.add("is-hidden");
   } else if (paidLocked) {
     borrowBtn.textContent = "Subscription Required";
     borrowBtn.disabled = true;
-    borrowBtn.classList.add("opacity-50", "cursor-not-allowed");
-    loginMsg.classList.remove("hidden");
+    borrowBtn.classList.add("is-disabled");
+    loginMsg.classList.remove("is-hidden");
     loginMsg.textContent = "This is a paid book. Upgrade your plan from Profile to borrow.";
   } else {
     borrowBtn.textContent = "Borrow Book";
     borrowBtn.disabled = false;
-    borrowBtn.classList.remove("opacity-50", "cursor-not-allowed");
-    loginMsg.classList.add("hidden");
+    borrowBtn.classList.remove("is-disabled");
+    loginMsg.classList.add("is-hidden");
   }
 
-  document.getElementById("bookModal").classList.remove("hidden");
+  document.getElementById("bookModal").classList.remove("is-hidden");
 }
 
 function showInlineExploreMessage(message) {
@@ -1515,12 +1491,12 @@ function showInlineExploreMessage(message) {
     return;
   }
 
-  loginMsg.classList.remove("hidden");
+  loginMsg.classList.remove("is-hidden");
   loginMsg.textContent = message;
 }
 
 function closeBookModal() {
-  document.getElementById("bookModal").classList.add("hidden");
+  document.getElementById("bookModal").classList.add("is-hidden");
 }
 
 function borrowBook() {
@@ -1535,9 +1511,9 @@ function borrowBook() {
     showInlineExploreMessage("This book is already in your borrowed list.");
     const borrowBtn = document.getElementById("borrowBtn");
     if (borrowBtn) {
-      borrowBtn.textContent = "Already Borrowed ✓";
+      borrowBtn.textContent = "Already Borrowed";
       borrowBtn.disabled = true;
-      borrowBtn.classList.add("opacity-50", "cursor-not-allowed");
+      borrowBtn.classList.add("is-disabled");
     }
     return;
   }
@@ -1628,6 +1604,27 @@ function initializeExploreSearch() {
   renderExploreSearchResults(searchInput.value);
 }
 
+function initializeBookModalActions() {
+  const closeBtn = document.getElementById("closeBookModalBtn");
+  const borrowBtn = document.getElementById("borrowBtn");
+  const wishlistBtn = document.getElementById("wishlistBtn");
+
+  if (closeBtn && closeBtn.dataset.modalActionBound !== "true") {
+    closeBtn.addEventListener("click", closeBookModal);
+    closeBtn.dataset.modalActionBound = "true";
+  }
+
+  if (borrowBtn && borrowBtn.dataset.modalActionBound !== "true") {
+    borrowBtn.addEventListener("click", borrowBook);
+    borrowBtn.dataset.modalActionBound = "true";
+  }
+
+  if (wishlistBtn && wishlistBtn.dataset.modalActionBound !== "true") {
+    wishlistBtn.addEventListener("click", addToWishlist);
+    wishlistBtn.dataset.modalActionBound = "true";
+  }
+}
+
 function initializeRecommendedHero() {
   refreshRecommendedHeroFromCollections();
 
@@ -1644,6 +1641,7 @@ window.borrowBook = borrowBook;
 window.addToWishlist = addToWishlist;
 
 function initializeExplorePage() {
+  initializeBookModalActions();
   syncExploreBookLibrary();
   initializeExploreSearch();
   initializeRecommendedHero();
@@ -1662,3 +1660,5 @@ if (document.readyState === "loading") {
 } else {
   initializeExplorePage();
 }
+
+

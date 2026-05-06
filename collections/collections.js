@@ -664,6 +664,11 @@ document.addEventListener("DOMContentLoaded", function () {
       cardElement.classList.add("is-returning");
     }
 
+    var returnModalOverlay = document.getElementById("returnModalOverlay");
+    if (returnModalOverlay) {
+      returnModalOverlay.classList.remove("show");
+    }
+
     showFakeLoading("Processing return...", 950, function () {
       saveStoredCollections(filteredEntries);
       markRecentlyRemoved(book.title);
@@ -1134,7 +1139,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const action = actionButton.getAttribute("data-collection-action");
     const card = actionButton.closest("[data-book-title]");
     const title = card ? card.getAttribute("data-book-title") || "book" : "book";
-    const book = getBookMeta(title);
+    
+    var book = null;
+    if (action === "return" || action === "read") {
+      var collectionEntries = getStoredCollections();
+      var foundEntry = collectionEntries.find(function (item) {
+        return normalizeKey(getCollectionTitle(item)) === normalizeKey(title);
+      });
+      book = foundEntry ? getBookMeta(foundEntry) : getBookMeta(title);
+    } else {
+      book = getBookMeta(title);
+    }
 
     if (action === "recommendations-toggle") {
       recommendationsExpanded = !recommendationsExpanded;

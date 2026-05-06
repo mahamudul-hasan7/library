@@ -651,13 +651,14 @@ document.addEventListener("DOMContentLoaded", function () {
     showToast('Restored "' + book.title + '" to your collection.');
   }
 
-  function returnBookFlow(book, cardElement) {
+  function returnBookFlow(entry, cardElement) {
     const collectionEntries = getStoredCollections();
+    const entryTitle = getCollectionTitle(entry);
     const bookToRemove = collectionEntries.find(function (item) {
-      return normalizeKey(getCollectionTitle(item)) === normalizeKey(book.title);
+      return normalizeKey(getCollectionTitle(item)) === normalizeKey(entryTitle);
     });
     const filteredEntries = collectionEntries.filter(function (item) {
-      return normalizeKey(getCollectionTitle(item)) !== normalizeKey(book.title);
+      return normalizeKey(getCollectionTitle(item)) !== normalizeKey(entryTitle);
     });
 
     if (cardElement) {
@@ -671,21 +672,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     showFakeLoading("Processing return...", 950, function () {
       saveStoredCollections(filteredEntries);
-      markRecentlyRemoved(book.title);
+      markRecentlyRemoved(entryTitle);
       
       
       const borrowedBooks = storage.readJson("brainrootBorrowed", []);
-      const isBorrowed = borrowedBooks.indexOf(book.title) !== -1;
+      const isBorrowed = borrowedBooks.indexOf(entryTitle) !== -1;
       if (isBorrowed) {
         const filteredBorrowed = borrowedBooks.filter(function (title) {
-          return title !== book.title;
+          return title !== entryTitle;
         });
         storage.writeJson("brainrootBorrowed", filteredBorrowed);
       }
       
       rerender();
       showToast({
-        text: 'Done. "' + book.title + '" was returned from your collection.',
+        text: 'Done. "' + entryTitle + '" was returned from your collection.',
         actionLabel: "Undo",
         onAction: function () {
           if (bookToRemove) {
@@ -1141,9 +1142,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const title = card ? card.getAttribute("data-book-title") || "book" : "book";
     
     var book = null;
+    var foundEntry = null;
+    
     if (action === "return" || action === "read") {
       var collectionEntries = getStoredCollections();
-      var foundEntry = collectionEntries.find(function (item) {
+      foundEntry = collectionEntries.find(function (item) {
         return normalizeKey(getCollectionTitle(item)) === normalizeKey(title);
       });
       book = foundEntry ? getBookMeta(foundEntry) : getBookMeta(title);
@@ -1216,9 +1219,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (action === "return") {
-      openReturnModal(book, function () {
-        returnBookFlow(book, card);
-      });
+      if (foundEntry) {
+        openReturnModal(book, function () {
+          returnBookFlow(foundEntry, card);
+        });
+      } else {
+        showToast("Book not found in collection.");
+      }
     }
   });
 

@@ -1,4 +1,28 @@
 (function () {
+  // Ensure storage is available
+  if (!window.brainrootStorage) {
+    window.brainrootStorage = {
+      readJson(key, defaultValue) {
+        try {
+          const value = localStorage.getItem(key);
+          return value ? JSON.parse(value) : defaultValue;
+        } catch (error) {
+          console.error(`Error reading ${key}:`, error);
+          return defaultValue;
+        }
+      },
+      writeJson(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+          return true;
+        } catch (error) {
+          console.error(`Error writing ${key}:`, error);
+          return false;
+        }
+      }
+    };
+  }
+  
   const storage = window.brainrootStorage;
   const AUTH_KEY = "brainrootCurrentUser";
   const BEHAVIOR_KEY = "brainrootBookBehavior";
@@ -51,8 +75,52 @@
     return Boolean(getCurrentUser());
   }
 
+  function removeStoredValue(key) {
+    try {
+      if (typeof storage.remove === "function") {
+        storage.remove(key);
+      } else if (typeof storage.removeItem === "function") {
+        storage.removeItem(key);
+      } else {
+        localStorage.removeItem(key);
+      }
+    } catch (error) {
+      console.error(`Error removing ${key}:`, error);
+    }
+  }
+
+  function writeCurrentUser(user) {
+    if (!user || typeof user !== "object") {
+      removeStoredValue(AUTH_KEY);
+      return null;
+    }
+
+    const existing = getCurrentUser() || {};
+    const nextUser = Object.assign({}, existing, user, {
+      loggedInAt: existing.loggedInAt || new Date().toISOString()
+    });
+
+    storage.writeJson(AUTH_KEY, nextUser);
+    return nextUser;
+  }
+
   function normalizeKey(value) {
     return String(value || "").trim().toLowerCase();
+  }
+
+  function getCurrentUserPlanType() {
+    const user = getCurrentUser();
+    return normalizeKey(user && (user.planType || user.plan_type));
+  }
+
+  function buildFreeSubscription(updatedAt) {
+    return {
+      plan: "Free Book",
+      billingCycle: "monthly",
+      price: 0,
+      planType: "free",
+      updatedAt: updatedAt || new Date().toISOString()
+    };
   }
 
   function getCurrentUserEmail() {
@@ -69,13 +137,19 @@
     storage.writeJson(SUBSCRIPTIONS_BY_USER_KEY, store || {});
   }
 
-  function migrateLegacySubscription(emailKey) {
+  function migrateLegacySubscription(emailKey, userPlanType) {
     if (!emailKey) {
       return;
     }
 
     const store = readSubscriptionsByUser();
     if (store[emailKey]) {
+      return;
+    }
+
+    if (userPlanType === "free") {
+      store[emailKey] = buildFreeSubscription();
+      writeSubscriptionsByUser(store);
       return;
     }
 
@@ -88,11 +162,16 @@
 
   function getSubscription() {
     const emailKey = getCurrentUserEmail();
-    migrateLegacySubscription(emailKey);
+    const userPlanType = getCurrentUserPlanType();
+    migrateLegacySubscription(emailKey, userPlanType);
 
     const store = readSubscriptionsByUser();
     if (emailKey && store[emailKey] && typeof store[emailKey] === "object") {
       return store[emailKey];
+    }
+
+    if (userPlanType === "free") {
+      return buildFreeSubscription();
     }
 
     const parsed = storage.readJson(SUBSCRIPTION_KEY, null);
@@ -286,6 +365,48 @@
     return false;
   }
 
+  async function refreshBackendSession(options) {
+    const config = options || {};
+
+    if (!window.brainrootAPI || typeof window.brainrootAPI.getCurrentUser !== "function") {
+      return getCurrentUser();
+    }
+
+    const user = await window.brainrootAPI.getCurrentUser();
+    if (user) {
+      writeCurrentUser(user);
+      renderNavigation();
+      setProfileLinks();
+      gateSecureLinks();
+      return user;
+    }
+
+    removeStoredValue(AUTH_KEY);
+    renderNavigation();
+    setProfileLinks();
+    gateSecureLinks();
+
+    if (config.redirect) {
+      redirectToLogin(window.location.href);
+    }
+
+    return null;
+  }
+
+  async function requireBackendLogin(message) {
+    if (!requireLogin(message)) {
+      return false;
+    }
+
+    const user = await refreshBackendSession({ redirect: false });
+    if (user) {
+      return true;
+    }
+
+    redirectToLogin(window.location.href);
+    return false;
+  }
+
   function setAuthVisibility(element, visible) {
     element.classList.toggle("is-auth-hidden", !visible);
 
@@ -330,6 +451,7 @@
     setProfileLinks();
     gateSecureLinks();
     renderNavigation();
+    refreshBackendSession({ redirect: isSecurePage() });
   });
 
   window.brainrootAuth = {
@@ -343,6 +465,8 @@
     getBookAccess: getBookAccess,
     isPaidBook: isPaidBook,
     requireLogin: requireLogin,
+    requireBackendLogin: requireBackendLogin,
+    refreshBackendSession: refreshBackendSession,
     buildLoginUrl: buildLoginUrl,
     redirectToLogin: redirectToLogin,
     renderNavigation: renderNavigation

@@ -1,11 +1,20 @@
 document.addEventListener("DOMContentLoaded", async function () {
   const api = window.brainrootAPI;
-  if (!window.brainrootAuth || !window.brainrootAuth.requireLogin("Please login to access your wishlist.")) {
+  if (!window.brainrootAuth) {
+    return;
+  }
+
+  const canAccessWishlist = typeof window.brainrootAuth.requireBackendLogin === "function"
+    ? await window.brainrootAuth.requireBackendLogin("Please login to access your wishlist.")
+    : window.brainrootAuth.requireLogin("Please login to access your wishlist.");
+
+  if (!canAccessWishlist) {
     return;
   }
 
   const wishlistContainer = document.querySelector(".wish-list");
   let feedbackTimer = null;
+  const fallbackBookImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='1000' viewBox='0 0 700 1000'%3E%3Crect width='700' height='1000' fill='%23dfe8ea'/%3E%3Crect x='70' y='80' width='560' height='840' rx='24' fill='%23ffffff'/%3E%3Ctext x='350' y='470' font-family='Segoe UI, Arial' font-size='54' font-weight='700' text-anchor='middle' fill='%232d3435'%3EBrainRoot%3C/text%3E%3Ctext x='350' y='540' font-family='Segoe UI, Arial' font-size='30' text-anchor='middle' fill='%23596061'%3EBook Cover%3C/text%3E%3C/svg%3E";
 
   function normalizeTitleKey(value) {
     return String(value || "").trim().toLowerCase();
@@ -41,6 +50,16 @@ document.addEventListener("DOMContentLoaded", async function () {
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=320&q=80"
     ];
     return fallbackCovers[hashTitle(title) % fallbackCovers.length];
+  }
+
+  function setBookImage(image, source, title) {
+    if (!image) return;
+    image.onerror = function () {
+      image.onerror = null;
+      image.src = fallbackBookImage;
+    };
+    image.src = String(source || "").trim() || fallbackBookImage;
+    image.alt = title || "Book cover";
   }
 
   function showFeedback(message, options) {
@@ -177,6 +196,23 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
+  function getBorrowedTitle(item) {
+    if (typeof item === "string") {
+      return item;
+    }
+    if (item && typeof item === "object") {
+      return item.title;
+    }
+    return "";
+  }
+
+  function isBookAlreadyBorrowed(items, title) {
+    const key = normalizeTitleKey(title);
+    return items.some(function (entry) {
+      return normalizeTitleKey(getBorrowedTitle(entry)) === key;
+    });
+  }
+
   function getCollectionLimit() {
     if (window.brainrootAuth && typeof window.brainrootAuth.getCollectionLimit === "function") {
       return window.brainrootAuth.getCollectionLimit();
@@ -213,17 +249,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     return "free";
   }
 
-  function setAddedState(button, isAdded, isLocked) {
+  function setAddedState(button, isBorrowed, isLocked) {
     if (!button) return;
     if (isLocked) {
       button.textContent = "Subscription Required";
       button.classList.add("wishlist-action-locked");
       button.classList.remove("wishlist-action-added");
+      button.setAttribute("aria-disabled", "true");
       return;
     }
-    button.textContent = isAdded ? "Added" : "Add to Collection";
-    button.classList.toggle("wishlist-action-added", isAdded);
+    button.textContent = isBorrowed ? "Borrowed" : "Borrow Book";
+    button.classList.toggle("wishlist-action-added", isBorrowed);
     button.classList.remove("wishlist-action-locked");
+    button.setAttribute("aria-disabled", isBorrowed ? "true" : "false");
   }
 
   async function renderWishlist() {
@@ -235,7 +273,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       return;
     }
 
-    const collections = await getCollections();
+    const borrowedItems = typeof api.getBorrowedBooks === "function" ? await api.getBorrowedBooks() : [];
     const defaultBooks = {
       "Concrete Poetry": { image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=320&q=80", category: "Theory", year: "2023", author: "Tadao Ando" },
       "The Kite Runner": { image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=320&q=80", category: "Drama", year: "2003", author: "Khaled Hosseini" },
@@ -253,15 +291,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         image: storedData.image || defaultData.image || getFallbackCoverImage(bookTitle),
         category: storedData.category || defaultData.category || "General",
         year: storedData.year || defaultData.year || "2023",
-        author: storedData.author || defaultData.author || "Unknown Author"
+        author: storedData.author || defaultData.author || "Unknown Author",
+        access: storedData.access || storedData.access_type || defaultData.access || getBookAccess(bookTitle),
+        description: storedData.description || defaultData.description || ""
       };
 
       const article = document.createElement("article");
       const indexNode = document.createElement("b");
       indexNode.textContent = String(index + 1).padStart(2, "0");
       const image = document.createElement("img");
-      image.src = bookData.image;
-      image.alt = bookTitle;
+      setBookImage(image, bookData.image, bookTitle);
       const copy = document.createElement("div");
       const meta = document.createElement("small");
       meta.textContent = bookData.category + " · " + bookData.year;
@@ -272,7 +311,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const addLink = document.createElement("a");
       addLink.href = "#";
       addLink.className = "add-btn";
-      addLink.textContent = "Add to Collection";
+      addLink.textContent = "Borrow Book";
       const removeLink = document.createElement("a");
       removeLink.href = "#";
       removeLink.className = "remove-btn";
@@ -302,36 +341,67 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const addBtn = article.querySelector(".add-btn");
       if (addBtn) {
-        const paidLocked = getBookAccess(bookTitle) === "paid" && !isPaidSubscriber();
-        setAddedState(addBtn, isBookAlreadyInCollections(collections, bookTitle), paidLocked);
+        const bookAccess = String(bookData.access || getBookAccess(bookTitle)).toLowerCase() === "paid" ? "paid" : "free";
+        const paidLocked = bookAccess === "paid" && !isPaidSubscriber();
+        setAddedState(addBtn, isBookAlreadyBorrowed(borrowedItems, bookTitle), paidLocked);
 
         addBtn.addEventListener("click", async function (e) {
           e.preventDefault();
 
-          if (getBookAccess(bookTitle) === "paid" && !isPaidSubscriber()) {
+          if (bookAccess === "paid" && !isPaidSubscriber()) {
             showFeedback("This is a paid book. Upgrade your plan in Profile first.");
             return;
           }
 
-          if (!window.brainrootAuth.requireLogin("Please login to add books to collections.")) {
-            return;
+          if (window.brainrootAuth) {
+            const canBorrow = typeof window.brainrootAuth.requireBackendLogin === "function"
+              ? await window.brainrootAuth.requireBackendLogin("Please login to borrow books.")
+              : window.brainrootAuth.requireLogin("Please login to borrow books.");
+
+            if (!canBorrow) {
+              return;
+            }
           }
 
           const currentCollections = await getCollections();
           const limit = getCollectionLimit();
-          if (Number.isFinite(limit) && currentCollections.length >= limit) {
+          const alreadyInCollection = isBookAlreadyInCollections(currentCollections, bookTitle);
+          if (!alreadyInCollection && Number.isFinite(limit) && currentCollections.length >= limit) {
             showFeedback("Collection limit reached. Upgrade plan from Profile.");
             return;
           }
 
-          if (!isBookAlreadyInCollections(currentCollections, bookTitle)) {
-            await api.addToCollection({
-              title: bookTitle,
-              author: bookData.author,
-              category: bookData.category,
-              image: bookData.image,
-              access: getBookAccess(bookTitle)
+          const displayTitle = getDisplayBookTitle(bookTitle);
+          const alreadyBorrowed = typeof api.isBookBorrowed === "function"
+            ? await api.isBookBorrowed(bookTitle)
+            : false;
+
+          if (alreadyBorrowed) {
+            await removeFromWishlistStorage(bookTitle);
+            article.classList.add("is-removing");
+            setTimeout(function () {
+              article.remove();
+              showEmptyWishlistIfNeeded();
+            }, 220);
+            showFeedback(`"${displayTitle}" is already borrowed, so it was removed from wishlist.`, {
+              showGoToCollection: true,
+              duration: 5000
             });
+            return;
+          }
+
+          const borrowed = await api.borrowBook({
+            title: bookTitle,
+            author: bookData.author,
+            category: bookData.category,
+            image: bookData.image,
+            access: bookAccess,
+            description: bookData.description
+          });
+
+          if (!borrowed) {
+            showFeedback(api.lastError || "Could not borrow this book. Try again.");
+            return;
           }
 
           await removeFromWishlistStorage(bookTitle);
@@ -342,8 +412,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             showEmptyWishlistIfNeeded();
           }, 220);
 
-          const displayTitle = getDisplayBookTitle(bookTitle);
-          showFeedback(`Added "${displayTitle}" to collection.`, {
+          showFeedback(`Borrowed "${displayTitle}" and removed it from wishlist.`, {
             showGoToCollection: true,
             duration: 5000
           });

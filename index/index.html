@@ -27,9 +27,13 @@
   <main class="container">
     <section class="hero">
       <h1>Search the architectural archive.</h1>
-      <div class="search-box">
+      <div class="search-box" id="indexSearchShell">
         <span class="icon">&#128269;</span>
-        <input type="text" placeholder="Title, author, or subject matter...">
+        <input type="text" id="indexSearchInput" placeholder="Title, author, or subject matter...">
+        <div id="indexSearchPanel" class="search-live-panel is-hidden">
+          <div id="indexSearchResults"></div>
+          <p id="indexSearchCount" style="padding: 10px; color: #999; font-size: 12px;">0 results</p>
+        </div>
       </div>
       <p class="discover">OR DISCOVER BY CATEGORY</p>
       <div class="chips">
@@ -160,7 +164,50 @@
       </div>
 
     </section>
-  </main>
+
+    <!-- Trending Books Section -->
+    <section class="featured trending-section">
+      <div class="section-top">
+        <div>
+          <p class="label">POPULAR</p>
+          <h2>Trending Books</h2>
+        </div>
+        <a class="browse" href="../explore/explore.html">View All</a>
+      </div>
+      <div class="grid" id="trendingBooksGrid">
+        <p class="loading">Loading trending books...</p>
+      </div>
+    </section>
+
+    <!-- Top Reading Section -->
+    <section class="featured top-reading-section">
+      <div class="section-top">
+        <div>
+          <p class="label">MOST READ</p>
+          <h2>Top Reading</h2>
+        </div>
+        <a class="browse" href="../explore/explore.html">View All</a>
+      </div>
+      <div class="grid" id="topReadingGrid">
+        <p class="loading">Loading top reading books...</p>
+      </div>
+    </section>
+
+    <!-- Most Liked Section -->
+    <section class="featured most-liked-section">
+      <div class="section-top">
+        <div>
+          <p class="label">FAVORITES</p>
+          <h2>Most Liked</h2>
+        </div>
+        <a class="browse" href="../explore/explore.html">View All</a>
+      </div>
+      <div class="grid" id="mostLikedGrid">
+        <p class="loading">Loading most liked books...</p>
+      </div>
+    </section>
+
+    </main>
 
   <div id="bookModal" class="book-modal hidden">
     <div class="modal-backdrop"></div>
@@ -215,9 +262,10 @@
       <a href="../collections/collections.html">Collections</a>
     </div>
   </footer>
-  <script src="../storage.js"></script>
-  <script src="../auth.js"></script>
+  <script src="../local-storage.js"></script>
+  <script src="../backend-storage.js"></script>
   <script src="../api-client.js"></script>
+  <script src="../auth.js"></script>
   <script src="./index.js"></script>
 </body>
 

@@ -6,12 +6,19 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>BrainRoot | Collections</title>
   <link href="./collections.css" rel="stylesheet"/>
+  <link href="../shared-search.css" rel="stylesheet"/>
 </head>
 <body class="collections-page">
   
   <nav class="collections-nav">
     <div class="collections-nav-inner">
       <div class="collections-brand"><a href="../index/index.html">BrainRoot</a></div>
+      <form class="site-nav-search" action="../explore/explore.html" method="get" role="search">
+        <button class="site-nav-search-submit" type="submit" aria-label="Search archive">
+          <img src="../Assets/search.png" alt="" aria-hidden="true"/>
+        </button>
+        <input class="site-nav-search-input" name="search" type="search" placeholder="Search the archive..." autocomplete="off"/>
+      </form>
       <div class="collections-nav-menu">
         <a class="collections-nav-link" href="../index/index.html">Home</a>
         <a class="collections-nav-link" href="../explore/explore.html">Explore</a>
@@ -34,6 +41,15 @@
         <span class="collections-kicker">Curated Collections</span>
         <h1>My Collections</h1>
       </header>
+      <div class="collections-viewbar" aria-label="Collection views">
+        <button class="collections-view-btn is-active" type="button" data-collection-view="active">Current</button>
+        <button class="collections-view-btn collections-view-btn--history" type="button" data-collection-view="history">History</button>
+        <div id="collectionsHistoryFilters" class="collections-history-filters hidden" role="group" aria-label="History filters">
+          <button class="collections-filter-btn" type="button" data-collection-filter="returned">Returned Books</button>
+          <button class="collections-filter-btn" type="button" data-collection-filter="expired">Expired Books</button>
+          <button class="collections-filter-btn collections-filter-btn--danger" type="button" data-collection-action="clear-history">Clear History</button>
+        </div>
+      </div>
       <div id="collectionsEmptyState" class="collections-empty">Your collection is empty. Add a book from Recommendations or browse the archive to build it.</div>
       <section id="collectionsList" class="collections-list"></section>
     </div>
@@ -66,9 +82,10 @@
     </div>
   </footer>
   
-  <script src="../storage.js"></script>
-  <script src="../auth.js"></script>
+  <script src="../local-storage.js"></script>
+  <script src="../backend-storage.js"></script>
   <script src="../api-client.js"></script>
+  <script src="../auth.js"></script>
   <script src="./collections.js"></script>
 </body>
 </html>

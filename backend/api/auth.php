@@ -3,6 +3,8 @@
 
 require_once '../config.php';
 
+ensureUserProfileColumns($conn);
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'POST') {
@@ -11,12 +13,18 @@ if ($method === 'POST') {
     $email = $input['email'] ?? null;
     $password = $input['password'] ?? null;
     $name = $input['name'] ?? null;
+    $institution = $input['institution'] ?? null;
+    $role = $input['role'] ?? null;
     
-    if (!$action || !$email || !$password) {
-        sendJson(['success' => false, 'error' => 'Action, email, and password are required'], 400);
+    if (!$action) {
+        sendJson(['success' => false, 'error' => 'Action is required'], 400);
     }
     
     if ($action === 'register') {
+        if (!$email || !$password) {
+            sendJson(['success' => false, 'error' => 'Email and password are required'], 400);
+        }
+
         if (!$name) {
             sendJson(['success' => false, 'error' => 'Name is required'], 400);
         }
@@ -34,14 +42,22 @@ if ($method === 'POST') {
         // Hash password
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         
-        // Insert user
-        $insertQuery = "INSERT INTO users (email, password, name) VALUES (?, ?, ?)";
+        // Insert user. New accounts always start on the free plan.
+        $planType = 'free';
+        $insertQuery = "INSERT INTO users (email, password, name, institution, role, plan_type) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($insertQuery);
-        $stmt->bind_param("sss", $email, $hashedPassword, $name);
+        $stmt->bind_param("ssssss", $email, $hashedPassword, $name, $institution, $role, $planType);
         
         if ($stmt->execute()) {
+            $userId = $conn->insert_id;
+            $createdAtQuery = "SELECT created_at FROM users WHERE id = ?";
+            $createdAtStmt = $conn->prepare($createdAtQuery);
+            $createdAtStmt->bind_param("i", $userId);
+            $createdAtStmt->execute();
+            $createdAt = $createdAtStmt->get_result()->fetch_assoc()['created_at'] ?? date('Y-m-d H:i:s');
+
             session_start();
-            $_SESSION['user_id'] = $conn->insert_id;
+            $_SESSION['user_id'] = $userId;
             $_SESSION['email'] = $email;
             $_SESSION['name'] = $name;
             
@@ -49,9 +65,15 @@ if ($method === 'POST') {
                 'success' => true,
                 'message' => 'Registration successful',
                 'user' => [
-                    'id' => $conn->insert_id,
+                    'id' => $userId,
                     'email' => $email,
-                    'name' => $name
+                    'name' => $name,
+                    'institution' => $institution,
+                    'role' => $role,
+                    'plan_type' => $planType,
+                    'planType' => $planType,
+                    'created_at' => $createdAt,
+                    'createdAt' => $createdAt
                 ]
             ]);
         } else {
@@ -60,8 +82,12 @@ if ($method === 'POST') {
     }
     
     else if ($action === 'login') {
+        if (!$email || !$password) {
+            sendJson(['success' => false, 'error' => 'Email and password are required'], 400);
+        }
+
         // Get user
-        $userQuery = "SELECT id, password, name FROM users WHERE email = ?";
+        $userQuery = "SELECT id, password, name, institution, role, plan_type, created_at FROM users WHERE email = ?";
         $stmt = $conn->prepare($userQuery);
         $stmt->bind_param("s", $email);
         $stmt->execute();
@@ -90,7 +116,13 @@ if ($method === 'POST') {
             'user' => [
                 'id' => $user['id'],
                 'email' => $email,
-                'name' => $user['name']
+                'name' => $user['name'],
+                'institution' => $user['institution'],
+                'role' => $user['role'],
+                'plan_type' => $user['plan_type'] ?: 'free',
+                'planType' => $user['plan_type'] ?: 'free',
+                'created_at' => $user['created_at'],
+                'createdAt' => $user['created_at']
             ]
         ]);
     }
@@ -107,20 +139,35 @@ if ($method === 'POST') {
 }
 
 else if ($method === 'GET') {
-    session_start();
-    
-    if (isset($_SESSION['user_id'])) {
-        sendJson([
-            'success' => true,
-            'user' => [
-                'id' => $_SESSION['user_id'],
-                'email' => $_SESSION['email'],
-                'name' => $_SESSION['name']
-            ]
-        ]);
-    } else {
+    $userId = getCurrentUserId();
+    $userQuery = "SELECT id, email, name, institution, role, plan_type, created_at FROM users WHERE id = ?";
+    $stmt = $conn->prepare($userQuery);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
         sendJson(['success' => false, 'error' => 'Not authenticated'], 401);
     }
+
+    $user = $result->fetch_assoc();
+    $_SESSION['email'] = $user['email'];
+    $_SESSION['name'] = $user['name'];
+
+    sendJson([
+        'success' => true,
+        'user' => [
+            'id' => $user['id'],
+            'email' => $user['email'],
+            'name' => $user['name'],
+            'institution' => $user['institution'],
+            'role' => $user['role'],
+            'plan_type' => $user['plan_type'] ?: 'free',
+            'planType' => $user['plan_type'] ?: 'free',
+            'created_at' => $user['created_at'],
+            'createdAt' => $user['created_at']
+        ]
+    ]);
 }
 
 else {

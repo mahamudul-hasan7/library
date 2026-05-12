@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BrainRoot | Profile</title>
   <link rel="stylesheet" href="./profile.css" />
+  <link rel="stylesheet" href="../shared-search.css" />
 </head>
 <body class="profile-page">
   <nav class="profile-nav">
@@ -14,6 +15,13 @@
           <a href="../index/index.html" class="profile-brand-link">BrainRoot</a>
         </span>
       </div>
+
+      <form class="site-nav-search" action="../explore/explore.html" method="get" role="search">
+        <button class="site-nav-search-submit" type="submit" aria-label="Search archive">
+          <img src="../Assets/search.png" alt="" aria-hidden="true" />
+        </button>
+        <input class="site-nav-search-input" name="search" type="search" placeholder="Search the archive..." autocomplete="off" />
+      </form>
 
       <div class="profile-nav-right">
         <div class="profile-menu" data-auth="public">
@@ -45,8 +53,8 @@
               <h1 id="profileDisplayName">Mahamudul Hasan</h1>
             </div>
             <div class="profile-member-meta">
-              <span class="profile-member-badge">Premium Member</span>
-              <span class="profile-member-since">Member since 2022</span>
+              <span class="profile-member-badge">Free Member</span>
+              <span class="profile-member-since">Member since 2026</span>
             </div>
           </div>
         </div>
@@ -57,15 +65,9 @@
           <div class="profile-card profile-account-panel">
             <h2 class="profile-section-title">Account Settings</h2>
             <form id="profileSettingsForm" class="profile-form">
-              <div class="profile-form-grid">
-                <div class="profile-form-field">
-                  <label class="profile-label">First Name</label>
-                  <input data-profile-field="firstName" class="profile-input" type="text" value="Mahamudul" />
-                </div>
-                <div class="profile-form-field">
-                  <label class="profile-label">Last Name</label>
-                  <input data-profile-field="lastName" class="profile-input" type="text" value="Hasan" />
-                </div>
+              <div class="profile-form-field">
+                <label class="profile-label">Full Name</label>
+                <input data-profile-field="name" class="profile-input" type="text" value="Mahamudul Hasan" />
               </div>
 
               <div class="profile-form-field">
@@ -101,16 +103,16 @@
               <div class="profile-plan-summary">
                 <div>
                   <p class="profile-meta-label">Current Plan</p>
-                  <p id="currentPlanName" class="profile-plan-name">Premium Subscriber</p>
-                  <p id="currentPlanMeta" class="profile-meta-text">Payment Method: Mastercard **** 4242</p>
+                  <p id="currentPlanName" class="profile-plan-name">Free Book Subscriber</p>
+                  <p id="currentPlanMeta" class="profile-meta-text">Free access active - No payment required</p>
                 </div>
-                <img src="../Assets/verify badge.png" alt="Verified account" class="profile-verification-icon" />
+                <img src="../Assets/verify badge.png" alt="Verified account" class="profile-verification-icon hidden" />
               </div>
 
               <div class="profile-plan-details">
                 <div class="profile-detail-row">
                   <span class="profile-detail-label">Renewal Date</span>
-                  <span id="renewalDateValue" class="profile-detail-value">October 14, 2026</span>
+                  <span id="renewalDateValue" class="profile-detail-value">Not Applicable</span>
                 </div>
                 <div class="profile-detail-row">
                   <span class="profile-detail-label">Account Type</span>
@@ -173,7 +175,7 @@
             <li>Standard reading queue</li>
             <li>Community support</li>
           </ul>
-          <button data-plan-button="free" data-plan-price="0" type="button" class="profile-plan-button">Select Plan</button>
+          <button data-plan-button="free" data-plan-price="0" type="button" class="profile-plan-button profile-plan-button-active">Select Plan</button>
         </div>
 
         <div class="profile-plan-card">
@@ -204,7 +206,7 @@
             <li>34 books/month max</li>
             <li>Priority support</li>
           </ul>
-          <button data-plan-button="standard" data-plan-price="299" type="button" class="profile-plan-button profile-plan-button-active">Select Plan</button>
+          <button data-plan-button="standard" data-plan-price="299" type="button" class="profile-plan-button">Select Plan</button>
         </div>
 
         <div class="profile-plan-card">
@@ -240,8 +242,8 @@
       <div class="profile-modal-body">
         <div class="profile-selected-card">
           <p class="profile-detail-label">Selected Plan</p>
-          <h3 class="profile-plan-title" id="modalPlanName">Standard</h3>
-          <p class="profile-meta-text">Monthly price: <span id="modalPrice" class="profile-price-inline">BDT 299</span></p>
+          <h3 class="profile-plan-title" id="modalPlanName">Free Book</h3>
+          <p class="profile-meta-text">Monthly price: <span id="modalPrice" class="profile-price-inline">BDT 0</span></p>
         </div>
 
         <div>
@@ -254,8 +256,8 @@
 
         <div class="profile-total-card">
           <p class="profile-detail-label">Total Amount</p>
-          <h3 class="profile-total-amount" id="modalTotal">BDT 299</h3>
-          <p class="profile-meta-text" id="billingInfo">Charged monthly</p>
+          <h3 class="profile-total-amount" id="modalTotal">BDT 0</h3>
+          <p class="profile-meta-text" id="billingInfo">Free plan activated (no billing).</p>
         </div>
       </div>
 
@@ -280,7 +282,8 @@
     </div>
   </footer>
 
-  <script src="../storage.js"></script>
+  <script src="../local-storage.js"></script>
+  <script src="../api-client.js"></script>
   <script src="../auth.js"></script>
   <script src="./profile.js"></script>
 </body>

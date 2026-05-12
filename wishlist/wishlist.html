@@ -5,10 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrainRoot - Wishlist</title>
   <link rel="stylesheet" href="./wishlist.css">
+  <link rel="stylesheet" href="../shared-search.css">
 </head>
 <body>
   <header class="topbar">
     <div class="brand"><a href="../index/index.html">BrainRoot</a></div>
+    <form class="site-nav-search" action="../explore/explore.html" method="get" role="search">
+      <button class="site-nav-search-submit" type="submit" aria-label="Search archive">
+        <img src="../Assets/search.png" alt="" aria-hidden="true">
+      </button>
+      <input class="site-nav-search-input" name="search" type="search" placeholder="Search the archive..." autocomplete="off">
+    </form>
     <nav>
       <a href="../index/index.html">Home</a>
       <a href="../explore/explore.html">Explore</a>
@@ -27,9 +34,9 @@
     <p class="sub">Curated records awaiting inclusion into your primary research library.</p>
 
     <section class="wish-list">
-      <article><b>01</b><img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>Theory � 2023</small><h3>Spatial Logics of Northern Brutalism</h3><p>Professor Elena Vane</p><a href="../collections/collections.html">Add to Collection</a> <a href="#">Remove</a></div></article>
-      <article><b>02</b><img src="https://images.unsplash.com/photo-1474932430478-367dbb6832c1?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>History � 1994</small><h3>The Transparent Void</h3><p>Arthur K. Sterling</p><a href="../collections/collections.html">Add to Collection</a> <a href="#">Remove</a></div></article>
-      <article><b>03</b><img src="https://images.unsplash.com/photo-1531901599143-df5010ab9438?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>Urbanism � 2021</small><h3>Post-Digital Infrastructure</h3><p>S. T. Marone</p><a href="../collections/collections.html">Add to Collection</a> <a href="#">Remove</a></div></article>
+      <article><b>01</b><img src="https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>Theory � 2023</small><h3>Spatial Logics of Northern Brutalism</h3><p>Professor Elena Vane</p><a href="#">Borrow Book</a> <a href="#">Remove</a></div></article>
+      <article><b>02</b><img src="https://images.unsplash.com/photo-1474932430478-367dbb6832c1?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>History � 1994</small><h3>The Transparent Void</h3><p>Arthur K. Sterling</p><a href="#">Borrow Book</a> <a href="#">Remove</a></div></article>
+      <article><b>03</b><img src="https://images.unsplash.com/photo-1531901599143-df5010ab9438?auto=format&fit=crop&w=320&q=80" alt="book"><div><small>Urbanism � 2021</small><h3>Post-Digital Infrastructure</h3><p>S. T. Marone</p><a href="#">Borrow Book</a> <a href="#">Remove</a></div></article>
     </section>
   </main>
 
@@ -42,9 +49,10 @@
       <a href="../collections/collections.html">Collections</a>
     </div>
   </footer>
-  <script src="../storage.js"></script>
-  <script src="../auth.js"></script>
+  <script src="../local-storage.js"></script>
+  <script src="../backend-storage.js"></script>
   <script src="../api-client.js"></script>
+  <script src="../auth.js"></script>
   <script src="./wishlist.js"></script>
 </body>
 </html>

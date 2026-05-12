@@ -26,10 +26,9 @@ const subscriptionPlans = {
 };
 
 const defaultProfile = {
-  firstName: "Mahamudul",
-  lastName: "Hasan",
-  email: "mahamudul@arch-institute.org",
-  institution: "Metropolitan School of Architecture"
+  name: "Profile User",
+  email: "reader@brainroot.local",
+  institution: "BrainRoot Library"
 };
 
 const defaultSecuritySettings = {
@@ -39,7 +38,7 @@ const defaultSecuritySettings = {
 
 const storage = window.brainrootStorage;
 
-let selectedPlan = { ...subscriptionPlans.standard };
+let selectedPlan = { ...subscriptionPlans.free };
 
 let toastHideTimer = null;
 
@@ -114,6 +113,62 @@ function formatPrice(amount) {
   return amount === 0 ? "BDT 0" : "BDT " + amount;
 }
 
+function createDefaultFreeSubscription(updatedAt) {
+  return {
+    plan: subscriptionPlans.free.name,
+    billingCycle: "monthly",
+    price: 0,
+    planType: "free",
+    updatedAt: updatedAt || new Date().toISOString()
+  };
+}
+
+function getSubscriptionForDisplay() {
+  const storedSubscription = window.brainrootAuth?.getSubscription?.() || readStoredValue("brainrootSubscription");
+  if (storedSubscription && typeof storedSubscription === "object") {
+    return storedSubscription;
+  }
+
+  const currentUser = getCurrentUser();
+  const planType = String(currentUser.planType || currentUser.plan_type || "free").toLowerCase();
+  const configuredPlan = subscriptionPlans[planType] || subscriptionPlans.free;
+
+  if (configuredPlan.type === "free") {
+    return createDefaultFreeSubscription(currentUser.loggedInAt);
+  }
+
+  return {
+    plan: configuredPlan.name,
+    billingCycle: "monthly",
+    price: configuredPlan.price,
+    planType: configuredPlan.type,
+    updatedAt: currentUser.loggedInAt || new Date().toISOString()
+  };
+}
+
+function parseProfileDate(value) {
+  if (!value) {
+    return null;
+  }
+
+  const normalizedValue = String(value).trim().replace(" ", "T");
+  const parsedDate = new Date(normalizedValue);
+  return isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+function getMemberSinceYear() {
+  const currentUser = getCurrentUser();
+  const memberDate = parseProfileDate(currentUser.created_at || currentUser.createdAt || currentUser.loggedInAt);
+  return (memberDate || new Date()).getFullYear();
+}
+
+function updateMemberSinceDisplay() {
+  const memberSinceEl = document.querySelector(".profile-member-since");
+  if (memberSinceEl) {
+    memberSinceEl.textContent = "Member since " + getMemberSinceYear();
+  }
+}
+
 function formatReadableDate(dateValue) {
   return dateValue.toLocaleDateString("en-US", {
     month: "long",
@@ -181,9 +236,13 @@ function toggleSecuritySetting(settingName) {
   renderSecuritySettings();
 }
 
-function getCurrentUserEmail() {
+function getCurrentUser() {
   const currentUser = window.brainrootAuth?.getCurrentUser?.() || readStoredValue("brainrootCurrentUser");
-  return currentUser?.email || "";
+  return currentUser && typeof currentUser === "object" ? currentUser : {};
+}
+
+function getCurrentUserEmail() {
+  return getCurrentUser().email || "";
 }
 
 function capitalizeWords(value) {
@@ -196,22 +255,117 @@ function capitalizeWords(value) {
     .join(" ");
 }
 
+function normalizeProfileKey(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function getProfileStorageKey(email) {
+  const emailKey = normalizeProfileKey(email || getCurrentUserEmail());
+  return emailKey ? "brainrootProfile:" + emailKey : "brainrootProfile";
+}
+
+function splitFullName(name) {
+  return String(name || "").trim();
+}
+
+function readStoredProfileForUser(email) {
+  const keyedProfile = readStoredValue(getProfileStorageKey(email));
+  if (keyedProfile && typeof keyedProfile === "object") {
+    return keyedProfile;
+  }
+
+  const legacyProfile = readStoredValue("brainrootProfile");
+  if (
+    legacyProfile &&
+    typeof legacyProfile === "object" &&
+    normalizeProfileKey(legacyProfile.email) === normalizeProfileKey(email)
+  ) {
+    return legacyProfile;
+  }
+
+  return {};
+}
+
 function getMergedProfile() {
-  const storedProfile = readStoredValue("brainrootProfile") || {};
-  const currentEmail = getCurrentUserEmail() || defaultProfile.email;
+  const currentUser = getCurrentUser();
+  const currentEmail = String(currentUser.email || "").trim();
+  const storedProfile = readStoredProfileForUser(currentEmail);
 
   return {
-    firstName: storedProfile.firstName || defaultProfile.firstName,
-    lastName: storedProfile.lastName || defaultProfile.lastName,
-    email: storedProfile.email || currentEmail,
-    institution: storedProfile.institution || defaultProfile.institution
+    name: storedProfile.name || currentUser.name || defaultProfile.name,
+    email: storedProfile.email || currentEmail || defaultProfile.email,
+    institution: storedProfile.institution || currentUser.institution || currentUser.institute || defaultProfile.institution,
+    role: storedProfile.role || currentUser.role || "Reader"
   };
 }
 
+function saveProfileForCurrentUser(profile) {
+  const fullName = profile.name || "";
+  const currentUser = getCurrentUser();
+  const nextUser = Object.assign({}, currentUser, {
+    email: profile.email,
+    name: fullName || currentUser.name || profile.email,
+    institution: profile.institution,
+    role: profile.role || currentUser.role || "Reader"
+  });
+
+  storage.writeJson("brainrootCurrentUser", nextUser);
+  storage.writeJson(getProfileStorageKey(profile.email), profile);
+  storage.writeJson("brainrootProfile", profile);
+}
+
+function getFullNameFromProfile(profile) {
+  return profile.name || "";
+}
+
+function buildProfileFromApiUser(user) {
+  return {
+    name: user?.name || defaultProfile.name,
+    email: user?.email || defaultProfile.email,
+    institution: user?.institution || defaultProfile.institution,
+    role: user?.role || "Reader"
+  };
+}
+
+function mergeApiUserIntoLocalProfile(user) {
+  if (!user || typeof user !== "object") {
+    return null;
+  }
+
+  const profile = buildProfileFromApiUser(user);
+  storage.writeJson("brainrootCurrentUser", {
+    id: user.id,
+    email: user.email,
+    name: user.name || getFullNameFromProfile(profile),
+    institution: profile.institution,
+    role: profile.role,
+    plan_type: user.plan_type || user.planType || "free",
+    planType: user.planType || user.plan_type || "free",
+    created_at: user.created_at || user.createdAt || getCurrentUser().created_at || getCurrentUser().createdAt || new Date().toISOString(),
+    createdAt: user.createdAt || user.created_at || getCurrentUser().createdAt || getCurrentUser().created_at || new Date().toISOString(),
+    loggedInAt: getCurrentUser().loggedInAt || new Date().toISOString()
+  });
+  storage.writeJson(getProfileStorageKey(profile.email), profile);
+  storage.writeJson("brainrootProfile", profile);
+  return profile;
+}
+
+async function refreshProfileFromDatabase() {
+  if (!window.brainrootAPI || typeof window.brainrootAPI.getProfile !== "function") {
+    return null;
+  }
+
+  const result = await window.brainrootAPI.getProfile();
+  if (!result.success || !result.user) {
+    return null;
+  }
+
+  return mergeApiUserIntoLocalProfile(result.user);
+}
+
 function getDisplayName(profile) {
-  const fullName = [profile.firstName, profile.lastName].filter(Boolean).join(" ").trim();
-  if (fullName) {
-    return fullName;
+  if (profile.name) {
+    return profile.name;
   }
 
   if (profile.email) {
@@ -258,8 +412,7 @@ function isPaidSubscription(subscription) {
 function populateProfileFields() {
   const profile = getMergedProfile();
   const fieldSelectors = {
-    firstName: '[data-profile-field="firstName"]',
-    lastName: '[data-profile-field="lastName"]',
+    name: '[data-profile-field="name"]',
     email: '[data-profile-field="email"]',
     institution: '[data-profile-field="institution"]'
   };
@@ -274,7 +427,7 @@ function populateProfileFields() {
   const profileDisplayName = document.getElementById("profileDisplayName");
 
   if (profileDisplayName) {
-    profileDisplayName.textContent = getDisplayName(profile);
+    profileDisplayName.textContent = profile.name || getDisplayName(profile);
   }
 }
 
@@ -377,7 +530,9 @@ function closeSubscriptionModal() {
   updatePageScrollLock();
 }
 
-function confirmSubscription() {
+async function confirmSubscription() {
+  console.log("confirmSubscription() called");
+  
   const planName = document.getElementById("modalPlanName").textContent;
   const billingCycle = document.getElementById("billingCycle").value;
   const isFree = selectedPlan.type === "free";
@@ -391,15 +546,73 @@ function confirmSubscription() {
     updatedAt: new Date().toISOString()
   };
 
+  console.log("Subscription data:", nextSubscription);
+
+  // Save to local storage
   if (window.brainrootAuth && typeof window.brainrootAuth.setSubscription === "function") {
     window.brainrootAuth.setSubscription(nextSubscription);
   } else {
     storage.writeJson("brainrootSubscription", nextSubscription);
   }
 
+  // Update in database via API
+  let dbUpdateSuccess = false;
+  let apiError = null;
+
+  try {
+    // Try to use brainrootAPI if available
+    if (window.brainrootAPI && typeof window.brainrootAPI.updateSubscription === "function") {
+      console.log("Using brainrootAPI.updateSubscription()");
+      const result = await window.brainrootAPI.updateSubscription(nextSubscription);
+      console.log("API response:", result);
+      if (result.success) {
+        dbUpdateSuccess = true;
+        if (result.user) {
+          storage.writeJson("brainrootCurrentUser", result.user);
+        }
+      } else {
+        apiError = result.error;
+      }
+    } else {
+      // Fallback: Make direct API call with proper credentials
+      console.log("Using direct fetch to subscription.php");
+      const response = await fetch("../backend/api/subscription.php", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(nextSubscription)
+      });
+      
+      const result = await response.json();
+      console.log("API response:", result);
+      if (result.success) {
+        dbUpdateSuccess = true;
+        if (result.user) {
+          storage.writeJson("brainrootCurrentUser", result.user);
+        }
+      } else {
+        apiError = result.error;
+      }
+    }
+  } catch (error) {
+    console.error("Subscription database sync error:", error);
+    apiError = error.message;
+  }
+
+  // Refresh from database to ensure UI is synced
+  if (dbUpdateSuccess) {
+    console.log("DB update successful, refreshing from database");
+    await refreshProfileFromDatabase();
+  }
+
   window.dispatchEvent(new CustomEvent("brainroot:subscription-updated"));
 
-  if (isFree) {
+  if (!dbUpdateSuccess && apiError) {
+    console.warn("Subscription database update failed:", apiError);
+    showToast("Partial Update", "Local update successful. Database sync failed - please refresh.", "neutral");
+  } else if (isFree) {
     showToast("Plan Updated", "Free Book plan activated successfully.", "neutral");
   } else {
     showToast("Payment Successful", "Subscription to " + planName + " (" + billingCycle + ") confirmed.", "success");
@@ -417,32 +630,18 @@ function updateCurrentPlanDisplay() {
   const renewalDateValue = document.getElementById("renewalDateValue");
   const paidBadge = ensureSubscriptionBadge();
   const billingVerifiedIcon = document.querySelector(".profile-verification-icon");
-  const storedSubscription = window.brainrootAuth?.getSubscription?.() || readStoredValue("brainrootSubscription");
+  const memberBadge = document.querySelector(".profile-member-badge");
+  const storedSubscription = getSubscriptionForDisplay();
 
   if (!currentPlanName || !currentPlanMeta) {
     return;
   }
 
-  if (!storedSubscription) {
-    currentPlanName.textContent = "Premium Subscriber";
-    currentPlanMeta.textContent = "Payment Method: Mastercard **** 4242";
-    if (renewalDateValue) {
-      renewalDateValue.textContent = formatReadableDate(new Date());
-    }
-    if (paidBadge) {
-      paidBadge.classList.add("hidden");
-    }
-    if (billingVerifiedIcon) {
-      billingVerifiedIcon.classList.add("hidden");
-    }
-    return;
-  }
-
   currentPlanName.textContent = storedSubscription.plan + " Subscriber";
   if (storedSubscription.planType === "free") {
-    currentPlanMeta.textContent = "Free access active · No payment required";
+    currentPlanMeta.textContent = "Free access active - No payment required";
   } else {
-    currentPlanMeta.textContent = "Billing cycle: " + storedSubscription.billingCycle + " · " + formatPrice(storedSubscription.price);
+    currentPlanMeta.textContent = "Billing cycle: " + storedSubscription.billingCycle + " - " + formatPrice(storedSubscription.price);
   }
 
   if (renewalDateValue) {
@@ -456,11 +655,19 @@ function updateCurrentPlanDisplay() {
   if (billingVerifiedIcon) {
     billingVerifiedIcon.classList.toggle("hidden", !paidUser);
   }
+  if (memberBadge) {
+    memberBadge.textContent = paidUser ? storedSubscription.plan + " Member" : "Free Member";
+  }
+
+  const activePlanType = subscriptionPlans[storedSubscription.planType] ? storedSubscription.planType : "free";
+  selectedPlan = { ...subscriptionPlans[activePlanType] };
+  setActivePlanButton(activePlanType);
 }
 
 function syncProfilePageState() {
   populateProfileFields();
   updateCurrentPlanDisplay();
+  updateMemberSinceDisplay();
   renderSecuritySettings();
   updatePageScrollLock();
 }
@@ -481,6 +688,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const settingsForm = document.getElementById("profileSettingsForm");
   const logoutBtn = document.getElementById("logoutBtn");
   syncProfilePageState();
+  refreshProfileFromDatabase().then(function () {
+    syncProfilePageState();
+  });
 
   if (!settingsForm) {
     return;
@@ -534,24 +744,43 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  settingsForm.addEventListener("submit", function (event) {
+  settingsForm.addEventListener("submit", async function (event) {
     event.preventDefault();
 
-    const firstNameInput = settingsForm.querySelector('[data-profile-field="firstName"]');
-    const lastNameInput = settingsForm.querySelector('[data-profile-field="lastName"]');
+    const currentProfile = getMergedProfile();
+    const nameInput = settingsForm.querySelector('[data-profile-field="name"]');
     const emailInput = settingsForm.querySelector('[data-profile-field="email"]');
     const institutionInput = settingsForm.querySelector('[data-profile-field="institution"]');
 
     const formData = {
-      firstName: firstNameInput?.value?.trim() || defaultProfile.firstName,
-      lastName: lastNameInput?.value?.trim() || defaultProfile.lastName,
-      email: emailInput?.value?.trim() || defaultProfile.email,
-      institution: institutionInput?.value?.trim() || defaultProfile.institution
+      name: nameInput?.value?.trim() || currentProfile.name,
+      email: emailInput?.value?.trim() || currentProfile.email,
+      institution: institutionInput?.value?.trim() || currentProfile.institution,
+      role: currentProfile.role || "Reader"
     };
 
-    storage.writeJson("brainrootProfile", formData);
+    const fullName = formData.name || formData.email;
+
+    if (window.brainrootAPI && typeof window.brainrootAPI.updateProfile === "function") {
+      const result = await window.brainrootAPI.updateProfile({
+        name: fullName,
+        email: formData.email,
+        institution: formData.institution,
+        role: formData.role
+      });
+
+      if (!result.success) {
+        showToast("Update Failed", result.error || "Profile could not be saved to database.", "neutral");
+        return;
+      }
+
+      mergeApiUserIntoLocalProfile(result.user);
+    } else {
+      saveProfileForCurrentUser(formData);
+    }
+
     populateProfileFields();
-    showToast("Profile Updated", "Your profile changes were saved successfully.", "success");
+    showToast("Profile Updated", "Your profile changes were saved to the database.", "success");
   });
 
   if (logoutBtn) {
@@ -566,6 +795,9 @@ document.addEventListener("DOMContentLoaded", function () {
 window.addEventListener("pageshow", function () {
   if (window.brainrootAuth && window.brainrootAuth.isLoggedIn()) {
     syncProfilePageState();
+    refreshProfileFromDatabase().then(function () {
+      syncProfilePageState();
+    });
   }
 });
 

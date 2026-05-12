@@ -3,6 +3,8 @@
 
 require_once '../config.php';
 
+ensureBookCatalogColumns($conn);
+
 $method = $_SERVER['REQUEST_METHOD'];
 $userId = getCurrentUserId();
 
@@ -15,11 +17,22 @@ if ($method === 'GET') {
             b.author, 
             b.category, 
             b.image_url,
+            b.image_url as image,
+            b.description,
+            b.rating_average,
+            b.rating_count,
             b.access_type as access,
             w.added_at
         FROM wishlist w
         JOIN books b ON w.book_id = b.id
         WHERE w.user_id = ?
+            AND NOT EXISTS (
+                SELECT 1
+                FROM borrowed_books bb
+                WHERE bb.user_id = w.user_id
+                    AND bb.book_id = w.book_id
+                    AND bb.returned_at IS NULL
+            )
         ORDER BY w.added_at DESC
     ";
     
@@ -43,6 +56,7 @@ else if ($method === 'POST') {
     $category = $input['category'] ?? 'General';
     $image_url = $input['image'] ?? null;
     $access = $input['access'] ?? 'free';
+    $description = $input['description'] ?? null;
     
     if (!$title) {
         sendJson(['success' => false, 'error' => 'Title is required'], 400);
@@ -59,18 +73,34 @@ else if ($method === 'POST') {
         $bookId = $bookResult->fetch_assoc()['id'];
     } else {
         $insertBookQuery = "
-            INSERT INTO books (title, author, category, image_url, access_type)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO books (title, author, category, description, image_url, access_type)
+            VALUES (?, ?, ?, ?, ?, ?)
         ";
         $stmt = $conn->prepare($insertBookQuery);
-        $stmt->bind_param("sssss", $title, $author, $category, $image_url, $access);
+        $stmt->bind_param("ssssss", $title, $author, $category, $description, $image_url, $access);
         $stmt->execute();
         $bookId = $conn->insert_id;
+    }
+
+    $borrowedQuery = "
+        SELECT id FROM borrowed_books
+        WHERE user_id = ? AND book_id = ? AND returned_at IS NULL
+        LIMIT 1
+    ";
+    $stmt = $conn->prepare($borrowedQuery);
+    $stmt->bind_param("ii", $userId, $bookId);
+    $stmt->execute();
+
+    if ($stmt->get_result()->num_rows > 0) {
+        sendJson([
+            'success' => false,
+            'error' => 'This book is already borrowed, so it cannot be added to wishlist.'
+        ], 409);
     }
     
     // Add to wishlist
     $wishlistQuery = "
-        INSERT INTO wishlist (user_id, book_id)
+        INSERT IGNORE INTO wishlist (user_id, book_id)
         VALUES (?, ?)
     ";
     $stmt = $conn->prepare($wishlistQuery);

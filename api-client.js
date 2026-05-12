@@ -1,18 +1,88 @@
 // api-client.js - Connect frontend to database APIs
 
 (function() {
-  const API_BASE = 'http://localhost:8000/backend/api';
+  const API_BASE = 'http://localhost/BrainRoot/backend/api';
+  const REQUEST_TIMEOUT = 8000; // 8 seconds
+
+  function getStoredCurrentUser() {
+    try {
+      return JSON.parse(localStorage.getItem('brainrootCurrentUser') || 'null');
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function getJsonHeaders() {
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    const user = getStoredCurrentUser();
+
+    if (user && user.id && user.email) {
+      headers['X-Brainroot-User-Id'] = String(user.id);
+      headers['X-Brainroot-User-Email'] = String(user.email);
+    }
+
+    return headers;
+  }
+
+  // Helper function to wrap fetch with timeout
+  async function fetchWithTimeout(url, options = {}) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        throw new Error('CONNECTION_TIMEOUT');
+      }
+      throw error;
+    }
+  }
+
+  // Helper to determine error type
+  function getErrorMessage(error, defaultMsg = 'Connection failed') {
+    if (error.message === 'CONNECTION_TIMEOUT') {
+      return 'Server is not responding. Please check if the backend is running.';
+    }
+    if (error instanceof TypeError) {
+      return 'Unable to connect to server. Please check your internet connection.';
+    }
+    return defaultMsg;
+  }
 
   window.brainrootAPI = {
+    // Books - Public catalog
+    async getBooks() {
+      try {
+        const response = await fetch(`${API_BASE}/books.php`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        return data.success ? data.data : [];
+      } catch (error) {
+        console.error('Error fetching books:', error);
+        return [];
+      }
+    },
+
     // Collections - Get all books
     async getCollections() {
       try {
         const response = await fetch(`${API_BASE}/collections.php`, {
           method: 'GET',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: getJsonHeaders()
         });
         
         if (!response.ok) {
@@ -34,14 +104,12 @@
         const response = await fetch(`${API_BASE}/collections.php`, {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: getJsonHeaders(),
           body: JSON.stringify({
             title: book.title,
             author: book.author || 'Unknown',
             category: book.category || 'General',
-            image: book.image || book.imageUrl,
+            image: book.image || book.imageUrl || book.image_url,
             progress: book.progress || 0,
             access: book.access || 'free'
           })
@@ -61,9 +129,7 @@
         const response = await fetch(`${API_BASE}/collections.php`, {
           method: 'DELETE',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: getJsonHeaders(),
           body: JSON.stringify({ title })
         });
         
@@ -81,9 +147,7 @@
         const response = await fetch(`${API_BASE}/borrowed.php`, {
           method: 'GET',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: getJsonHeaders()
         });
         
         const data = await response.json();
@@ -94,25 +158,133 @@
       }
     },
 
-    // Borrowed Books - Borrow a book
-    async borrowBook(title) {
+    // Borrowed Books - Get returned or expired history
+    async getBorrowHistory(status) {
+      try {
+        const historyStatus = encodeURIComponent(status || 'returned');
+        const response = await fetch(`${API_BASE}/borrowed.php?status=${historyStatus}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success ? data.data : [];
+      } catch (error) {
+        console.error('Error fetching borrow history:', error);
+        this.lastError = error.message;
+        return [];
+      }
+    },
+
+    async getReturnedBooks() {
+      return this.getBorrowHistory('returned');
+    },
+
+    async getExpiredBooks() {
+      return this.getBorrowHistory('expired');
+    },
+
+    async clearBorrowHistory() {
       try {
         const response = await fetch(`${API_BASE}/borrowed.php`, {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            action: 'clear_history'
+          })
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success;
+      } catch (error) {
+        console.error('Error clearing borrow history:', error);
+        this.lastError = error.message;
+        return false;
+      }
+    },
+
+    async removeFromBorrowHistory(book) {
+      try {
+        const bookPayload = typeof book === 'object' && book !== null ? book : { title: book };
+        const response = await fetch(`${API_BASE}/borrowed.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            action: 'remove_history',
+            title: bookPayload.title,
+            history_type: bookPayload.history_type || bookPayload.historyType || ''
+          })
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success;
+      } catch (error) {
+        console.error('Error removing history item:', error);
+        this.lastError = error.message;
+        return false;
+      }
+    },
+
+    // Borrowed Books - Borrow a book
+    async borrowBook(book) {
+      try {
+        const bookPayload = typeof book === 'object' && book !== null ? book : { title: book };
+        const response = await fetch(`${API_BASE}/borrowed.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
           body: JSON.stringify({
             action: 'borrow',
-            title: title
+            title: bookPayload.title,
+            author: bookPayload.author || 'Unknown Author',
+            category: bookPayload.category || 'General',
+            image: bookPayload.image || bookPayload.imageUrl || bookPayload.image_url || '',
+            access: bookPayload.access || bookPayload.access_type || 'free',
+            description: bookPayload.description || bookPayload.summary || ''
           })
         });
         
         const data = await response.json();
+        this.lastError = data.error || null;
         return data.success;
       } catch (error) {
         console.error('Error borrowing book:', error);
+        this.lastError = error.message;
+        return false;
+      }
+    },
+
+    // Borrowed Books - Renew a returned or expired book
+    async renewBook(book) {
+      try {
+        const bookPayload = typeof book === 'object' && book !== null ? book : { title: book };
+        const response = await fetch(`${API_BASE}/borrowed.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            action: 'renew',
+            title: bookPayload.title,
+            author: bookPayload.author || 'Unknown Author',
+            category: bookPayload.category || 'General',
+            image: bookPayload.image || bookPayload.imageUrl || bookPayload.image_url || '',
+            access: bookPayload.access || bookPayload.access_type || 'free',
+            description: bookPayload.description || bookPayload.summary || ''
+          })
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success;
+      } catch (error) {
+        console.error('Error renewing book:', error);
+        this.lastError = error.message;
         return false;
       }
     },
@@ -123,9 +295,7 @@
         const response = await fetch(`${API_BASE}/borrowed.php`, {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: getJsonHeaders(),
           body: JSON.stringify({
             action: 'return',
             title: title
@@ -133,9 +303,11 @@
         });
         
         const data = await response.json();
+        this.lastError = data.error || null;
         return data.success;
       } catch (error) {
         console.error('Error returning book:', error);
+        this.lastError = error.message;
         return false;
       }
     },
@@ -146,9 +318,7 @@
         const response = await fetch(`${API_BASE}/wishlist.php`, {
           method: 'GET',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: getJsonHeaders()
         });
         
         const data = await response.json();
@@ -165,22 +335,23 @@
         const response = await fetch(`${API_BASE}/wishlist.php`, {
           method: 'POST',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: getJsonHeaders(),
           body: JSON.stringify({
             title: book.title,
             author: book.author || 'Unknown',
             category: book.category || 'General',
-            image: book.image || book.imageUrl,
-            access: book.access || 'free'
+            image: book.image || book.imageUrl || book.image_url,
+            access: book.access || book.access_type || 'free',
+            description: book.description || book.summary || ''
           })
         });
         
         const data = await response.json();
+        this.lastError = data.error || null;
         return data.success;
       } catch (error) {
         console.error('Error adding to wishlist:', error);
+        this.lastError = error.message;
         return false;
       }
     },
@@ -191,9 +362,7 @@
         const response = await fetch(`${API_BASE}/wishlist.php`, {
           method: 'DELETE',
           credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: getJsonHeaders(),
           body: JSON.stringify({ title })
         });
         
@@ -214,8 +383,222 @@
         console.error('Error checking borrowed status:', error);
         return false;
       }
+    },
+
+    // Auth - Register a new user
+    async register(userData) {
+      try {
+        const response = await fetchWithTimeout(`${API_BASE}/auth.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            action: 'register',
+            name: userData.name,
+            email: userData.email,
+            password: userData.password,
+            institution: userData.institution || userData.institute || '',
+            role: userData.role || ''
+          })
+        });
+
+        // Check for HTTP errors
+        if (!response.ok) {
+          throw new Error(`HTTP_ERROR_${response.status}`);
+        }
+
+        const data = await response.json();
+        return {
+          success: data.success,
+          user: data.user || null,
+          error: data.error || null,
+          message: data.message || null
+        };
+      } catch (error) {
+        console.error('Error registering:', error);
+        const errorMsg = getErrorMessage(error, 'Failed to create account');
+        return {
+          success: false,
+          user: null,
+          error: errorMsg,
+          message: null
+        };
+      }
+    },
+
+    // Auth - Login user
+    async login(email, password) {
+      try {
+        const response = await fetchWithTimeout(`${API_BASE}/auth.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            action: 'login',
+            email: email,
+            password: password
+          })
+        });
+
+        // Check for HTTP errors
+        if (!response.ok) {
+          throw new Error(`HTTP_ERROR_${response.status}`);
+        }
+
+        const data = await response.json();
+        return {
+          success: data.success,
+          user: data.user || null,
+          error: data.error || null,
+          message: data.message || null
+        };
+      } catch (error) {
+        console.error('Error logging in:', error);
+        const errorMsg = getErrorMessage(error, 'Login failed');
+        return {
+          success: false,
+          user: null,
+          error: errorMsg,
+          message: null
+        };
+      }
+    },
+
+    // Auth - Logout user
+    async logout() {
+      try {
+        const response = await fetch(`${API_BASE}/auth.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            action: 'logout'
+          })
+        });
+
+        const data = await response.json();
+        return data.success;
+      } catch (error) {
+        console.error('Error logging out:', error);
+        return false;
+      }
+    },
+
+    // Profile - Get current user's profile from database
+    async getProfile() {
+      try {
+        const response = await fetch(`${API_BASE}/profile.php`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        return {
+          success: data.success,
+          user: data.user || null,
+          error: data.error || null,
+          message: data.message || null
+        };
+      } catch (error) {
+        console.error('Error getting profile:', error);
+        return {
+          success: false,
+          user: null,
+          error: error.message,
+          message: null
+        };
+      }
+    },
+
+    // Profile - Update current user's profile in database
+    async updateProfile(profileData) {
+      try {
+        const response = await fetch(`${API_BASE}/profile.php`, {
+          method: 'PUT',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            name: profileData.name,
+            email: profileData.email,
+            institution: profileData.institution || '',
+            role: profileData.role || ''
+          })
+        });
+
+        const data = await response.json();
+        return {
+          success: data.success,
+          user: data.user || null,
+          error: data.error || null,
+          message: data.message || null
+        };
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        return {
+          success: false,
+          user: null,
+          error: error.message,
+          message: null
+        };
+      }
+    },
+
+    // Subscription - Update user's subscription plan in database
+    async updateSubscription(subscriptionData) {
+      try {
+        const response = await fetch(`${API_BASE}/subscription.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            plan: subscriptionData.plan,
+            billingCycle: subscriptionData.billingCycle || 'monthly',
+            price: subscriptionData.price || 0,
+            planType: subscriptionData.planType || 'free'
+          })
+        });
+
+        const data = await response.json();
+        return {
+          success: data.success,
+          plan: data.plan || null,
+          planType: data.planType || null,
+          user: data.user || null,
+          error: data.error || null,
+          message: data.message || null
+        };
+      } catch (error) {
+        console.error('Error updating subscription:', error);
+        return {
+          success: false,
+          plan: null,
+          planType: null,
+          user: null,
+          error: error.message,
+          message: null
+        };
+      }
+    },
+
+    // Auth - Get current user
+    async getCurrentUser() {
+      try {
+        const response = await fetch(`${API_BASE}/auth.php`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        return data.success ? data.user : null;
+      } catch (error) {
+        console.error('Error getting current user:', error);
+        return null;
+      }
     }
   };
 
   console.log('API Client loaded - use window.brainrootAPI');
 })();
+

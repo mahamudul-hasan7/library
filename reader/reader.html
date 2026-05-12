@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainRoot Reader</title>
+  <link rel="stylesheet" href="../shared-search.css?v=1">
+  <link rel="stylesheet" href="./reader.css?v=1">
+  <!-- PDF.js Library -->
+  <script src="../Assets/vendor/pdfjs/pdf.min.js" async data-pdfjs></script>
+</head>
+<body class="reader-page">
+  <header class="reader-nav">
+    <div class="reader-brand"><a href="../index/index.html">BrainRoot</a></div>
+    <form class="site-nav-search" action="../explore/explore.html" method="get" role="search">
+      <button class="site-nav-search-submit" type="submit" aria-label="Search archive">
+        <img src="../Assets/search.png" alt="" aria-hidden="true">
+      </button>
+      <input class="site-nav-search-input" name="search" type="search" placeholder="Search the archive..." autocomplete="off">
+    </form>
+    <nav class="reader-menu">
+      <a href="../index/index.html">Home</a>
+      <a href="../explore/explore.html">Explore</a>
+      <a href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+      <a href="../collections/collections.html" data-auth="private">Collections</a>
+      <a href="../login/login.html" data-auth="login" data-auth-login-slot="true">Login</a>
+      <a href="../profile/profile.html" data-auth="profile" class="reader-profile-icon auth-profile-link" title="Profile">
+        <img src="../Assets/profile icon.png" alt="Profile">
+      </a>
+    </nav>
+  </header>
+
+  <main class="reader-shell">
+    <aside class="reader-sidebar">
+      <img id="readerCover" class="reader-cover" src="" alt="Book cover">
+      <div class="reader-book-meta">
+        <p id="readerAccessBadge" class="reader-access-badge">Free</p>
+        <h1 id="readerTitle">Loading book...</h1>
+        <p id="readerAuthor">BrainRoot Library</p>
+        <p id="readerCategory">General</p>
+      </div>
+      <div class="reader-progress-card">
+        <div class="reader-progress-top">
+          <span>Progress</span>
+          <strong id="readerProgressValue">0%</strong>
+        </div>
+        <div class="reader-progress-track">
+          <span id="readerProgressBar"></span>
+        </div>
+      </div>
+      <a class="reader-back-link" href="../explore/explore.html">Back to Explore</a>
+    </aside>
+
+    <section class="reader-panel">
+      <div id="readerNotice" class="reader-notice is-hidden"></div>
+      <div class="reader-toolbar" aria-label="Reading controls">
+        <button id="decreaseFontBtn" class="reader-tool-btn" type="button" aria-label="Decrease font size">A-</button>
+        <button id="increaseFontBtn" class="reader-tool-btn" type="button" aria-label="Increase font size">A+</button>
+        <button id="themeBtn" class="reader-tool-btn" type="button">Dark</button>
+        <button id="bookmarkBtn" class="reader-tool-btn" type="button">Bookmark</button>
+        <!-- PDF-specific controls -->
+        <div class="reader-pdf-controls" id="pdfControls" style="display: none;">
+          <button id="pdfPrevBtn" class="reader-tool-btn" type="button" aria-label="Previous page">Prev</button>
+          <label class="pdf-page-jump" aria-label="Current page">
+            <input id="pdfPageInput" type="number" min="1" value="1" inputmode="numeric">
+            <span id="pdfPageCount">/ --</span>
+          </label>
+          <button id="pdfNextBtn" class="reader-tool-btn" type="button" aria-label="Next page">Next</button>
+          <button id="pdfZoomInBtn" class="reader-tool-btn" type="button" aria-label="Zoom in">Zoom +</button>
+          <span id="pdfZoomValue" class="pdf-zoom-value">135%</span>
+          <button id="pdfZoomOutBtn" class="reader-tool-btn" type="button" aria-label="Zoom out">Zoom -</button>
+          <button id="pdfFullscreenBtn" class="reader-tool-btn" type="button" aria-label="Fullscreen">Full</button>
+        </div>
+      </div>
+
+      <!-- Text Reader -->
+      <article id="readerContent" class="reader-content" tabindex="0">
+        <p class="reader-loading">Preparing the reading edition...</p>
+      </article>
+
+      <!-- PDF Viewer -->
+      <div id="pdfViewer" class="pdf-viewer" style="display: none;">
+        <button id="pdfPrevOverlayBtn" class="pdf-page-nav pdf-page-nav--prev" type="button" aria-label="Previous page">Prev</button>
+        <div id="pdfStage" class="pdf-stage">
+          <canvas id="pdfCanvas" class="pdf-canvas"></canvas>
+          <div id="pdfPageToast" class="pdf-page-toast" aria-hidden="true"></div>
+        </div>
+        <aside id="pdfPreviewPanel" class="pdf-preview-panel" aria-live="polite">
+          <p class="pdf-preview-label">Preview</p>
+          <button id="pdfPreviewButton" class="pdf-preview-card" type="button" aria-label="Open next page preview">
+            <canvas id="pdfPreviewCanvas" class="pdf-preview-canvas"></canvas>
+            <span id="pdfPreviewPage" class="pdf-preview-page">Page --</span>
+          </button>
+        </aside>
+        <button id="pdfNextOverlayBtn" class="pdf-page-nav pdf-page-nav--next" type="button" aria-label="Next page">Next</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="../local-storage.js?v=1"></script>
+  <script src="../api-client.js?v=1"></script>
+  <script src="../auth.js?v=1"></script>
+  <script src="./pdf-viewer.js?v=1"></script>
+  <script src="./reader.js?v=1"></script>
+</body>
+</html>

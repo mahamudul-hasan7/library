@@ -3,6 +3,9 @@
 
 require_once '../config.php';
 
+ensureBookCatalogColumns($conn);
+ensureBorrowedBookColumns($conn);
+
 $method = $_SERVER['REQUEST_METHOD'];
 $userId = getCurrentUserId();
 
@@ -15,16 +18,39 @@ if ($method === 'GET') {
             b.author, 
             b.category, 
             b.image_url,
+            b.image_url as image,
+            b.description,
+            b.file_url,
+            b.sample_url,
+            b.published_year,
+            b.language,
+            b.format,
+            b.pages,
+            b.rating_average,
+            b.rating_count,
             c.progress, 
             c.importance,
             b.access_type as access,
-            COALESCE(bb.returned_at IS NULL, false) as is_borrowed
+            bb.borrowed_at,
+            bb.due_at,
+            bb.returned_at,
+            COALESCE(bb.returned_at IS NULL, false) as is_borrowed,
+            CASE
+                WHEN bb.returned_at IS NULL AND bb.due_at IS NOT NULL AND bb.due_at < NOW()
+                THEN 1
+                ELSE 0
+            END as is_expired
         FROM collections c
         JOIN books b ON c.book_id = b.id
         LEFT JOIN borrowed_books bb ON c.user_id = bb.user_id 
             AND c.book_id = bb.book_id 
             AND bb.returned_at IS NULL
         WHERE c.user_id = ?
+            AND (
+                bb.id IS NULL
+                OR bb.due_at IS NULL
+                OR bb.due_at >= NOW()
+            )
         ORDER BY c.added_at DESC
     ";
     
@@ -84,6 +110,11 @@ else if ($method === 'POST') {
     $stmt->bind_param("iiii", $userId, $bookId, $progress, $progress);
     
     if ($stmt->execute()) {
+        $removeWishlistQuery = "DELETE FROM wishlist WHERE user_id = ? AND book_id = ?";
+        $stmt = $conn->prepare($removeWishlistQuery);
+        $stmt->bind_param("ii", $userId, $bookId);
+        $stmt->execute();
+
         sendJson(['success' => true, 'message' => 'Added to collection']);
     } else {
         sendJson(['success' => false, 'error' => $stmt->error], 400);

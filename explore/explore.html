@@ -5,10 +5,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>BrainRoot Architectural Library - Explore</title>
     <link href="./explore.css" rel="stylesheet" />
-    <script src="../storage.js"></script>
-    <script src="../auth.js"></script>
-    <script src="../api-client.js"></script>
-    <script src="./explore.js"></script>
+    <link href="../shared-search.css" rel="stylesheet" />
   </head>
   <body class="explore-page">
     <nav class="top-nav">
@@ -17,16 +14,7 @@
           <span class="brand-mark">
             <a class="brand-home-link" href="../index/index.html">BrainRoot</a>
           </span>
-          <div class="nav-menu">
-            <a class="nav-link" href="../index/index.html" data-auth="public">Home</a>
-            <a class="nav-link-active" href="../explore/explore.html" data-auth="public">Explore</a>
-            <a class="nav-link" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
-            <a class="nav-link" href="../collections/collections.html" data-auth="private">Collections</a>
-          </div>
-        </div>
-
-        <div class="top-nav-actions">
-          <div id="exploreSearchShell" class="explore-search-shell">
+          <div id="exploreSearchShell" class="explore-search-shell site-nav-search site-nav-search--live">
             <img src="../Assets/search.png" alt="Search" class="explore-search-icon" />
             <input
               id="exploreSearchInput"
@@ -42,7 +30,16 @@
               <div id="exploreSearchResults" class="explore-search-results"></div>
             </div>
           </div>
+        </div>
 
+        <div class="top-nav-right">
+          <div class="nav-menu">
+            <a class="nav-link" href="../index/index.html" data-auth="public">Home</a>
+            <a class="nav-link-active" href="../explore/explore.html" data-auth="public">Explore</a>
+            <a class="nav-link" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
+            <a class="nav-link" href="../collections/collections.html" data-auth="private">Collections</a>
+          </div>
+          <div class="top-nav-actions">
           <a
             href="../login/login.html"
             data-auth="login"
@@ -239,11 +236,10 @@
       </div>
     </footer>
 
-    <script src="../storage.js"></script>
-    <script src="../auth.js"></script>
+    <script src="../local-storage.js"></script>
+    <script src="../backend-storage.js"></script>
     <script src="../api-client.js"></script>
+    <script src="../auth.js"></script>
     <script src="./explore.js"></script>
   </body>
 </html>
-
-

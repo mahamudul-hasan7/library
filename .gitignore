@@ -1,0 +1,47 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Node (if using npm)
+node_modules/
+npm-debug.log
+
+# PHP
+vendor/
+composer.lock
+
+# Logs
+*.log
+
+# Cache
+.cache/
+__pycache__/
+
+# Build output
+dist/
+build/
+
+# Testing
+coverage/
+
+# Sensitive files
+config.local.php
+secrets.php
+
+# XAMPP local files (if you want)
+# database backups, local migrations, etc.
+*.db
+*.sqlite

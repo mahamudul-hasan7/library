@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const storage = window.brainrootStorage;
-  const form = document.querySelector("form");
+  // Select the register form (not the search form)
+  const form = document.querySelector("form:not(.site-nav-search)");
   if (!form) {
     return;
   }
@@ -26,6 +27,27 @@ document.addEventListener("DOMContentLoaded", function () {
   function clearMessage() {
     messageNode.textContent = "";
     messageNode.classList.remove("is-error", "is-success");
+  }
+
+  function createDefaultFreeSubscription() {
+    return {
+      plan: "Free Book",
+      billingCycle: "monthly",
+      price: 0,
+      planType: "free",
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function saveDefaultSubscriptionForUser(email) {
+    const emailKey = String(email || "").trim().toLowerCase();
+    if (!emailKey) {
+      return;
+    }
+
+    const subscriptionsByUser = storage.readJson("brainrootSubscriptionsByUser", {});
+    subscriptionsByUser[emailKey] = createDefaultFreeSubscription();
+    storage.writeJson("brainrootSubscriptionsByUser", subscriptionsByUser);
   }
 
   function setFieldState(field, hasError) {
@@ -81,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   toggleCustomInstitute();
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", async function (event) {
     event.preventDefault();
 
     const name = (nameInput?.value || "").trim();
@@ -141,30 +163,78 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const users = storage.readJson("brainrootUsers", []);
-    const exists = users.some(function (user) {
-      return user.email === email;
-    });
-
-    if (exists) {
-      setFieldState(emailInput, true);
-      showMessage("error", "An account with this email already exists.");
-      return;
+    // Disable button and show loading state
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton?.textContent;
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Creating account...";
     }
 
-    users.push({
+    showMessage("success", "Creating your account...");
+
+    // Call backend API to register user
+    const result = await window.brainrootAPI.register({
       name: name,
       email: email,
-      institute: institute,
-      role: role,
-      createdAt: new Date().toISOString()
+      password: password,
+      institution: institute,
+      role: role
     });
 
-    storage.writeJson("brainrootUsers", users);
-    showMessage("success", "Account created successfully. Redirecting to login...");
-    window.setTimeout(function () {
-      window.location.href = "../login/login.html";
-    }, 650);
+    // Re-enable button
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = originalButtonText;
+    }
+
+    if (result.success) {
+      const planType = result.user.plan_type || result.user.planType || "free";
+      const createdAt = result.user.created_at || result.user.createdAt || new Date().toISOString();
+      // Store user data locally
+      const currentUser = {
+        id: result.user.id,
+        email: result.user.email,
+        name: result.user.name,
+        institution: institute,
+        role: role,
+        plan_type: planType,
+        planType: planType,
+        created_at: createdAt,
+        createdAt: createdAt,
+        loggedInAt: new Date().toISOString()
+      };
+      const profileNameParts = String(result.user.name || name).trim().split(/\s+/).filter(Boolean);
+      const profileData = {
+        firstName: profileNameParts[0] || name,
+        lastName: profileNameParts.slice(1).join(" "),
+        email: result.user.email,
+        institution: institute,
+        role: role
+      };
+
+      storage.writeJson("brainrootCurrentUser", currentUser);
+      storage.writeJson("brainrootProfile:" + String(result.user.email || email).trim().toLowerCase(), profileData);
+      saveDefaultSubscriptionForUser(result.user.email || email);
+
+      showMessage("success", "Account created successfully. Redirecting to login...");
+      window.setTimeout(function () {
+        window.location.href = "../login/login.html";
+      }, 650);
+    } else {
+      // Handle specific error types
+      let errorMsg = result.error || "Failed to create account. Please try again.";
+      
+      if (result.error && result.error.includes("Server is not responding")) {
+        errorMsg = "Server is not responding. Please try again in a few moments. Make sure the backend server is running.";
+      } else if (result.error && result.error.includes("Unable to connect")) {
+        errorMsg = "Unable to connect to the server. Please check your internet connection or contact support.";
+      } else if (result.error && result.error.includes("already exists") || result.error && result.error.includes("already registered")) {
+        errorMsg = "This email is already registered. Please try logging in or use a different email.";
+      }
+      
+      showMessage("error", errorMsg);
+    }
   });
 });
 

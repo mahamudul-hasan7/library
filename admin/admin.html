@@ -4,56 +4,109 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrainRoot - Admin Panel</title>
-  <link rel="stylesheet" href="./admin.css">
+  <link rel="stylesheet" href="./admin.css?v=2">
 </head>
 <body class="admin-page">
-  <nav class="admin-nav">
-    <div class="admin-brand">
-      <a href="../index/index.html">BrainRoot</a>
-      <span class="admin-badge">Admin</span>
-    </div>
-    <div class="admin-nav-links">
-      <a href="./admin.html" class="admin-nav-link active">Dashboard</a>
-      <a href="../index/index.html" class="admin-nav-link">View Site</a>
-      <button onclick="adminLogout()" class="admin-nav-link logout-btn">Logout</button>
-    </div>
-  </nav>
-
-  <main class="admin-main">
-    <div class="admin-container">
-      <!-- Header -->
-      <section class="admin-header">
-        <h1>Admin Dashboard</h1>
-        <p>Manage books and library content</p>
-      </section>
-
-      <!-- Tabs -->
-      <div class="admin-tabs">
-        <button class="admin-tab-btn active" data-tab="add-book">Add Book</button>
-        <button class="admin-tab-btn" data-tab="manage-books">Manage Books</button>
+  <div class="admin-shell">
+    <aside class="admin-sidebar">
+      <div class="sidebar-brand">
+        <a href="../index/index.html" class="brand-mark">BR</a>
+        <div class="sidebar-brand-copy">
+          <strong>BrainRoot</strong>
+          <span>Digital Library Admin</span>
+        </div>
       </div>
 
-      <!-- Tab 1: Add Book -->
-      <section class="admin-tab-content active" id="add-book">
-        <div class="admin-card">
-          <h2>Add New Book</h2>
-          <form id="addBookForm" class="admin-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Book Title *</label>
-                <input type="text" name="title" required placeholder="Enter book title">
-              </div>
-              <div class="form-group">
-                <label>Author *</label>
-                <input type="text" name="author" required placeholder="Author name">
-              </div>
-            </div>
+      <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" aria-pressed="false" title="Collapse sidebar">
+        <span class="sidebar-toggle-icon" aria-hidden="true">☰</span>
+        <span class="sidebar-toggle-label">Collapse sidebar</span>
+      </button>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label>Category *</label>
-                <select name="category" required>
-                  <option value="">Select category</option>
+      <nav class="sidebar-nav" aria-label="Admin sections">
+        <button type="button" class="sidebar-link active" data-view="dashboard" title="Dashboard"><span class="sidebar-icon" aria-hidden="true">D</span><span class="sidebar-label">Dashboard</span></button>
+        <button type="button" class="sidebar-link" data-view="books" title="Book Management"><span class="sidebar-icon" aria-hidden="true">B</span><span class="sidebar-label">Book Management</span></button>
+        <button type="button" class="sidebar-link" data-view="categories" title="Category Control"><span class="sidebar-icon" aria-hidden="true">C</span><span class="sidebar-label">Category Control</span></button>
+        <button type="button" class="sidebar-link" data-view="users" title="User Management"><span class="sidebar-icon" aria-hidden="true">U</span><span class="sidebar-label">User Management</span></button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button type="button" class="sidebar-link danger" onclick="adminLogout()" title="Logout"><span class="sidebar-icon" aria-hidden="true">L</span><span class="sidebar-label">Logout</span></button>
+      </div>
+    </aside>
+
+    <div class="admin-frame">
+      <header class="admin-topbar">
+        <form id="librarySearchForm" class="topbar-search" role="search">
+          <span class="search-ico" aria-hidden="true">⌕</span>
+          <input id="librarySearch" type="search" placeholder="Search archives, members, or logs..." autocomplete="off">
+        </form>
+
+        <div class="topbar-actions">
+          <button type="button" class="topbar-icon" id="notificationsBtn" aria-label="Notifications">!</button>
+          <button type="button" class="topbar-icon" id="helpBtn" aria-label="Help">?</button>
+          <div class="topbar-user">
+            <img id="topbarAvatar" src="../Assets/profile icon.png" alt="Admin profile">
+            <div>
+              <strong id="topbarUserName">Admin User</strong>
+              <span id="topbarUserRole">System Administrator</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-main">
+        <section class="admin-view active" data-view="dashboard">
+          <div class="view-header">
+            <div>
+              <p class="eyebrow">Resource Library &gt; Dashboard</p>
+              <h1>System Overview</h1>
+              <p>Performance metrics and archive updates for today.</p>
+            </div>
+            <div class="hero-actions">
+              <button type="button" class="btn btn-ghost" data-view-jump="books">View Books</button>
+              <button type="button" class="btn btn-primary" id="exportReportBtn">Export Report</button>
+            </div>
+          </div>
+
+          <div id="dashboardStats" class="stat-grid"></div>
+
+          <div class="dashboard-grid">
+            <section class="panel panel-wide">
+              <div class="panel-header">
+                <div>
+                  <h2>Recently Added Books</h2>
+                  <p>Most recent catalog entries and their archive state.</p>
+                </div>
+                <button type="button" class="text-link" data-view-jump="books">View Archive</button>
+              </div>
+              <div id="recentBooksTable" class="table-wrap"></div>
+            </section>
+          </div>
+        </section>
+
+        <section class="admin-view" data-view="books">
+          <div class="view-header compact">
+            <div>
+              <p class="eyebrow">Resource Library &gt; Book Management</p>
+              <h1>Book Management</h1>
+              <p>Manage and organize your digital resource catalog.</p>
+            </div>
+            <button type="button" class="btn btn-primary" data-view-jump="add-book">+ Add New Resource</button>
+          </div>
+
+          <div id="bookStats" class="stat-grid"></div>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div class="filter-pills">
+                <button type="button" class="pill active" data-pill-filter="all">All Books</button>
+                <button type="button" class="pill" data-pill-filter="free">Free</button>
+                <button type="button" class="pill" data-pill-filter="paid">Paid</button>
+                <button type="button" class="pill" data-pill-filter="featured">Featured</button>
+              </div>
+              <div class="manage-tools">
+                <select id="bookCategoryFilter" class="filter-select">
+                  <option value="">All Categories</option>
                   <option value="Architecture">Architecture</option>
                   <option value="Classic Literature">Classic Literature</option>
                   <option value="Science">Science</option>
@@ -65,83 +118,277 @@
                   <option value="Mystery">Mystery</option>
                   <option value="Adventure">Adventure</option>
                   <option value="Fantasy">Fantasy</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Data Science">Data Science</option>
+                  <option value="Computer Science">Computer Science</option>
                   <option value="Other">Other</option>
                 </select>
-              </div>
-              <div class="form-group">
-                <label>Published Year</label>
-                <input type="number" name="published_year" placeholder="e.g., 2020">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Description</label>
-              <textarea name="description" rows="4" placeholder="Book description"></textarea>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Pages</label>
-                <input type="number" name="pages" placeholder="Number of pages">
-              </div>
-              <div class="form-group">
-                <label>Access Type</label>
-                <select name="access_type">
-                  <option value="free">Free</option>
-                  <option value="paid">Paid</option>
-                  <option value="premium">Premium</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Image URL</label>
-              <input type="url" name="image_url" placeholder="https://example.com/image.jpg">
-            </div>
-
-            <div class="form-group">
-              <label>PDF File URL</label>
-              <input type="url" name="file_url" placeholder="https://example.com/book.pdf or ../Assets/books/file.pdf">
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Featured Section</label>
-                <select name="featured_section">
-                  <option value="none">None</option>
+                <select id="bookFeaturedFilter" class="filter-select">
+                  <option value="">All Featured</option>
                   <option value="trending">Trending</option>
                   <option value="top_reading">Top Reading</option>
                   <option value="most_liked">Most Liked</option>
+                  <option value="none">No Feature</option>
                 </select>
-              </div>
-              <div class="form-group">
-                <label>View Count</label>
-                <input type="number" name="view_count" placeholder="0" min="0">
-              </div>
-              <div class="form-group">
-                <label>Like Count</label>
-                <input type="number" name="like_count" placeholder="0" min="0">
+                <button type="button" class="btn btn-soft" id="clearFiltersBtn">Reset</button>
               </div>
             </div>
 
-            <div class="form-actions">
-              <button type="submit" class="btn btn-primary">Add Book</button>
-              <button type="reset" class="btn btn-secondary">Clear Form</button>
+            <div id="manageResult" class="form-result"></div>
+
+            <div id="booksTableContainer" class="table-wrap"></div>
+          </section>
+        </section>
+
+        <section class="admin-view" data-view="categories">
+          <div class="view-header compact">
+            <div>
+              <p class="eyebrow">Resource Library &gt; Featured Control</p>
+              <h1>Featured & Category Control</h1>
+              <p>Curate featured sections and category-based front-page lists.</p>
+            </div>
+            <button type="button" class="btn btn-primary" data-view-jump="add-book">+ Add New Resource</button>
+          </div>
+
+          <div id="categoryStats" class="stat-grid"></div>
+
+          <div class="category-grid">
+            <section class="panel panel-wide">
+              <div class="panel-header">
+                <div>
+                  <h2>Trending Books</h2>
+                  <p>Books ranked by view activity and archive attention.</p>
+                </div>
+                <button type="button" class="icon-btn" id="publishCategoriesBtn" aria-label="Publish category changes">...</button>
+              </div>
+              <div id="trendingList" class="stack-list"></div>
+              <div class="panel-footer center">Manage all trending titles</div>
+            </section>
+
+            <section class="panel panel-side">
+              <div class="panel-header">
+                <div>
+                  <h2>Top Reading</h2>
+                  <p>Featured books ready for the homepage carousel.</p>
+                </div>
+                <button type="button" class="icon-btn">S</button>
+              </div>
+              <div id="topReadingList" class="stack-list"></div>
+              <button type="button" class="dashed-action" data-view-jump="add-book" data-preset-featured="top_reading">+ Add Title to Top Reading</button>
+            </section>
+          </div>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Featured Books (Main Hero)</h2>
+                <p>Primary slots and backups for the home page banner.</p>
+              </div>
+              <div class="panel-actions">
+                <button type="button" class="text-link" id="draftViewBtn">Draft View</button>
+                <button type="button" class="btn btn-primary" id="publishFeaturedBtn">Publish Changes</button>
+              </div>
+            </div>
+            <div id="featuredHeroGrid" class="hero-grid"></div>
+          </section>
+        </section>
+
+        <section class="admin-view" data-view="users">
+          <div class="view-header compact">
+            <div>
+              <p class="eyebrow">Admin Panel &gt; User Management</p>
+              <h1>User Management</h1>
+              <p>Review library member accounts, manage permissions, and track borrowing activity.</p>
+            </div>
+            <button type="button" class="btn btn-soft" id="exportUsersBtn">Export List</button>
+          </div>
+
+          <div id="userStats" class="stat-grid"></div>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div class="filter-pills">
+                <button type="button" class="pill active" data-user-role-filter="all">All Members</button>
+                <button type="button" class="pill" data-user-role-filter="admin">Admins</button>
+                <button type="button" class="pill" data-user-role-filter="faculty">Faculty</button>
+                <button type="button" class="pill" data-user-role-filter="student">Students</button>
+                <button type="button" class="pill" data-user-role-filter="guest">Guests</button>
+              </div>
+              <button type="button" class="icon-btn" id="refreshUsersBtn" aria-label="Refresh users">R</button>
+            </div>
+            <div class="table-wrap" id="usersTableContainer"></div>
+          </section>
+        </section>
+
+        <section class="admin-view" data-view="add-book">
+          <div class="view-header compact">
+            <div>
+              <p class="eyebrow">Resource Library &gt; Add New Resource</p>
+              <h1>Archive New Entry</h1>
+              <p>Catalog a new digital asset into the BrainRoot secure repository.</p>
+            </div>
+            <button type="button" class="btn btn-soft" data-view-jump="books">Back to Books</button>
+          </div>
+
+          <div id="addBookResult" class="form-result"></div>
+
+          <form id="addBookForm" class="add-layout admin-form">
+            <section class="panel form-panel">
+              <div class="panel-header">
+                <div>
+                  <h2>Core Bibliographic Data</h2>
+                  <p>Enter the title, metadata, and catalog labels for the resource.</p>
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="add_title">Book Title *</label>
+                  <input id="add_title" type="text" name="title" required placeholder="e.g. The Architecture of Intelligence">
+                </div>
+                <div class="form-group">
+                  <label for="add_author">Author Name *</label>
+                  <input id="add_author" type="text" name="author" required placeholder="e.g. Dr. Julian Vane">
+                </div>
+                <div class="form-group">
+                  <label for="add_category">Category *</label>
+                  <select id="add_category" name="category" required>
+                    <option value="">Select category</option>
+                    <option value="Architecture">Architecture</option>
+                    <option value="Classic Literature">Classic Literature</option>
+                    <option value="Science">Science</option>
+                    <option value="Philosophy">Philosophy</option>
+                    <option value="Productivity">Productivity</option>
+                    <option value="History">History</option>
+                    <option value="Design">Design</option>
+                    <option value="Biography">Biography</option>
+                    <option value="Mystery">Mystery</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="add_published_year">Published Year</label>
+                  <input id="add_published_year" type="number" name="published_year" placeholder="2024" min="0" inputmode="numeric">
+                </div>
+                <div class="form-group">
+                  <label for="add_access_type">Initial Status</label>
+                  <select id="add_access_type" name="access_type">
+                    <option value="free">Available</option>
+                    <option value="paid">Loaned</option>
+                    <option value="premium">Reserved</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="add_featured_section">Featured Section</label>
+                  <select id="add_featured_section" name="featured_section">
+                    <option value="none">None</option>
+                    <option value="trending">Trending</option>
+                    <option value="top_reading">Top Reading</option>
+                    <option value="most_liked">Most Liked</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="add_pages">Pages</label>
+                  <input id="add_pages" type="number" name="pages" placeholder="0" min="0" inputmode="numeric">
+                </div>
+                <div class="form-group full-width">
+                  <label for="add_description">Resource Description</label>
+                  <textarea id="add_description" name="description" rows="5" placeholder="Provide a detailed abstract or summary for academic indexing..."></textarea>
+                </div>
+              </div>
+            </section>
+
+            <div class="add-side">
+              <section class="panel asset-panel">
+                <div class="panel-header">
+                  <div>
+                    <h2>Cover Asset</h2>
+                    <p>Use a direct image link or an internal assets path.</p>
+                  </div>
+                </div>
+                <div class="cover-dropzone">
+                  <img id="addCoverPreview" src="" alt="Cover preview">
+                  <div>
+                    <strong>Upload Cover Image</strong>
+                    <span>Use a URL or an asset path. PNG, JPG up to 10MB.</span>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="add_image_url">Image Link</label>
+                  <input id="add_image_url" type="text" name="image_url" placeholder="https://example.com/image.jpg or /Assets/images/cover.jpg">
+                </div>
+
+                <div class="form-group">
+                  <label for="add_file_url">PDF Link</label>
+                  <input id="add_file_url" type="text" name="file_url" placeholder="https://example.com/book.pdf or /Assets/books/file.pdf">
+                </div>
+
+                <div class="info-box">
+                  <strong>Standard format</strong>
+                  <p>1600 x 2400px recommended for high-resolution indexing.</p>
+                </div>
+              </section>
+
+              <section class="panel ops-panel">
+                <div class="panel-header">
+                  <div>
+                    <h2>Archive Operations</h2>
+                  </div>
+                </div>
+                <div class="form-grid compact-grid">
+                  <div class="form-group">
+                    <label for="add_view_count">View Count</label>
+                    <input id="add_view_count" type="number" name="view_count" placeholder="0" min="0">
+                  </div>
+                  <div class="form-group">
+                    <label for="add_like_count">Like Count</label>
+                    <input id="add_like_count" type="number" name="like_count" placeholder="0" min="0">
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary block-btn">Save Book</button>
+                <button type="reset" class="btn btn-soft block-btn">Cancel</button>
+                <p class="tiny-note">By saving, you confirm that this digital record is ready for catalog publishing.</p>
+              </section>
             </div>
           </form>
-          <div id="addBookResult" class="form-result"></div>
-        </div>
-      </section>
+        </section>
+      </main>
+    </div>
+  </div>
 
-      <!-- Tab 2: Manage Books -->
-      <section class="admin-tab-content" id="manage-books">
-        <div class="admin-card">
-          <div class="manage-header">
-            <h2>All Books</h2>
-            <div class="manage-controls">
-              <input type="text" id="searchBooks" class="search-input" placeholder="Search books...">
-              <select id="filterCategory" class="filter-select">
-                <option value="">All Categories</option>
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Resource Library &gt; Edit Book Details</p>
+          <h2>Edit Book Details</h2>
+        </div>
+        <button type="button" class="modal-close" onclick="closeEditModal()">×</button>
+      </div>
+
+      <form id="editBookForm" class="modal-form">
+        <input type="hidden" name="book_id" id="edit_book_id">
+
+        <section class="panel modal-panel-grid">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="edit_title">Book Title</label>
+              <input id="edit_title" type="text" name="title" required>
+            </div>
+            <div class="form-group">
+              <label for="edit_author">Author</label>
+              <input id="edit_author" type="text" name="author" required>
+            </div>
+            <div class="form-group">
+              <label for="edit_category">Category</label>
+              <select id="edit_category" name="category" required>
                 <option value="Architecture">Architecture</option>
                 <option value="Classic Literature">Classic Literature</option>
                 <option value="Science">Science</option>
@@ -149,150 +396,166 @@
                 <option value="Productivity">Productivity</option>
                 <option value="History">History</option>
                 <option value="Design">Design</option>
+                <option value="Biography">Biography</option>
+                <option value="Mystery">Mystery</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Technology">Technology</option>
+                <option value="Data Science">Data Science</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Other">Other</option>
               </select>
+            </div>
+            <div class="form-group">
+              <label for="edit_published_year">Published Year</label>
+              <input id="edit_published_year" type="number" name="published_year" min="0">
+            </div>
+            <div class="form-group">
+              <label for="edit_access_type">Access Type</label>
+              <select id="edit_access_type" name="access_type">
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit_featured_section">Featured Section</label>
+              <select id="edit_featured_section" name="featured_section">
+                <option value="none">None</option>
+                <option value="trending">Trending</option>
+                <option value="top_reading">Top Reading</option>
+                <option value="most_liked">Most Liked</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit_pages">Pages</label>
+              <input id="edit_pages" type="number" name="pages" min="0">
+            </div>
+            <div class="form-group full-width">
+              <label for="edit_description">Description</label>
+              <textarea id="edit_description" name="description" rows="4"></textarea>
             </div>
           </div>
 
-          <div id="manageResult" class="form-result"></div>
+          <div class="edit-side">
+            <div class="cover-dropzone compact">
+              <img id="editCoverPreview" src="" alt="Cover preview">
+              <div>
+                <strong>Cover Asset Preview</strong>
+                <span>Live preview from the image link field.</span>
+              </div>
+            </div>
 
-          <div id="booksTableContainer" class="books-table-container">
-            <table class="books-table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Category</th>
-                  <th>Access</th>
-                  <th>Year</th>
-                  <th>Featured</th>
-                  <th>Views</th>
-                  <th>Likes</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="booksTableBody">
-                <tr><td colspan="6" class="loading">Loading books...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-    </div>
-  </main>
+            <div class="form-group">
+              <label for="edit_image_url">Image Link</label>
+              <input id="edit_image_url" type="text" name="image_url">
+            </div>
 
-  <!-- Edit Modal -->
-  <div id="editModal" class="modal hidden">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Edit Book</h2>
-        <button class="modal-close" onclick="closeEditModal()">×</button>
-      </div>
-      <form id="editBookForm" class="admin-form">
-        <input type="hidden" name="book_id" id="edit_book_id">
-        
-        <div class="form-row">
-          <div class="form-group">
-            <label>Book Title</label>
-            <input type="text" name="title" id="edit_title" required>
-          </div>
-          <div class="form-group">
-            <label>Author</label>
-            <input type="text" name="author" id="edit_author" required>
-          </div>
-        </div>
+            <div class="form-group">
+              <label for="edit_file_url">PDF Link</label>
+              <input id="edit_file_url" type="text" name="file_url">
+            </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Category</label>
-            <select name="category" id="edit_category" required>
-              <option value="Architecture">Architecture</option>
-              <option value="Classic Literature">Classic Literature</option>
-              <option value="Science">Science</option>
-              <option value="Philosophy">Philosophy</option>
-              <option value="Productivity">Productivity</option>
-              <option value="History">History</option>
-              <option value="Design">Design</option>
-            </select>
+            <div class="form-grid compact-grid">
+              <div class="form-group">
+                <label for="edit_view_count">View Count</label>
+                <input id="edit_view_count" type="number" name="view_count" min="0">
+              </div>
+              <div class="form-group">
+                <label for="edit_like_count">Like Count</label>
+                <input id="edit_like_count" type="number" name="like_count" min="0">
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Published Year</label>
-            <input type="number" name="published_year" id="edit_published_year">
-          </div>
-        </div>
+        </section>
 
-        <div class="form-group">
-          <label>Description</label>
-          <textarea name="description" id="edit_description" rows="3"></textarea>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Pages</label>
-            <input type="number" name="pages" id="edit_pages">
-          </div>
-          <div class="form-group">
-            <label>Access Type</label>
-            <select name="access_type" id="edit_access_type">
-              <option value="free">Free</option>
-              <option value="paid">Paid</option>
-              <option value="premium">Premium</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Image URL</label>
-          <input type="url" name="image_url" id="edit_image_url">
-        </div>
-
-        <div class="form-group">
-          <label>PDF File URL</label>
-          <input type="url" name="file_url" id="edit_file_url">
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Featured Section</label>
-            <select name="featured_section" id="edit_featured_section">
-              <option value="none">None</option>
-              <option value="trending">Trending</option>
-              <option value="top_reading">Top Reading</option>
-              <option value="most_liked">Most Liked</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>View Count</label>
-            <input type="number" name="view_count" id="edit_view_count" min="0">
-          </div>
-          <div class="form-group">
-            <label>Like Count</label>
-            <input type="number" name="like_count" id="edit_like_count" min="0">
-          </div>
-        </div>
-
-        <div class="form-actions">
+        <div class="form-actions modal-actions">
           <button type="submit" class="btn btn-primary">Save Changes</button>
-          <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+          <button type="button" class="btn btn-soft" onclick="closeEditModal()">Cancel</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Delete Confirmation Modal -->
-  <div id="deleteModal" class="modal hidden">
+  <div id="deleteModal" class="modal hidden" aria-hidden="true">
     <div class="modal-content modal-small">
       <div class="modal-header">
-        <h2>Delete Book</h2>
-        <button class="modal-close" onclick="closeDeleteModal()">×</button>
+        <div>
+          <p class="eyebrow">Archive Operation</p>
+          <h2>Delete Book</h2>
+        </div>
+        <button type="button" class="modal-close" onclick="closeDeleteModal()">×</button>
       </div>
-      <p id="deleteMessage"></p>
-      <div class="form-actions">
-        <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
-        <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+      <p id="deleteMessage" class="delete-message"></p>
+      <div class="form-actions modal-actions">
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+        <button type="button" class="btn btn-soft" onclick="closeDeleteModal()">Cancel</button>
       </div>
     </div>
   </div>
 
-  <script src="./admin.js"></script>
+  <!-- Edit User Modal -->
+  <div id="userModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">Admin Action</p>
+          <h2>Edit User</h2>
+        </div>
+        <button type="button" class="modal-close" onclick="closeUserModal()">×</button>
+      </div>
+      <form id="userForm" class="modal-form">
+        <input type="hidden" id="edit_user_id" name="id">
+        <section class="modal-panel-grid">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="edit_user_name">Full Name</label>
+              <input id="edit_user_name" type="text" name="name" required>
+            </div>
+            <div class="form-group">
+              <label for="edit_user_email">Email</label>
+              <input id="edit_user_email" type="email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label for="edit_user_institution">Institution</label>
+              <input id="edit_user_institution" type="text" name="institution">
+            </div>
+            <div class="form-group">
+              <label for="edit_user_role">Role</label>
+              <select id="edit_user_role" name="role">
+                <option value="student">Student</option>
+                <option value="faculty">Faculty</option>
+                <option value="guest">Guest</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit_user_plan">Plan</label>
+              <select id="edit_user_plan" name="plan_type">
+                <option value="free">Free</option>
+                <option value="basic">Basic</option>
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit_user_status">Status</label>
+              <select id="edit_user_status" name="status">
+                <option value="active">Active</option>
+                <option value="suspended">Suspended</option>
+              </select>
+            </div>
+          </div>
+        </section>
+        <div class="form-actions modal-actions">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+          <button type="button" class="btn btn-soft" onclick="closeUserModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="./admin.js?v=5"></script>
 </body>
 </html>

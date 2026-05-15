@@ -3,7 +3,6 @@
 # Enable mod_rewrite
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /BrainRoot/
 </IfModule>
 
 # Cache control for different file types

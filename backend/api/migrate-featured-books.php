@@ -5,6 +5,12 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once '../config.php';
 
+if (isProductionEnvironment()) {
+    sendJson(['success' => false, 'error' => 'Not found'], 404);
+}
+
+requireAdminUser($conn);
+
 try {
   // Check if columns already exist
   $result = $conn->query("SHOW COLUMNS FROM books LIKE 'featured_section'");

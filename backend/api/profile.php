@@ -1,6 +1,11 @@
 <?php
 // backend/api/profile.php - Read and update the logged-in user's profile
 
+// Prevent any output before JSON - MUST come first!
+ob_start();
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once '../config.php';
 
 ensureUserProfileColumns($conn);

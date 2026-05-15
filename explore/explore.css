@@ -671,7 +671,12 @@ a {
 
 .all-books-actions {
   display: flex;
+  align-items: flex-start;
   gap: 16px;
+}
+
+.control-dropdown {
+  position: relative;
 }
 
 .filter-btn {
@@ -686,6 +691,36 @@ a {
 
 .filter-btn:hover {
   background: var(--color-surface-high);
+}
+
+.control-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  min-width: 180px;
+  border: 1px solid rgba(172, 179, 180, 0.18);
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 18px 40px rgba(45, 52, 53, 0.14);
+  padding: 8px;
+}
+
+.control-menu-item {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 10px 12px;
+  color: var(--color-on-surface);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.control-menu-item:hover,
+.control-menu-item.is-active {
+  background: var(--color-surface-low);
+  color: var(--color-primary);
 }
 
 .all-books-list {

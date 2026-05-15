@@ -1,6 +1,11 @@
 <?php
 // backend/api/auth.php - Handle authentication (login/register)
 
+// Prevent any output before JSON - MUST come first!
+ob_start();
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once '../config.php';
 
 ensureUserProfileColumns($conn);
@@ -56,7 +61,7 @@ if ($method === 'POST') {
             $createdAtStmt->execute();
             $createdAt = $createdAtStmt->get_result()->fetch_assoc()['created_at'] ?? date('Y-m-d H:i:s');
 
-            session_start();
+            startBrainrootSession();
             $_SESSION['user_id'] = $userId;
             $_SESSION['email'] = $email;
             $_SESSION['name'] = $name;
@@ -105,7 +110,7 @@ if ($method === 'POST') {
         }
         
         // Create session
-        session_start();
+        startBrainrootSession();
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['email'] = $email;
         $_SESSION['name'] = $user['name'];
@@ -128,7 +133,7 @@ if ($method === 'POST') {
     }
     
     else if ($action === 'logout') {
-        session_start();
+        startBrainrootSession();
         session_destroy();
         sendJson(['success' => true, 'message' => 'Logged out successfully']);
     }

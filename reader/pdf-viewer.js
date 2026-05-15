@@ -3,7 +3,7 @@
   const MIN_SCALE = 0.65;
   const MAX_SCALE = 3;
   const SCALE_STEP = 0.2;
-  const DEFAULT_SCALE = 1.35;
+  const DEFAULT_SCALE = 1.0;
 
   function initializePdfViewer() {
     if (window.PDFViewer) {
@@ -20,11 +20,13 @@
     let currentPage = 1;
     let pageCount = 0;
     let pdfScale = DEFAULT_SCALE;
+    let fitMode = "";
     let isRendering = false;
     let renderToken = 0;
     let previewToken = 0;
     let toastTimer = null;
     let resizeTimer = null;
+    let progressTimer = null;
 
     function getElement(id) {
       return document.getElementById(id);
@@ -53,28 +55,64 @@
       }
     }
 
+    function setButtonActive(id, isActive) {
+      const button = getElement(id);
+      if (button) {
+        button.classList.toggle("is-active", isActive);
+      }
+    }
+
+    function getAvailablePageSize() {
+      const viewer = getPdfViewer();
+      const previewPanel = getElement("pdfPreviewPanel");
+      const isFullscreenViewer = Boolean(viewer && document.fullscreenElement === viewer);
+      const viewerWidth = viewer ? viewer.clientWidth : window.innerWidth;
+      const viewerHeight = viewer ? viewer.clientHeight : window.innerHeight;
+      const panelWidth = previewPanel && window.getComputedStyle(previewPanel).display !== "none"
+        ? previewPanel.offsetWidth + 24
+        : 0;
+      const horizontalPadding = isFullscreenViewer ? 84 : 72;
+      const verticalPadding = isFullscreenViewer ? 132 : 64;
+
+      return {
+        width: Math.max(240, viewerWidth - panelWidth - horizontalPadding),
+        height: Math.max(320, viewerHeight - verticalPadding)
+      };
+    }
+
+    function getScaleForFitMode(baseViewport) {
+      if (!fitMode || !baseViewport) {
+        return pdfScale;
+      }
+
+      const available = getAvailablePageSize();
+      const widthScale = available.width / baseViewport.width;
+      const pageScale = Math.min(widthScale, available.height / baseViewport.height);
+      const nextScale = fitMode === "page" ? pageScale : widthScale;
+
+      return clamp(Number(nextScale.toFixed(2)), MIN_SCALE, MAX_SCALE);
+    }
+
     function updateReaderProgress() {
-      if (!pageCount) {
+      if (!window.BrainRootReader || typeof window.BrainRootReader.saveProgress !== "function" || !pageCount) {
         return;
       }
 
-      const progress = clamp(Math.round((currentPage / pageCount) * 100), 0, 100);
-      const valueEl = getElement("readerProgressValue");
-      const barEl = getElement("readerProgressBar");
-
-      if (valueEl) {
-        valueEl.textContent = progress + "%";
-      }
-
-      if (barEl) {
-        barEl.style.width = progress + "%";
-      }
+      window.clearTimeout(progressTimer);
+      progressTimer = window.setTimeout(function () {
+        window.BrainRootReader.saveProgress({
+          pdfPage: currentPage,
+          pdfPageCount: pageCount,
+          progress: Math.round((currentPage / pageCount) * 100)
+        });
+      }, 160);
     }
 
     function updateControls() {
       const pageInput = getElement("pdfPageInput");
       const pageCountLabel = getElement("pdfPageCount");
       const zoomValue = getElement("pdfZoomValue");
+      const fullscreenZoomValue = getElement("pdfFullscreenZoomValue");
       const previewPage = getElement("pdfPreviewPage");
       const previewButton = getElement("pdfPreviewButton");
       const hasPrevious = currentPage > 1;
@@ -94,12 +132,22 @@
         zoomValue.textContent = Math.round(pdfScale * 100) + "%";
       }
 
+      if (fullscreenZoomValue) {
+        fullscreenZoomValue.textContent = Math.round(pdfScale * 100) + "%";
+      }
+
       setButtonDisabled("pdfPrevBtn", isRendering || !hasPrevious);
       setButtonDisabled("pdfPrevOverlayBtn", isRendering || !hasPrevious);
       setButtonDisabled("pdfNextBtn", isRendering || !hasNext);
       setButtonDisabled("pdfNextOverlayBtn", isRendering || !hasNext);
       setButtonDisabled("pdfZoomInBtn", isRendering || pdfScale >= MAX_SCALE);
       setButtonDisabled("pdfZoomOutBtn", isRendering || pdfScale <= MIN_SCALE);
+      setButtonDisabled("pdfFullscreenZoomInBtn", isRendering || pdfScale >= MAX_SCALE);
+      setButtonDisabled("pdfFullscreenZoomOutBtn", isRendering || pdfScale <= MIN_SCALE);
+      setButtonActive("pdfFitWidthBtn", fitMode === "width");
+      setButtonActive("pdfFitPageBtn", fitMode === "page");
+      setButtonActive("pdfFullscreenFitWidthBtn", fitMode === "width");
+      setButtonActive("pdfFullscreenFitPageBtn", fitMode === "page");
 
       if (previewButton) {
         previewButton.disabled = isRendering || !hasNext;
@@ -137,19 +185,67 @@
       }, 900);
     }
 
-    function animateCanvas(direction) {
+    function removePageGhost(ghost) {
+      if (!ghost || !ghost.parentElement) {
+        return;
+      }
+
+      ghost.parentElement.removeChild(ghost);
+    }
+
+    function createPageGhost(snapshot, direction) {
+      const stage = getElement("pdfStage");
+      if (!stage || !snapshot || direction === "zoom") {
+        return null;
+      }
+
+      const viewer = getPdfViewer();
+      const isFullscreenViewer = Boolean(viewer && document.fullscreenElement === viewer);
+      const ghost = document.createElement("div");
+      ghost.className = "pdf-page-ghost";
+      ghost.setAttribute("aria-hidden", "true");
+      ghost.style.backgroundImage = "url('" + snapshot.src + "')";
+      ghost.style.width = snapshot.width + "px";
+      ghost.style.height = snapshot.height + "px";
+      ghost.classList.add(direction === "forward" ? "pdf-page-ghost-forward" : "pdf-page-ghost-back");
+
+      if (isFullscreenViewer) {
+        ghost.classList.add(direction === "forward" ? "pdf-page-ghost-turn-forward" : "pdf-page-ghost-turn-back");
+      }
+
+      stage.appendChild(ghost);
+
+      window.setTimeout(function () {
+        removePageGhost(ghost);
+      }, isFullscreenViewer ? 760 : 520);
+
+      return ghost;
+    }
+
+    function animateCanvas(direction, previousSnapshot) {
       const canvas = getCanvas();
+      const viewer = getPdfViewer();
       if (!canvas) {
         return;
       }
 
-      canvas.classList.remove("pdf-page-forward", "pdf-page-back", "pdf-page-zoom");
+      const isFullscreenViewer = Boolean(viewer && document.fullscreenElement === viewer);
+
+      canvas.classList.remove(
+        "pdf-page-forward",
+        "pdf-page-back",
+        "pdf-page-zoom",
+        "pdf-page-turn-forward",
+        "pdf-page-turn-back"
+      );
       void canvas.offsetWidth;
 
+      createPageGhost(previousSnapshot, direction);
+
       if (direction === "forward") {
-        canvas.classList.add("pdf-page-forward");
+        canvas.classList.add(isFullscreenViewer ? "pdf-page-turn-forward" : "pdf-page-forward");
       } else if (direction === "back") {
-        canvas.classList.add("pdf-page-back");
+        canvas.classList.add(isFullscreenViewer ? "pdf-page-turn-back" : "pdf-page-back");
       } else {
         canvas.classList.add("pdf-page-zoom");
       }
@@ -224,6 +320,14 @@
       setRendering(true);
 
       try {
+        const previousCanvas = getCanvas();
+        const previousSnapshot = previousCanvas && previousCanvas.width && previousCanvas.height && direction !== "zoom"
+          ? {
+              src: previousCanvas.toDataURL("image/png"),
+              width: previousCanvas.offsetWidth || previousCanvas.width,
+              height: previousCanvas.offsetHeight || previousCanvas.height
+            }
+          : null;
         const page = await pdfDoc.getPage(targetPage);
         if (token !== renderToken) {
           return false;
@@ -235,6 +339,8 @@
         }
 
         const ctx = canvas.getContext("2d", { alpha: false });
+        const baseViewport = page.getViewport({ scale: 1 });
+        pdfScale = getScaleForFitMode(baseViewport);
         const viewport = page.getViewport({ scale: pdfScale });
 
         canvas.width = Math.floor(viewport.width);
@@ -252,7 +358,7 @@
         }
 
         currentPage = targetPage;
-        animateCanvas(direction);
+        animateCanvas(direction, previousSnapshot);
         showPageToast("Page " + currentPage);
         updateControls();
         await renderPreview();
@@ -276,7 +382,13 @@
     }
 
     async function zoomBy(delta) {
+      fitMode = "";
       pdfScale = clamp(Number((pdfScale + delta).toFixed(2)), MIN_SCALE, MAX_SCALE);
+      await renderPage(currentPage, "zoom");
+    }
+
+    async function fitTo(mode) {
+      fitMode = mode;
       await renderPage(currentPage, "zoom");
     }
 
@@ -337,8 +449,9 @@
     }
 
     window.PDFViewer = {
-      async loadPDF(pdfUrl) {
+      async loadPDF(pdfUrl, options) {
         try {
+          const config = options || {};
           const loadingTask = pdfjsLib.getDocument(pdfUrl);
           const pdf = await loadingTask.promise;
 
@@ -346,10 +459,11 @@
           pageCount = pdf.numPages;
           currentPage = 1;
           pdfScale = DEFAULT_SCALE;
+          fitMode = config.fitMode || "";
           showPdfUi();
           updateControls();
 
-          return await renderPage(1, "jump");
+          return await renderPage(clamp(Number(config.initialPage || 1), 1, pageCount), "jump");
         } catch (error) {
           console.error("PDF loading error:", error);
 
@@ -386,6 +500,14 @@
         await zoomBy(-SCALE_STEP);
       },
 
+      async fitWidth() {
+        await fitTo("width");
+      },
+
+      async fitPage() {
+        await fitTo("page");
+      },
+
       toggleFullscreen: toggleFullscreen,
 
       getCurrentPage() {
@@ -406,6 +528,13 @@
         ["pdfPreviewButton", "click", function () { window.PDFViewer.nextPage(); }],
         ["pdfZoomInBtn", "click", function () { window.PDFViewer.zoomIn(); }],
         ["pdfZoomOutBtn", "click", function () { window.PDFViewer.zoomOut(); }],
+        ["pdfFitWidthBtn", "click", function () { window.PDFViewer.fitWidth(); }],
+        ["pdfFitPageBtn", "click", function () { window.PDFViewer.fitPage(); }],
+        ["pdfFullscreenZoomInBtn", "click", function () { window.PDFViewer.zoomIn(); }],
+        ["pdfFullscreenZoomOutBtn", "click", function () { window.PDFViewer.zoomOut(); }],
+        ["pdfFullscreenFitWidthBtn", "click", function () { window.PDFViewer.fitWidth(); }],
+        ["pdfFullscreenFitPageBtn", "click", function () { window.PDFViewer.fitPage(); }],
+        ["pdfFullscreenExitBtn", "click", function () { window.PDFViewer.toggleFullscreen(); }],
         ["pdfFullscreenBtn", "click", function () { window.PDFViewer.toggleFullscreen(); }]
       ];
 
@@ -444,6 +573,9 @@
       }
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(function () {
+        if (fitMode && pdfDoc) {
+          renderPage(currentPage, "zoom");
+        }
         renderPreview();
       }, 120);
     });
@@ -474,6 +606,9 @@
     window.addEventListener("resize", function () {
       window.clearTimeout(resizeTimer);
       resizeTimer = window.setTimeout(function () {
+        if (fitMode && pdfDoc) {
+          renderPage(currentPage, "zoom");
+        }
         renderPreview();
       }, 120);
     });

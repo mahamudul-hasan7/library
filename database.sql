@@ -12,6 +12,7 @@ CREATE TABLE users (
   institution VARCHAR(255),
   role VARCHAR(100),
   plan_type VARCHAR(50) DEFAULT 'free',
+  status VARCHAR(50) DEFAULT 'active',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -38,7 +39,20 @@ CREATE TABLE books (
   view_count INT DEFAULT 0,
   like_count INT DEFAULT 0,
   featured_section ENUM('trending', 'top_reading', 'most_liked', 'none') DEFAULT 'none',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Category catalog for admin filters and book forms
+CREATE TABLE categories (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(100) UNIQUE NOT NULL,
+  slug VARCHAR(120) UNIQUE NOT NULL,
+  description TEXT,
+  status VARCHAR(50) DEFAULT 'active',
+  sort_order INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- User Collections (books user has in their collection)
@@ -79,16 +93,64 @@ CREATE TABLE borrowed_books (
   UNIQUE KEY unique_active_borrow_open (user_id, active_borrow_book_id)
 );
 
--- Book views history (for recommendations)
-CREATE TABLE book_views (
+-- Subscription change history
+CREATE TABLE subscription_history (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  plan_name VARCHAR(100) NOT NULL,
+  plan_type VARCHAR(50) NOT NULL,
+  billing_cycle VARCHAR(50) DEFAULT 'monthly',
+  price INT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_subscription_user_date (user_id, created_at)
+);
+
+-- Saved reader position per user/book
+CREATE TABLE reading_progress (
   id INT PRIMARY KEY AUTO_INCREMENT,
   user_id INT NOT NULL,
   book_id INT NOT NULL,
-  view_source VARCHAR(100),
-  viewed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  progress INT DEFAULT 0,
+  scroll_y INT DEFAULT 0,
+  pdf_page INT NULL,
+  pdf_page_count INT NULL,
+  bookmark_scroll_y INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
-  INDEX idx_user_date (user_id, viewed_at)
+  UNIQUE KEY unique_user_book_progress (user_id, book_id),
+  INDEX idx_reading_progress_user_updated (user_id, updated_at)
+);
+
+-- One rating per user/book, aggregated back to books.rating_average/rating_count
+CREATE TABLE book_ratings (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  book_id INT NOT NULL,
+  rating TINYINT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user_book_rating (user_id, book_id),
+  INDEX idx_book_ratings_book (book_id)
+);
+
+-- Admin activity trail for catalog/user/category changes
+CREATE TABLE admin_logs (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  admin_user_id INT NULL,
+  action VARCHAR(80) NOT NULL,
+  entity_type VARCHAR(80) NOT NULL,
+  entity_id INT NULL,
+  summary VARCHAR(255),
+  metadata TEXT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (admin_user_id) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_admin_logs_created (created_at),
+  INDEX idx_admin_logs_entity (entity_type, entity_id)
 );
 
 -- Create indexes for better performance
@@ -98,6 +160,7 @@ CREATE INDEX idx_user_wishlist ON wishlist(user_id);
 CREATE INDEX idx_borrowed_user ON borrowed_books(user_id);
 CREATE INDEX idx_borrowed_active ON borrowed_books(returned_at);
 CREATE INDEX idx_borrowed_due ON borrowed_books(due_at);
+CREATE INDEX idx_categories_status_order ON categories(status, sort_order, name);
 
 -- Insert sample books
 INSERT INTO books (title, author, category, description, access_type, rating_average, rating_count, published_year, language, format, pages, section_name, status) VALUES
@@ -128,17 +191,27 @@ SET image_url = CASE title
 END
 WHERE image_url IS NULL OR image_url = '';
 
--- Insert test user (password: Test@123)
-INSERT INTO users (email, password, name, plan_type) VALUES
-('test@example.com', '$2y$10$XxV8gP3pZ0K9qL2mN3bQ.u0L0K9qL2mN3bQ0K9qL2mN3bQ0K9qL', 'Test User', 'free');
-
--- Insert sample collection for test user
-INSERT INTO collections (user_id, book_id, progress, importance) VALUES
-(1, 1, 45, 80),
-(1, 3, 20, 70);
-
--- Insert sample borrow history for test user
-INSERT INTO borrowed_books (user_id, book_id, borrowed_at, due_at, returned_at) VALUES
-(1, 1, DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_ADD(NOW(), INTERVAL 4 DAY), NULL),
-(1, 2, DATE_SUB(NOW(), INTERVAL 20 DAY), DATE_SUB(NOW(), INTERVAL 6 DAY), DATE_SUB(NOW(), INTERVAL 5 DAY)),
-(1, 3, DATE_SUB(NOW(), INTERVAL 30 DAY), DATE_SUB(NOW(), INTERVAL 16 DAY), NULL);
+-- Seed category catalog
+INSERT IGNORE INTO categories (name, slug, sort_order) VALUES
+('Architecture', 'architecture', 1),
+('Urbanism', 'urbanism', 2),
+('Design', 'design', 3),
+('Psychology', 'psychology', 4),
+('Productivity', 'productivity', 5),
+('Mystery', 'mystery', 6),
+('Memoir', 'memoir', 7),
+('Biography', 'biography', 8),
+('Health', 'health', 9),
+('History', 'history', 10),
+('Business', 'business', 11),
+('Finance', 'finance', 12),
+('Science', 'science', 13),
+('Technology', 'technology', 14),
+('Computer Science', 'computer-science', 15),
+('Data Science', 'data-science', 16),
+('Classic Literature', 'classic-literature', 17),
+('Drama', 'drama', 18),
+('Fiction', 'fiction', 19),
+('Sci-Fi', 'sci-fi', 20),
+('Environment', 'environment', 21),
+('Other', 'other', 22);

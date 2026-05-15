@@ -4,6 +4,7 @@
 require_once '../config.php';
 
 ensureUserProfileColumns($conn);
+ensureSubscriptionHistoryTable($conn);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $userId = getCurrentUserId();
@@ -56,6 +57,20 @@ if ($method === 'POST') {
         
         if (!$stmt->execute()) {
             throw new Exception("Execute failed: " . $stmt->error);
+        }
+
+        $historyQuery = "
+            INSERT INTO subscription_history (user_id, plan_name, plan_type, billing_cycle, price)
+            VALUES (?, ?, ?, ?, ?)
+        ";
+        $historyStmt = $conn->prepare($historyQuery);
+        if (!$historyStmt) {
+            throw new Exception("Prepare failed: " . $conn->error);
+        }
+
+        $historyStmt->bind_param("isssi", $userId, $planName, $planType, $billingCycle, $price);
+        if (!$historyStmt->execute()) {
+            throw new Exception("Execute failed: " . $historyStmt->error);
         }
 
         // Get updated user

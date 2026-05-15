@@ -3,6 +3,13 @@
 
 require_once '../config.php';
 
+if (isProductionEnvironment()) {
+    http_response_code(404);
+    exit('Not found');
+}
+
+requireAdminUser($conn);
+
 try {
     ensureBookCatalogColumns($conn);
     ensureBorrowedBookColumns($conn);
@@ -46,6 +53,29 @@ try {
     echo "✅ Test user inserted successfully\n";
     echo "   Email: test@example.com\n";
     echo "   Password: Test@123\n";
+
+    // Insert demo users for admin management
+    $demoUsers = [
+        ['admin@brainroot.edu', 'Admin@123', 'BrainRoot Admin', 'Library HQ', 'admin', 'premium', 'active'],
+        ['faculty@brainroot.edu', 'Faculty@123', 'Dr. Maya Sen', 'Architecture Dept.', 'faculty', 'standard', 'active'],
+        ['student@brainroot.edu', 'Student@123', 'Rahim Khan', 'Department of Design', 'student', 'free', 'active'],
+        ['guest@brainroot.edu', 'Guest@123', 'Visitor Account', 'Guest Access', 'guest', 'free', 'suspended']
+    ];
+
+    $insertDemoUserQuery = "INSERT IGNORE INTO users (email, password, name, institution, role, plan_type, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($insertDemoUserQuery);
+
+    foreach ($demoUsers as $demoUser) {
+        $hashedDemoPassword = password_hash($demoUser[1], PASSWORD_BCRYPT);
+        $stmt->bind_param("sssssss", $demoUser[0], $hashedDemoPassword, $demoUser[2], $demoUser[3], $demoUser[4], $demoUser[5], $demoUser[6]);
+        $stmt->execute();
+    }
+
+    echo "✅ Demo users inserted successfully\n";
+    echo "   admin@brainroot.edu / Admin@123\n";
+    echo "   faculty@brainroot.edu / Faculty@123\n";
+    echo "   student@brainroot.edu / Student@123\n";
+    echo "   guest@brainroot.edu / Guest@123\n";
     
     // Add test collection
     $getBookQuery = "SELECT id FROM books LIMIT 3";

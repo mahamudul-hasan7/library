@@ -331,6 +331,157 @@ function setExploreBookLibraryFromCatalog(catalogBooks) {
   return true;
 }
 
+const allBooksState = {
+  filter: "all",
+  sort: "newest"
+};
+
+const allBooksSortLabels = {
+  newest: "Newest",
+  oldest: "Oldest",
+  "title-asc": "Title A-Z",
+  "title-desc": "Title Z-A",
+  "author-asc": "Author A-Z",
+  "rating-desc": "Highest Rated"
+};
+
+function renderAllBooksCollection() {
+  syncAllBooksCollectionBadges();
+}
+
+function getAllBooksSection() {
+  const allBooksHeading = Array.from(document.querySelectorAll("section h2")).find(function (heading) {
+    return String(heading.textContent || "").trim().toLowerCase() === "all books collection";
+  });
+
+  return allBooksHeading ? allBooksHeading.closest("section") : null;
+}
+
+function getAllBooksRowsContainer() {
+  const section = getAllBooksSection();
+  return section ? section.querySelector(".all-books-list") : null;
+}
+
+function getFilteredAndSortedAllBooks() {
+  const books = Array.isArray(exploreBookLibrary.collection) ? exploreBookLibrary.collection.slice() : [];
+  const filter = allBooksState.filter;
+
+  const filteredBooks = books.filter(function (book) {
+    if (filter === "available") {
+      return String(book.status || "").trim().toLowerCase() !== "borrowed";
+    }
+
+    if (filter === "borrowed") {
+      return String(book.status || "").trim().toLowerCase() === "borrowed";
+    }
+
+    if (filter === "free") {
+      return String(getBookAccess(book.title) || "").trim().toLowerCase() !== "paid";
+    }
+
+    if (filter === "paid") {
+      return String(getBookAccess(book.title) || "").trim().toLowerCase() === "paid";
+    }
+
+    return true;
+  });
+
+  filteredBooks.sort(function (left, right) {
+    const leftTitle = String(left.title || "").trim();
+    const rightTitle = String(right.title || "").trim();
+    const leftAuthor = String(left.author || "").trim();
+    const rightAuthor = String(right.author || "").trim();
+    const leftYear = Number(left.publishedYear) || 0;
+    const rightYear = Number(right.publishedYear) || 0;
+    const leftRating = Number(left.ratingAverage) || 0;
+    const rightRating = Number(right.ratingAverage) || 0;
+    const leftSortIndex = Number(left.sortIndex) || 0;
+    const rightSortIndex = Number(right.sortIndex) || 0;
+
+    if (allBooksState.sort === "title-asc") {
+      return leftTitle.localeCompare(rightTitle);
+    }
+
+    if (allBooksState.sort === "title-desc") {
+      return rightTitle.localeCompare(leftTitle);
+    }
+
+    if (allBooksState.sort === "author-asc") {
+      return leftAuthor.localeCompare(rightAuthor) || leftTitle.localeCompare(rightTitle);
+    }
+
+    if (allBooksState.sort === "rating-desc") {
+      return rightRating - leftRating || rightSortIndex - leftSortIndex || rightTitle.localeCompare(leftTitle);
+    }
+
+    if (leftYear !== rightYear) {
+      return allBooksState.sort === "oldest" ? leftYear - rightYear : rightYear - leftYear;
+    }
+
+    if (leftSortIndex !== rightSortIndex) {
+      return allBooksState.sort === "oldest" ? leftSortIndex - rightSortIndex : rightSortIndex - leftSortIndex;
+    }
+
+    return allBooksState.sort === "oldest"
+      ? leftTitle.localeCompare(rightTitle)
+      : rightTitle.localeCompare(leftTitle);
+  });
+
+  return filteredBooks;
+}
+
+function updateAllBooksControlLabels() {
+  const filterBtn = document.getElementById("allBooksFilterBtn");
+  const sortBtn = document.getElementById("allBooksSortBtn");
+
+  if (filterBtn) {
+    const labelMap = {
+      all: "All",
+      available: "Available",
+      borrowed: "Borrowed",
+      free: "Free",
+      paid: "Paid"
+    };
+    filterBtn.textContent = "Filter: " + (labelMap[allBooksState.filter] || "All");
+  }
+
+  if (sortBtn) {
+    sortBtn.textContent = "Sort: " + (allBooksSortLabels[allBooksState.sort] || "Newest");
+  }
+}
+
+function closeAllBooksMenus() {
+  const filterBtn = document.getElementById("allBooksFilterBtn");
+  const sortBtn = document.getElementById("allBooksSortBtn");
+  const filterMenu = document.getElementById("allBooksFilterMenu");
+  const sortMenu = document.getElementById("allBooksSortMenu");
+
+  if (filterBtn) {
+    filterBtn.setAttribute("aria-expanded", "false");
+  }
+  if (sortBtn) {
+    sortBtn.setAttribute("aria-expanded", "false");
+  }
+  if (filterMenu) {
+    filterMenu.classList.add("is-hidden");
+  }
+  if (sortMenu) {
+    sortMenu.classList.add("is-hidden");
+  }
+}
+
+function setAllBooksFilter(filterValue) {
+  allBooksState.filter = filterValue || "all";
+  updateAllBooksControlLabels();
+  renderAllBooksCollection();
+}
+
+function setAllBooksSort(sortValue) {
+  allBooksState.sort = sortValue || "newest";
+  updateAllBooksControlLabels();
+  renderAllBooksCollection();
+}
+
 async function loadExploreBookLibraryFromDatabase() {
   if (!window.brainrootAPI || typeof window.brainrootAPI.getBooks !== "function") {
     return false;
@@ -521,7 +672,6 @@ function openBookActionFromElement(element) {
   if (!metadata) {
     return;
   }
-
   openBookModal(metadata.title, metadata.author, metadata.description, metadata.status, metadata.imageUrl);
 }
 
@@ -833,12 +983,134 @@ function syncHorizontalShowcaseSection(sectionTitle, books) {
   });
 }
 
+// Load featured sections from API
+async function loadFeaturedSections() {
+  try {
+    const sections = ['trending', 'top_reading', 'most_liked'];
+
+    for (const section of sections) {
+      try {
+        const response = await fetch(`../backend/api/books-crud.php?section=${section}`);
+        if (!response.ok) throw new Error('Failed to fetch featured books');
+
+        const data = await response.json();
+
+        if (!data.success || !data.books || data.books.length === 0) {
+          continue;
+        }
+
+        // Convert API response to exploreBookLibrary format
+        const convertedBooks = data.books.map(book => ({
+          title: book.title || '',
+          author: book.author || 'Unknown',
+          category: book.category || 'General',
+          status: book.status || 'Available',
+          access: (book.access_type || 'free').toLowerCase() === 'paid' ? 'paid' : 'free',
+          description: book.description || '',
+          coverAlt: book.title + ' cover',
+          imageUrl: book.image_url || book.image || ''
+        }));
+
+        // Update library based on section
+        if (section === 'trending') {
+          exploreBookLibrary.trending = convertedBooks;
+        } else if (section === 'top_reading') {
+          exploreBookLibrary.topReading = convertedBooks;
+        } else if (section === 'most_liked') {
+          exploreBookLibrary.mostLiked = convertedBooks;
+        }
+      } catch (sectionError) {
+        console.error(`Error loading ${section} books:`, sectionError);
+        // Continue with next section
+      }
+    }
+  } catch (error) {
+    console.error('Error loading featured sections:', error);
+  }
+}
+
 function syncExploreBookLibrary() {
   syncHorizontalShowcaseSection("Trending Books", exploreBookLibrary.trending);
   syncHorizontalShowcaseSection("Top Reading", exploreBookLibrary.topReading);
   syncHorizontalShowcaseSection("Most Liked", exploreBookLibrary.mostLiked);
-  syncAllBooksCollectionBadges();
+  renderAllBooksCollection();
   setupCarouselNavigation();
+}
+
+function initializeAllBooksControls() {
+  const filterBtn = document.getElementById("allBooksFilterBtn");
+  const sortBtn = document.getElementById("allBooksSortBtn");
+  const filterMenu = document.getElementById("allBooksFilterMenu");
+  const sortMenu = document.getElementById("allBooksSortMenu");
+
+  if (filterBtn && filterBtn.dataset.menuBound !== "true") {
+    filterBtn.dataset.menuBound = "true";
+    filterBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      const isOpen = !filterMenu.classList.contains("is-hidden");
+      closeAllBooksMenus();
+      if (!isOpen) {
+        filterMenu.classList.remove("is-hidden");
+        filterBtn.setAttribute("aria-expanded", "true");
+      }
+    });
+  }
+
+  if (sortBtn && sortBtn.dataset.menuBound !== "true") {
+    sortBtn.dataset.menuBound = "true";
+    sortBtn.addEventListener("click", function (event) {
+      event.stopPropagation();
+      const isOpen = !sortMenu.classList.contains("is-hidden");
+      closeAllBooksMenus();
+      if (!isOpen) {
+        sortMenu.classList.remove("is-hidden");
+        sortBtn.setAttribute("aria-expanded", "true");
+      }
+    });
+  }
+
+  if (filterMenu && filterMenu.dataset.menuBound !== "true") {
+    filterMenu.dataset.menuBound = "true";
+    filterMenu.addEventListener("click", function (event) {
+      const target = event.target.closest("[data-all-books-filter]");
+      if (!target) {
+        return;
+      }
+
+      const filterValue = target.getAttribute("data-all-books-filter") || "all";
+      filterMenu.querySelectorAll(".control-menu-item").forEach(function (item) {
+        item.classList.toggle("is-active", item === target);
+      });
+      setAllBooksFilter(filterValue);
+      closeAllBooksMenus();
+    });
+  }
+
+  if (sortMenu && sortMenu.dataset.menuBound !== "true") {
+    sortMenu.dataset.menuBound = "true";
+    sortMenu.addEventListener("click", function (event) {
+      const target = event.target.closest("[data-all-books-sort]");
+      if (!target) {
+        return;
+      }
+
+      const sortValue = target.getAttribute("data-all-books-sort") || "newest";
+      setAllBooksSort(sortValue);
+      sortMenu.querySelectorAll(".control-menu-item").forEach(function (item) {
+        item.classList.toggle("is-active", item === target);
+      });
+      closeAllBooksMenus();
+    });
+  }
+
+  if (!document.body.dataset.allBooksMenuBound) {
+    document.body.dataset.allBooksMenuBound = "true";
+    document.addEventListener("click", function () {
+      closeAllBooksMenus();
+    });
+  }
+
+  updateAllBooksControlLabels();
 }
 
 function setupCarouselNavigation() {
@@ -901,91 +1173,41 @@ function setupCarouselNavigation() {
 }
 
 function syncAllBooksCollectionBadges() {
-  const allBooksHeading = Array.from(document.querySelectorAll("section h2")).find(function (heading) {
-    return String(heading.textContent || "").trim().toLowerCase() === "all books collection";
-  });
-
-  if (!allBooksHeading) {
+  const listContainer = getAllBooksRowsContainer();
+  if (!listContainer) {
     return;
   }
 
-  const section = allBooksHeading.closest("section");
-  if (!section) {
+  const collectionBooks = getFilteredAndSortedAllBooks();
+  listContainer.replaceChildren();
+
+  if (!collectionBooks.length) {
+    const emptyState = document.createElement("p");
+    emptyState.className = "explore-search-empty";
+    emptyState.textContent = "No books match the selected filter.";
+    listContainer.appendChild(emptyState);
+    updateAllBooksControlLabels();
     return;
   }
 
-  const collectionBooks = exploreBookLibrary.collection;
-  let rows = Array.from(section.querySelectorAll(".all-books-list > .all-books-row"));
+  collectionBooks.forEach(function (metadata) {
+    const row = createClassedElement("div", "all-books-row");
+    const rowContent = createClassedElement("div", "all-books-row-main");
+    const imageWrap = createClassedElement("div", "all-books-cover-wrap");
+    const image = createClassedElement("img", "all-books-cover");
+    const imageRating = createClassedElement("span", "all-books-rating-chip");
+    const grid = createClassedElement("div", "all-books-info-grid");
+    const titleWrap = createClassedElement("div", "all-books-copy");
+    const title = createClassedElement("h4", "all-books-row-title");
+    const author = createClassedElement("p", "all-books-author");
+    const categoryText = createClassedElement("p", "all-books-category");
+    const badgeWrap = createClassedElement("div", "all-books-badges");
+    const detailsButton = createClassedElement("button", "all-books-details-btn");
 
-  if (!rows.length) {
-    const listContainer = section.querySelector(".all-books-list");
-    if (!listContainer) {
-      return;
-    }
-
-    listContainer.replaceChildren();
-
-    collectionBooks.forEach(function (book) {
-      const row = createClassedElement("div", "all-books-row");
-      const rowContent = createClassedElement("div", "all-books-row-main");
-      const imageWrap = createClassedElement("div", "all-books-cover-wrap");
-      const image = createClassedElement("img", "all-books-cover");
-      const imageRating = createClassedElement("span", "all-books-rating-chip");
-      const grid = createClassedElement("div", "all-books-info-grid");
-      const titleWrap = createClassedElement("div", "all-books-copy");
-      const title = createClassedElement("h4", "all-books-row-title");
-      const author = createClassedElement("p", "all-books-author");
-      const badgeWrap = createClassedElement("div", "all-books-badges");
-      const detailsButton = createClassedElement("button", "all-books-details-btn");
-
-      image.alt = book.coverAlt || book.title + " cover";
-      imageRating.setAttribute("data-all-books-image-rating", "true");
-      detailsButton.type = "button";
-      detailsButton.textContent = "Details";
-
-      imageWrap.append(image, imageRating);
-      titleWrap.append(title, author);
-      grid.append(titleWrap, badgeWrap);
-      rowContent.append(imageWrap, grid);
-      row.append(rowContent, detailsButton);
-      listContainer.appendChild(row);
-    });
-
-    rows = Array.from(section.querySelectorAll(".all-books-list > .all-books-row"));
-  }
-
-  rows.forEach(function (row, index) {
-    const book = collectionBooks[index];
-    if (!row || !book) {
-      return;
-    }
-
-    const metadata = book;
-    const detailsButton = row.querySelector(".all-books-details-btn");
-    const titleEl = row.querySelector(".all-books-row-title");
-    const authorEl = row.querySelector(".all-books-author");
-    const imageEl = row.querySelector(".all-books-cover");
-    const badgeWrap = row.querySelector(".all-books-badges");
-    const titleWrap = row.querySelector(".all-books-copy");
-    if (!badgeWrap || !titleWrap || !detailsButton || !titleEl || !authorEl || !imageEl) {
-      return;
-    }
-
-    row.className = "all-books-row";
-    const rowContent = row.querySelector(".all-books-row-main");
-    if (rowContent) {
-      rowContent.className = "all-books-row-main";
-    }
-    if (imageEl.parentElement) {
-      imageEl.parentElement.className = "all-books-cover-wrap";
-    }
-    const gridWrap = row.querySelector(".all-books-info-grid");
-    if (gridWrap) {
-      gridWrap.className = "all-books-info-grid";
-    }
-    titleEl.className = "all-books-row-title";
-    authorEl.className = "all-books-author";
-    detailsButton.className = "all-books-details-btn";
+    image.alt = metadata.coverAlt || metadata.title + " cover";
+    imageRating.setAttribute("data-all-books-image-rating", "true");
+    detailsButton.type = "button";
+    detailsButton.textContent = "Details";
 
     const coverUrl = getBookCoverUrl(metadata);
     const availability = getBookAvailability(metadata.status);
@@ -999,42 +1221,16 @@ function syncAllBooksCollectionBadges() {
     accessBadge.className = "access-badge " + (access === "Paid" ? "access-badge-paid" : "access-badge-free");
     accessBadge.textContent = access;
 
-    let imageRatingEl = imageEl.parentElement ? imageEl.parentElement.querySelector("[data-all-books-image-rating]") : null;
-    if (!imageRatingEl && imageEl.parentElement) {
-      imageRatingEl = document.createElement("span");
-      imageRatingEl.setAttribute("data-all-books-image-rating", "true");
-      imageRatingEl.className = "all-books-rating-chip";
-      imageEl.parentElement.appendChild(imageRatingEl);
-    }
-    if (imageRatingEl) {
-      const listRatingChip = getBookRatingChip(metadata.title);
-      imageRatingEl.textContent = listRatingChip;
-      imageRatingEl.classList.toggle("is-hidden", !listRatingChip);
-    }
+    const listRatingChip = getBookRatingChip(metadata.title);
+    imageRating.textContent = listRatingChip;
+    imageRating.classList.toggle("is-hidden", !listRatingChip);
 
-    const ratingText = titleWrap.querySelector("[data-all-books-rating]");
-    if (ratingText) {
-      ratingText.remove();
-    }
-
-    let categoryText = titleWrap.querySelector("[data-all-books-category]");
-    if (!categoryText) {
-      categoryText = document.createElement("p");
-      categoryText.setAttribute("data-all-books-category", "true");
-
-      if (authorEl) {
-        authorEl.insertAdjacentElement("afterend", categoryText);
-      } else {
-        titleWrap.appendChild(categoryText);
-      }
-    }
-
+    title.textContent = metadata.title;
+    author.textContent = metadata.author;
     categoryText.className = "all-books-category";
     categoryText.textContent = "Category: " + metadata.category;
 
-    titleEl.textContent = metadata.title;
-    authorEl.textContent = metadata.author;
-    setExploreBookImage(imageEl, coverUrl, metadata.coverAlt || (metadata.title + " cover"));
+    setExploreBookImage(image, coverUrl, metadata.coverAlt || (metadata.title + " cover"));
     setBookAction(detailsButton, {
       title: metadata.title,
       author: metadata.author,
@@ -1045,8 +1241,16 @@ function syncAllBooksCollectionBadges() {
     });
     detailsButton.textContent = "Details";
 
+    imageWrap.append(image, imageRating);
+    titleWrap.append(title, author, categoryText);
+    grid.append(titleWrap, badgeWrap);
+    rowContent.append(imageWrap, grid);
+    row.append(rowContent, detailsButton);
     badgeWrap.replaceChildren(availabilityBadge, accessBadge);
+    listContainer.appendChild(row);
   });
+
+  updateAllBooksControlLabels();
 }
 
 function getCollectionsTitles() {
@@ -1609,6 +1813,45 @@ function getDatabaseRatingRecord(title) {
   };
 }
 
+function applyRemoteRatingSummary(title, summary) {
+  if (!summary) {
+    return;
+  }
+
+  const book = getBookDefinitionByTitle(title);
+  if (book) {
+    book.ratingAverage = Number(summary.average || 0) || 0;
+    book.rating_average = book.ratingAverage;
+    book.ratingCount = Number(summary.count || 0) || 0;
+    book.rating_count = book.ratingCount;
+  }
+
+  if (summary.user_rating) {
+    const store = readExploreRatingsStore();
+    const key = normalizeTitleKey(title);
+    const entry = store[key] && typeof store[key] === "object" ? store[key] : {};
+    const users = entry.users && typeof entry.users === "object" ? entry.users : {};
+    users[getCurrentRaterId()] = Number(summary.user_rating);
+    store[key] = { users: users };
+    writeExploreRatingsStore(store);
+  }
+}
+
+async function loadRemoteRatingForTitle(title) {
+  if (!window.brainrootAPI || typeof window.brainrootAPI.getBookRating !== "function" || !title) {
+    return;
+  }
+
+  try {
+    const summary = await window.brainrootAPI.getBookRating(title);
+    applyRemoteRatingSummary(title, summary);
+    renderModalRating(title);
+    syncExploreBookLibrary();
+  } catch (error) {
+    console.error("Rating sync failed:", error);
+  }
+}
+
 function getBookRatingLabel(title) {
   const record = getRatingRecordByTitle(title);
   const databaseRecord = getDatabaseRatingRecord(title);
@@ -1648,6 +1891,16 @@ function setUserRatingForTitle(title, ratingValue) {
   users[userId] = value;
   store[key] = { users: users };
   writeExploreRatingsStore(store);
+
+  if (window.brainrootAPI && typeof window.brainrootAPI.rateBook === "function") {
+    window.brainrootAPI.rateBook(title, value).then(function (summary) {
+      applyRemoteRatingSummary(title, summary);
+      renderModalRating(title);
+      syncExploreBookLibrary();
+    }).catch(function (error) {
+      console.error("Rating save failed:", error);
+    });
+  }
 }
 
 function renderModalRating(title) {
@@ -1719,6 +1972,7 @@ function openBookModal(title, author, description, status, imageUrl) {
   }
 
   renderModalRating(title);
+  loadRemoteRatingForTitle(title);
 
   if (window.brainrootLibraryBehavior) {
     window.brainrootLibraryBehavior.recordBookView({
@@ -1977,7 +2231,9 @@ window.addToWishlist = addToWishlist;
 async function initializeExplorePage() {
   initializeBookModalActions();
   await loadExploreBookLibraryFromDatabase();
+  await loadFeaturedSections();
   syncExploreBookLibrary();
+  initializeAllBooksControls();
   initializeExploreSearch();
   initializeRecommendedHero();
   markExploreCardsByAccess();

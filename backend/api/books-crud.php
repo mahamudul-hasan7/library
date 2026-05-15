@@ -1,13 +1,7 @@
 <?php
-// backend/api/books.php - Complete book catalog CRUD API
+// backend/api/books-crud.php - Complete book catalog CRUD API
 
-// Set JSON header immediately
-header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-cache, no-store, must-revalidate');
-header('Pragma: no-cache');
-header('Expires: 0');
-
-// Prevent any output before JSON
+// Prevent any output before JSON - MUST come first!
 ob_start();
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
@@ -15,6 +9,8 @@ error_reporting(E_ALL);
 require_once '../config.php';
 
 ensureBookCatalogColumns($conn);
+ensureCategoriesTable($conn);
+ensureAdminLogsTable($conn);
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
@@ -23,18 +19,22 @@ $section = $_GET['section'] ?? null;
 
 // Handle different HTTP methods
 if ($method === 'GET' && $action === 'list') {
+    requireAdminUser($conn);
     // Get all books
     getBooks($conn);
 } else if ($method === 'GET' && $section) {
     // Get books by featured section
     getBooksBySection($conn, $section);
 } else if ($method === 'POST') {
+    requireAdminUser($conn);
     // Add new book
     addBook($conn);
 } else if ($method === 'PUT' && $bookId) {
+    requireAdminUser($conn);
     // Update book
     updateBook($conn, $bookId);
 } else if ($method === 'DELETE' && $bookId) {
+    requireAdminUser($conn);
     // Delete book
     deleteBook($conn, $bookId);
 } else if ($method === 'GET') {
@@ -45,7 +45,9 @@ if ($method === 'GET' && $action === 'list') {
 }
 
 function getPublicBooks($conn) {
-    seedBookCatalog($conn);
+    if (!isProductionEnvironment()) {
+        seedBookCatalog($conn);
+    }
 
     $query = "
         SELECT
@@ -82,10 +84,16 @@ function getBooks($conn) {
             section_name, status, view_count, like_count, featured_section,
             created_at
         FROM books
-        ORDER BY title ASC
+        ORDER BY created_at DESC, id DESC
     ";
 
     $result = $conn->query($query);
+
+    if (!$result) {
+        sendJson(['success' => false, 'error' => 'Query failed: ' . $conn->error], 500);
+        return;
+    }
+
     $books = [];
 
     while ($row = $result->fetch_assoc()) {
@@ -181,6 +189,8 @@ function addBook($conn) {
     $published_year = intval($input['published_year'] ?? 0) ?: null;
     $pages = intval($input['pages'] ?? 0) ?: null;
     $featured_section = trim($input['featured_section'] ?? 'none');
+    $view_count = max(0, intval($input['view_count'] ?? 0));
+    $like_count = max(0, intval($input['like_count'] ?? 0));
 
     // Validate featured_section
     $valid_sections = ['trending', 'top_reading', 'most_liked', 'none'];
@@ -196,8 +206,8 @@ function addBook($conn) {
         $query = "
             INSERT INTO books
             (title, author, category, description, access_type, image_url, file_url, 
-             published_year, pages, language, format, section_name, status, featured_section, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'English', 'Digital', 'collection', 'Available', ?, NOW())
+             published_year, pages, language, format, section_name, status, view_count, like_count, featured_section, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'English', 'Digital', 'collection', 'Available', ?, ?, ?, NOW())
         ";
 
         $stmt = $conn->prepare($query);
@@ -207,7 +217,7 @@ function addBook($conn) {
         }
 
         $stmt->bind_param(
-            'ssssssssiss',
+            'sssssssiiiis',
             $title,
             $author,
             $category,
@@ -217,6 +227,8 @@ function addBook($conn) {
             $file_url,
             $published_year,
             $pages,
+            $view_count,
+            $like_count,
             $featured_section
         );
 
@@ -225,6 +237,13 @@ function addBook($conn) {
         }
 
         $newId = $stmt->insert_id;
+        logAdminAction($conn, 'book.create', 'book', $newId, 'Added book: ' . $title, [
+            'title' => $title,
+            'author' => $author,
+            'category' => $category,
+            'access_type' => $access_type,
+            'featured_section' => $featured_section
+        ]);
 
         sendJson([
             'success' => true,
@@ -255,11 +274,15 @@ function updateBook($conn, $bookId) {
     $access_type = $input['access_type'] ?? null;
     $image_url = $input['image_url'] ?? null;
     $file_url = $input['file_url'] ?? null;
-    $published_year = intval($input['published_year'] ?? 0) ?: null;
-    $pages = intval($input['pages'] ?? 0) ?: null;
+    $published_year = array_key_exists('published_year', $input) && $input['published_year'] !== ''
+        ? max(0, intval($input['published_year']))
+        : null;
+    $pages = array_key_exists('pages', $input) && $input['pages'] !== ''
+        ? max(0, intval($input['pages']))
+        : null;
     $featured_section = $input['featured_section'] ?? null;
-    $view_count = intval($input['view_count'] ?? 0) ?: null;
-    $like_count = intval($input['like_count'] ?? 0) ?: null;
+    $view_count = array_key_exists('view_count', $input) ? max(0, intval($input['view_count'])) : null;
+    $like_count = array_key_exists('like_count', $input) ? max(0, intval($input['like_count'])) : null;
 
     // Validate featured_section if provided
     if ($featured_section !== null) {
@@ -355,6 +378,8 @@ function updateBook($conn, $bookId) {
             throw new Exception("Execute failed: " . $stmt->error);
         }
 
+        logAdminAction($conn, 'book.update', 'book', $bookId, 'Updated book #' . $bookId, $input);
+
         sendJson([
             'success' => true,
             'message' => 'Book updated successfully'
@@ -369,6 +394,17 @@ function deleteBook($conn, $bookId) {
     $bookId = intval($bookId);
 
     try {
+        $title = 'book #' . $bookId;
+        $titleStmt = $conn->prepare('SELECT title FROM books WHERE id = ? LIMIT 1');
+        if ($titleStmt) {
+            $titleStmt->bind_param('i', $bookId);
+            $titleStmt->execute();
+            $titleResult = $titleStmt->get_result();
+            if ($titleResult->num_rows > 0) {
+                $title = $titleResult->fetch_assoc()['title'];
+            }
+        }
+
         $query = 'DELETE FROM books WHERE id = ?';
         $stmt = $conn->prepare($query);
         
@@ -385,6 +421,7 @@ function deleteBook($conn, $bookId) {
         if ($stmt->affected_rows === 0) {
             sendJson(['success' => false, 'error' => 'Book not found'], 404);
         } else {
+            logAdminAction($conn, 'book.delete', 'book', $bookId, 'Deleted book: ' . $title);
             sendJson([
                 'success' => true,
                 'message' => 'Book deleted successfully'

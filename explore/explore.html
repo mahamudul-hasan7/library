@@ -143,8 +143,27 @@
             <p class="all-books-subtitle">Browse our entire curated archive by metadata.</p>
           </div>
           <div class="all-books-actions">
-            <button class="filter-btn" type="button">Filter</button>
-            <button class="filter-btn" type="button">Sort by Date</button>
+            <div class="control-dropdown">
+              <button id="allBooksFilterBtn" class="filter-btn" type="button" aria-expanded="false" aria-controls="allBooksFilterMenu">Filter: All</button>
+              <div id="allBooksFilterMenu" class="control-menu is-hidden" role="menu" aria-label="Filter books">
+                <button type="button" class="control-menu-item is-active" data-all-books-filter="all">All</button>
+                <button type="button" class="control-menu-item" data-all-books-filter="available">Available</button>
+                <button type="button" class="control-menu-item" data-all-books-filter="borrowed">Borrowed</button>
+                <button type="button" class="control-menu-item" data-all-books-filter="free">Free</button>
+                <button type="button" class="control-menu-item" data-all-books-filter="paid">Paid</button>
+              </div>
+            </div>
+            <div class="control-dropdown">
+              <button id="allBooksSortBtn" class="filter-btn" type="button" aria-expanded="false" aria-controls="allBooksSortMenu">Sort: Newest</button>
+              <div id="allBooksSortMenu" class="control-menu is-hidden" role="menu" aria-label="Sort books">
+                <button type="button" class="control-menu-item is-active" data-all-books-sort="newest">Newest First</button>
+                <button type="button" class="control-menu-item" data-all-books-sort="oldest">Oldest First</button>
+                <button type="button" class="control-menu-item" data-all-books-sort="title-asc">Title A-Z</button>
+                <button type="button" class="control-menu-item" data-all-books-sort="title-desc">Title Z-A</button>
+                <button type="button" class="control-menu-item" data-all-books-sort="author-asc">Author A-Z</button>
+                <button type="button" class="control-menu-item" data-all-books-sort="rating-desc">Highest Rated</button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="all-books-list"></div>
@@ -240,6 +259,6 @@
     <script src="../backend-storage.js"></script>
     <script src="../api-client.js"></script>
     <script src="../auth.js"></script>
-    <script src="./explore.js"></script>
+    <script src="./explore.js?v=2"></script>
   </body>
 </html>

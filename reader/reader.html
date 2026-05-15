@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrainRoot Reader</title>
   <link rel="stylesheet" href="../shared-search.css?v=1">
-  <link rel="stylesheet" href="./reader.css?v=1">
+  <link rel="stylesheet" href="./reader.css?v=3">
   <!-- PDF.js Library -->
   <script src="../Assets/vendor/pdfjs/pdf.min.js" async data-pdfjs></script>
 </head>
@@ -38,26 +38,30 @@
         <h1 id="readerTitle">Loading book...</h1>
         <p id="readerAuthor">BrainRoot Library</p>
         <p id="readerCategory">General</p>
-      </div>
-      <div class="reader-progress-card">
-        <div class="reader-progress-top">
-          <span>Progress</span>
-          <strong id="readerProgressValue">0%</strong>
-        </div>
-        <div class="reader-progress-track">
-          <span id="readerProgressBar"></span>
+        <div class="reader-book-details">
+          <div class="detail-item">
+            <span class="detail-label">Published</span>
+            <span id="readerYear" class="detail-value">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Pages</span>
+            <span id="readerPages" class="detail-value">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Language</span>
+            <span id="readerLanguage" class="detail-value">—</span>
+          </div>
         </div>
       </div>
       <a class="reader-back-link" href="../explore/explore.html">Back to Explore</a>
     </aside>
 
     <section class="reader-panel">
+      <div class="reader-fullscreen-alert" role="note" aria-live="polite">
+        For better experience, please use full screen mode.
+      </div>
       <div id="readerNotice" class="reader-notice is-hidden"></div>
       <div class="reader-toolbar" aria-label="Reading controls">
-        <button id="decreaseFontBtn" class="reader-tool-btn" type="button" aria-label="Decrease font size">A-</button>
-        <button id="increaseFontBtn" class="reader-tool-btn" type="button" aria-label="Increase font size">A+</button>
-        <button id="themeBtn" class="reader-tool-btn" type="button">Dark</button>
-        <button id="bookmarkBtn" class="reader-tool-btn" type="button">Bookmark</button>
         <!-- PDF-specific controls -->
         <div class="reader-pdf-controls" id="pdfControls" style="display: none;">
           <button id="pdfPrevBtn" class="reader-tool-btn" type="button" aria-label="Previous page">Prev</button>
@@ -67,8 +71,10 @@
           </label>
           <button id="pdfNextBtn" class="reader-tool-btn" type="button" aria-label="Next page">Next</button>
           <button id="pdfZoomInBtn" class="reader-tool-btn" type="button" aria-label="Zoom in">Zoom +</button>
-          <span id="pdfZoomValue" class="pdf-zoom-value">135%</span>
+          <span id="pdfZoomValue" class="pdf-zoom-value">100%</span>
           <button id="pdfZoomOutBtn" class="reader-tool-btn" type="button" aria-label="Zoom out">Zoom -</button>
+          <button id="pdfFitWidthBtn" class="reader-tool-btn" type="button" aria-label="Fit page width">Fit Width</button>
+          <button id="pdfFitPageBtn" class="reader-tool-btn" type="button" aria-label="Fit whole page">Fit Page</button>
           <button id="pdfFullscreenBtn" class="reader-tool-btn" type="button" aria-label="Fullscreen">Full</button>
         </div>
       </div>
@@ -80,6 +86,14 @@
 
       <!-- PDF Viewer -->
       <div id="pdfViewer" class="pdf-viewer" style="display: none;">
+        <div class="pdf-fullscreen-controls" aria-label="Fullscreen PDF controls">
+          <button id="pdfFullscreenZoomOutBtn" class="reader-tool-btn" type="button" aria-label="Zoom out">Zoom -</button>
+          <span id="pdfFullscreenZoomValue" class="pdf-zoom-value">100%</span>
+          <button id="pdfFullscreenZoomInBtn" class="reader-tool-btn" type="button" aria-label="Zoom in">Zoom +</button>
+          <button id="pdfFullscreenFitWidthBtn" class="reader-tool-btn" type="button" aria-label="Fit page width">Fit Width</button>
+          <button id="pdfFullscreenFitPageBtn" class="reader-tool-btn" type="button" aria-label="Fit whole page">Fit Page</button>
+          <button id="pdfFullscreenExitBtn" class="reader-tool-btn" type="button" aria-label="Exit fullscreen">Exit</button>
+        </div>
         <button id="pdfPrevOverlayBtn" class="pdf-page-nav pdf-page-nav--prev" type="button" aria-label="Previous page">Prev</button>
         <div id="pdfStage" class="pdf-stage">
           <canvas id="pdfCanvas" class="pdf-canvas"></canvas>
@@ -100,7 +114,7 @@
   <script src="../local-storage.js?v=1"></script>
   <script src="../api-client.js?v=1"></script>
   <script src="../auth.js?v=1"></script>
-  <script src="./pdf-viewer.js?v=1"></script>
-  <script src="./reader.js?v=1"></script>
+  <script src="./pdf-viewer.js?v=3"></script>
+  <script src="./reader.js?v=2"></script>
 </body>
 </html>

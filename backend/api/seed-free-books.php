@@ -3,6 +3,12 @@
 
 require_once '../config.php';
 
+if (isProductionEnvironment()) {
+    sendJson(['success' => false, 'error' => 'Not found'], 404);
+}
+
+requireAdminUser($conn);
+
 try {
     // Books from Project Gutenberg (public domain - copyright-free)
     $freeBooks = [

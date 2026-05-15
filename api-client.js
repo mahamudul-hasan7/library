@@ -1,7 +1,7 @@
 // api-client.js - Connect frontend to database APIs
 
 (function() {
-  const API_BASE = 'http://localhost/BrainRoot/backend/api';
+  const API_BASE = resolveAppRootUrl() + 'backend/api';
   const REQUEST_TIMEOUT = 8000; // 8 seconds
 
   function getStoredCurrentUser() {
@@ -10,6 +10,15 @@
     } catch (error) {
       return null;
     }
+  }
+
+  function resolveAppRootUrl() {
+    const pathname = window.location.pathname.replace(/\\/g, '/');
+    const match = pathname.match(/^(.*\/)(?:index|wishlist|collections|profile|explore|login|register|reader|admin)\/[^/]+$/i);
+    if (match) {
+      return window.location.origin + match[1];
+    }
+    return new URL('./', window.location.href).href;
   }
 
   function getJsonHeaders() {
@@ -72,6 +81,23 @@
         return data.success ? data.data : [];
       } catch (error) {
         console.error('Error fetching books:', error);
+        return [];
+      }
+    },
+
+    async getFeaturedBooks(section) {
+      try {
+        const featuredSection = encodeURIComponent(section || 'trending');
+        const response = await fetch(`${API_BASE}/books-crud.php?section=${featuredSection}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        return data.success ? (data.books || []) : [];
+      } catch (error) {
+        console.error('Error fetching featured books:', error);
         return [];
       }
     },
@@ -578,6 +604,113 @@
           error: error.message,
           message: null
         };
+      }
+    },
+
+    // Categories - Shared catalog
+    async getCategories(includeAll = false) {
+      try {
+        const suffix = includeAll ? '?all=1' : '';
+        const response = await fetch(`${API_BASE}/categories.php${suffix}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        return data.success ? (data.categories || []) : [];
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        return [];
+      }
+    },
+
+    // Reader progress - Save and restore per user/book
+    async getReadingProgress(book) {
+      try {
+        const bookPayload = typeof book === 'object' && book !== null ? book : { title: book };
+        const params = bookPayload.book_id || bookPayload.id
+          ? `book_id=${encodeURIComponent(bookPayload.book_id || bookPayload.id)}`
+          : `title=${encodeURIComponent(bookPayload.title || '')}`;
+        const response = await fetch(`${API_BASE}/reading-progress.php?${params}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success ? data.progress : null;
+      } catch (error) {
+        console.error('Error fetching reading progress:', error);
+        this.lastError = error.message;
+        return null;
+      }
+    },
+
+    async saveReadingProgress(progressData) {
+      try {
+        const response = await fetch(`${API_BASE}/reading-progress.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify(progressData || {})
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success;
+      } catch (error) {
+        console.error('Error saving reading progress:', error);
+        this.lastError = error.message;
+        return false;
+      }
+    },
+
+    // Ratings - One rating per user/book
+    async getBookRating(book) {
+      try {
+        const bookPayload = typeof book === 'object' && book !== null ? book : { title: book };
+        const params = bookPayload.book_id || bookPayload.id
+          ? `book_id=${encodeURIComponent(bookPayload.book_id || bookPayload.id)}`
+          : `title=${encodeURIComponent(bookPayload.title || '')}`;
+        const response = await fetch(`${API_BASE}/ratings.php?${params}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: getJsonHeaders()
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success ? data.rating : null;
+      } catch (error) {
+        console.error('Error fetching book rating:', error);
+        this.lastError = error.message;
+        return null;
+      }
+    },
+
+    async rateBook(book, rating) {
+      try {
+        const bookPayload = typeof book === 'object' && book !== null ? book : { title: book };
+        const response = await fetch(`${API_BASE}/ratings.php`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: getJsonHeaders(),
+          body: JSON.stringify({
+            book_id: bookPayload.book_id || bookPayload.id || null,
+            title: bookPayload.title || '',
+            rating: rating
+          })
+        });
+
+        const data = await response.json();
+        this.lastError = data.error || null;
+        return data.success ? data.rating : null;
+      } catch (error) {
+        console.error('Error saving book rating:', error);
+        this.lastError = error.message;
+        return null;
       }
     },
 

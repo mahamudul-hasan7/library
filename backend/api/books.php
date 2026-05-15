@@ -1,6 +1,11 @@
 <?php
 // backend/api/books.php - Public book catalog
 
+// Prevent any output before JSON - MUST come first!
+ob_start();
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 require_once '../config.php';
 
 ensureBookCatalogColumns($conn);
@@ -84,7 +89,9 @@ if ($method !== 'GET') {
     sendJson(['success' => false, 'error' => 'Method not allowed'], 405);
 }
 
-seedBookCatalog($conn);
+if (!isProductionEnvironment()) {
+    seedBookCatalog($conn);
+}
 
 $query = "
     SELECT

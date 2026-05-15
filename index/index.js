@@ -111,29 +111,60 @@ document.addEventListener("DOMContentLoaded", function () {
     return article;
   }
 
-  async function renderFeaturedBooksFromDatabase() {
+  function uniqueBooksById(books) {
+    const seen = new Set();
+    const uniqueBooks = [];
+
+    books.forEach(function (book) {
+      const key = String(book && (book.id ?? book.title ?? "")).trim().toLowerCase();
+      if (!key || seen.has(key)) {
+        return;
+      }
+
+      seen.add(key);
+      uniqueBooks.push(book);
+    });
+
+    return uniqueBooks;
+  }
+
+  async function loadBooksForSearch() {
     if (!api || typeof api.getBooks !== "function") {
-      bindFeaturedBookClickHandlers();
-      return;
+      return [];
     }
 
     const books = await api.getBooks();
-    if (!books || !books.length) {
+    if (books && books.length) {
+      indexAllBooks = books;
+      resetIndexSearchIndex();
+    }
+
+    return books || [];
+  }
+
+  async function renderFeaturedBooksFromDatabase() {
+    if (!api || typeof api.getFeaturedBooks !== "function") {
       bindFeaturedBookClickHandlers();
       return;
     }
 
-    // Store all books for search
-    indexAllBooks = books;
-    resetIndexSearchIndex();
+    const allBooks = await loadBooksForSearch();
+    const featuredSections = ["trending", "top_reading", "most_liked"];
+    const featuredResults = await Promise.all(featuredSections.map(function (section) {
+      return api.getFeaturedBooks(section);
+    }));
 
+    const featuredBooks = uniqueBooksById(featuredResults.flat()).slice(0, 12);
+    const booksToRender = featuredBooks.length ? featuredBooks : allBooks.slice(0, 12);
     const grid = document.querySelector(".featured .grid");
+
     if (!grid) {
+      bindFeaturedBookClickHandlers();
       return;
     }
 
     grid.replaceChildren();
-    books.slice(0, 12).forEach(function (book) {
+    booksToRender.forEach(function (book) {
       grid.appendChild(createFeaturedBookCard(book));
     });
     bindFeaturedBookClickHandlers();
@@ -141,41 +172,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   bindFeaturedBookClickHandlers();
   renderFeaturedBooksFromDatabase();
-
-  // Load featured sections
-  async function loadFeaturedSection(sectionName, gridId) {
-    try {
-      const response = await fetch(`../backend/api/books-crud.php?section=${sectionName}`);
-      if (!response.ok) throw new Error('Failed to fetch books');
-      
-      const data = await response.json();
-      const grid = document.getElementById(gridId);
-      
-      if (!grid) return;
-      
-      if (!data.success || !data.books || data.books.length === 0) {
-        grid.innerHTML = `<p class="loading">No ${sectionName.replace('_', ' ')} books available</p>`;
-        return;
-      }
-      
-      grid.replaceChildren();
-      data.books.slice(0, 6).forEach(book => {
-        grid.appendChild(createFeaturedBookCard(book));
-      });
-      bindFeaturedBookClickHandlers();
-    } catch (error) {
-      console.error(`Error loading ${sectionName} books:`, error);
-      const grid = document.getElementById(gridId);
-      if (grid) {
-        grid.innerHTML = `<p class="loading">Error loading books</p>`;
-      }
-    }
-  }
-
-  // Load all featured sections
-  loadFeaturedSection('trending', 'trendingBooksGrid');
-  loadFeaturedSection('top_reading', 'topReadingGrid');
-  loadFeaturedSection('most_liked', 'mostLikedGrid');
 
   // ===== Index Page Search Implementation =====
   let indexSearchIndex = null;

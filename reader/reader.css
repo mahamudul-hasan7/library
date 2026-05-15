@@ -113,85 +113,117 @@ a {
 }
 
 .reader-book-meta {
-  padding: 22px;
+  padding: 24px;
+  background: var(--reader-surface);
 }
 
 .reader-access-badge {
   display: inline-flex;
-  margin: 0 0 14px;
-  padding: 6px 10px;
-  background: rgba(0, 95, 175, 0.09);
+  margin: 0 0 16px;
+  padding: 6px 12px;
+  background: rgba(0, 95, 175, 0.12);
   color: var(--reader-primary);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+  border-radius: 4px;
 }
 
 .reader-book-meta h1 {
-  margin: 0 0 10px;
-  font-size: 30px;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  margin: 0 0 12px;
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  font-weight: 800;
 }
 
 .reader-book-meta p {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: var(--reader-muted);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-.reader-progress-card {
-  padding: 18px;
+.reader-book-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--reader-border);
 }
 
-.reader-progress-top {
+.detail-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
-  color: var(--reader-muted);
   font-size: 13px;
+}
+
+.detail-label {
+  color: var(--reader-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detail-value {
+  color: var(--reader-ink);
   font-weight: 700;
-}
-
-.reader-progress-track {
-  height: 8px;
-  overflow: hidden;
-  background: rgba(0, 95, 175, 0.1);
-}
-
-.reader-progress-track span {
-  display: block;
-  width: 0%;
-  height: 100%;
-  background: var(--reader-primary);
-  transition: width 180ms ease;
 }
 
 .reader-back-link {
   display: inline-flex;
+  align-items: center;
   justify-content: center;
-  padding: 13px 18px;
-  border: 1px solid var(--reader-border);
-  background: var(--reader-surface);
+  padding: 12px 16px;
+  border: 1px solid var(--reader-primary);
+  border-radius: 6px;
+  background: rgba(0, 95, 175, 0.08);
   color: var(--reader-primary);
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  transition: all 160ms ease;
+  cursor: pointer;
+}
+
+.reader-back-link:hover {
+  background: var(--reader-primary);
+  color: var(--reader-surface);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 95, 175, 0.2);
 }
 
 .reader-panel {
   min-height: calc(100vh - 132px);
 }
 
+.reader-fullscreen-alert {
+  margin: 18px 32px 0;
+  padding: 12px 16px;
+  border: 1px dashed rgba(0, 95, 175, 0.45);
+  border-left: 4px solid var(--reader-primary);
+  border-radius: 6px;
+  background: rgba(0, 95, 175, 0.08);
+  color: var(--reader-primary);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
 .reader-notice {
-  margin: 24px 32px 0;
+  margin: 20px 32px 0;
   padding: 14px 16px;
   border-left: 4px solid var(--reader-primary);
+  border-radius: 4px;
   background: rgba(0, 95, 175, 0.08);
   color: var(--reader-muted);
-  line-height: 1.5;
+  line-height: 1.6;
+  font-size: 13px;
 }
 
 .reader-toolbar {
@@ -200,36 +232,50 @@ a {
   z-index: 10;
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  padding: 18px 32px;
+  gap: 8px;
+  padding: 14px 32px;
   border-bottom: 1px solid var(--reader-border);
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(10px);
+  flex-wrap: wrap;
 }
 
 .reader-tool-btn {
   min-width: 44px;
+  min-height: 40px;
   border: 1px solid var(--reader-border);
-  background: #ffffff;
-  color: var(--reader-ink);
-  padding: 9px 12px;
-  font-size: 13px;
-  font-weight: 800;
+  border-radius: 6px;
+  background: var(--reader-surface);
+  color: var(--reader-muted);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 160ms ease;
 }
 
-.reader-tool-btn:hover,
+.reader-tool-btn:hover {
+  border-color: var(--reader-primary);
+  color: var(--reader-primary);
+  background: rgba(0, 95, 175, 0.04);
+  transform: translateY(-1px);
+}
+
 .reader-tool-btn.is-active {
-  border-color: rgba(0, 95, 175, 0.34);
+  border-color: var(--reader-primary);
+  background: rgba(0, 95, 175, 0.12);
   color: var(--reader-primary);
 }
 
 .reader-content {
-  max-width: 780px;
+  max-width: 820px;
   margin: 0 auto;
-  padding: 42px 32px 72px;
+  padding: 48px 32px 80px;
   font-size: var(--reader-font-size, 18px);
-  line-height: 1.82;
+  line-height: var(--reader-line-height, 1.85);
+  letter-spacing: var(--reader-letter-spacing, 0.3px);
+  word-spacing: 0.15em;
+  text-rendering: optimizeLegibility;
 }
 
 .reader-content--file {
@@ -238,10 +284,13 @@ a {
 }
 
 .reader-content h2 {
-  margin: 42px 0 16px;
-  font-size: 1.55em;
-  line-height: 1.2;
+  margin: 48px 0 20px;
+  font-size: 1.65em;
+  line-height: 1.25;
   letter-spacing: -0.02em;
+  font-weight: 800;
+  color: var(--reader-ink);
+  scroll-margin-top: 80px;
 }
 
 .reader-content h2:first-child {
@@ -249,16 +298,32 @@ a {
 }
 
 .reader-content p {
-  margin: 0 0 1.25em;
+  margin: 0 0 1.8em;
+  color: var(--reader-ink);
+  text-align: justify;
+  hyphens: auto;
+}
+
+.reader-content p:first-of-type::first-letter {
+  font-size: 1.2em;
+  font-weight: 800;
+  margin-right: 0.05em;
 }
 
 .reader-content blockquote {
-  margin: 28px 0;
-  padding: 18px 22px;
+  margin: 32px 0;
+  padding: 20px 24px;
   border-left: 4px solid var(--reader-primary);
-  background: rgba(0, 95, 175, 0.06);
+  border-radius: 4px;
+  background: rgba(0, 95, 175, 0.08);
   color: var(--reader-muted);
-  font-size: 0.95em;
+  font-size: 0.98em;
+  font-style: italic;
+  line-height: 1.85;
+}
+
+.reader-page {
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
 .reader-inline-link {
@@ -295,6 +360,12 @@ a {
   color: var(--reader-ink);
 }
 
+.reader-page.reader-dark .reader-fullscreen-alert {
+  background: rgba(0, 95, 175, 0.18);
+  border-color: rgba(126, 197, 255, 0.6);
+  color: #9fd8ff;
+}
+
 @media (max-width: 900px) {
   .reader-nav {
     flex-wrap: wrap;
@@ -326,6 +397,10 @@ a {
     justify-content: flex-start;
     overflow-x: auto;
     padding: 14px 16px;
+  }
+
+  .reader-fullscreen-alert {
+    margin: 14px 16px 0;
   }
 
   .reader-content {
@@ -380,6 +455,10 @@ a {
   text-align: center;
 }
 
+.pdf-fullscreen-controls {
+  display: none;
+}
+
 /* Dark mode for PDF viewer */
 .reader-page.reader-dark .pdf-viewer {
   background: #12181b;
@@ -390,6 +469,7 @@ a {
 }
 
 .reader-page.reader-dark .pdf-page-jump,
+.reader-page.reader-dark .pdf-fullscreen-controls,
 .reader-page.reader-dark .pdf-preview-card,
 .reader-page.reader-dark .pdf-preview-panel,
 .reader-page.reader-dark .pdf-zoom-value {
@@ -434,6 +514,8 @@ a {
 }
 
 .pdf-canvas {
+  position: relative;
+  z-index: 1;
   display: block;
   max-width: none;
   background: #ffffff;
@@ -442,16 +524,72 @@ a {
   will-change: transform, opacity;
 }
 
+.pdf-page-ghost {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+  background: #ffffff;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: 0 20px 42px rgba(20, 31, 35, 0.18);
+  transform-origin: center center;
+  will-change: transform, opacity;
+  overflow: hidden;
+}
+
+.pdf-page-ghost::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.2), transparent 22%, transparent 72%, rgba(255, 255, 255, 0.2));
+  opacity: 0;
+}
+
+.pdf-page-ghost-forward {
+  animation: pdfPageGhostForward 420ms ease forwards;
+}
+
+.pdf-page-ghost-back {
+  animation: pdfPageGhostBack 420ms ease forwards;
+}
+
+.pdf-page-ghost-turn-forward {
+  transform-origin: left center;
+  animation: pdfBookPageTurnOutForward 720ms cubic-bezier(0.2, 0.72, 0.18, 1) forwards;
+  box-shadow: 30px 12px 42px rgba(20, 31, 35, 0.2);
+}
+
+.pdf-page-ghost-turn-back {
+  transform-origin: right center;
+  animation: pdfBookPageTurnOutBack 720ms cubic-bezier(0.2, 0.72, 0.18, 1) forwards;
+  box-shadow: -30px 12px 42px rgba(20, 31, 35, 0.2);
+}
+
 .pdf-canvas.pdf-page-forward {
-  animation: pdfPageForward 340ms cubic-bezier(0.22, 0.8, 0.28, 1);
+  animation: pdfPageForward 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .pdf-canvas.pdf-page-back {
-  animation: pdfPageBack 340ms cubic-bezier(0.22, 0.8, 0.28, 1);
+  animation: pdfPageBack 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .pdf-canvas.pdf-page-zoom {
   animation: pdfZoomPulse 260ms ease;
+}
+
+.pdf-canvas.pdf-page-turn-forward {
+  transform-origin: right center;
+  animation: pdfPageTurnForward 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pdf-canvas.pdf-page-turn-back {
+  transform-origin: left center;
+  animation: pdfPageTurnBack 620ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pdf-page-toast {
@@ -565,8 +703,37 @@ a {
   grid-template-columns: minmax(0, 1fr) 152px;
   height: 100vh;
   min-height: 100vh;
-  padding: 26px;
+  padding: 72px 26px 26px;
   background: #e7ecef;
+}
+
+.pdf-viewer:fullscreen .pdf-fullscreen-controls {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 24px);
+  padding: 8px;
+  border: 1px solid rgba(32, 41, 45, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 34px rgba(20, 31, 35, 0.16);
+  backdrop-filter: blur(12px);
+  transform: translateX(-50%);
+}
+
+.pdf-viewer:fullscreen .pdf-fullscreen-controls .reader-tool-btn {
+  min-height: 34px;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+.pdf-viewer:fullscreen .pdf-fullscreen-controls .pdf-zoom-value {
+  min-height: 34px;
+  padding: 8px 10px;
 }
 
 .pdf-viewer:fullscreen .pdf-stage {
@@ -574,11 +741,11 @@ a {
 }
 
 .pdf-viewer:fullscreen .pdf-canvas {
-  max-height: calc(100vh - 52px);
+  max-height: calc(100vh - 104px);
 }
 
 .pdf-viewer:fullscreen .pdf-preview-panel {
-  top: 26px;
+  top: 72px;
 }
 
 .pdf-viewer:fullscreen .pdf-page-nav--next {
@@ -587,34 +754,145 @@ a {
 
 @keyframes pdfPageForward {
   from {
-    opacity: 0.28;
-    transform: translateX(42px) rotateY(-5deg) scale(0.985);
+    opacity: 0.12;
+    transform: translateX(38px) scale(0.985);
+    filter: brightness(0.95);
   }
   to {
     opacity: 1;
-    transform: translateX(0) rotateY(0) scale(1);
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
   }
 }
 
 @keyframes pdfPageBack {
   from {
-    opacity: 0.28;
-    transform: translateX(-42px) rotateY(5deg) scale(0.985);
+    opacity: 0.12;
+    transform: translateX(-38px) scale(0.985);
+    filter: brightness(0.95);
   }
   to {
     opacity: 1;
-    transform: translateX(0) rotateY(0) scale(1);
+    transform: translateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes pdfPageGhostForward {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-42px) scale(0.985);
+  }
+}
+
+@keyframes pdfPageGhostBack {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(42px) scale(0.985);
   }
 }
 
 @keyframes pdfZoomPulse {
   from {
-    opacity: 0.74;
-    transform: scale(0.992);
+    opacity: 0.8;
+    transform: scale(0.96);
+    filter: brightness(0.98);
+  }
+  50% {
+    transform: scale(1.02);
   }
   to {
     opacity: 1;
     transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes pdfPageTurnForward {
+  0% {
+    opacity: 0.28;
+    transform: perspective(2200px) rotateY(18deg) translateX(36px) scale(0.985);
+    filter: brightness(0.92);
+  }
+  56% {
+    opacity: 0.72;
+    transform: perspective(2200px) rotateY(7deg) translateX(12px) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(2200px) rotateY(0deg) translateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes pdfPageTurnBack {
+  0% {
+    opacity: 0.28;
+    transform: perspective(2200px) rotateY(-18deg) translateX(-36px) scale(0.985);
+    filter: brightness(0.92);
+  }
+  56% {
+    opacity: 0.72;
+    transform: perspective(2200px) rotateY(-7deg) translateX(-12px) scale(0.995);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(2200px) rotateY(0deg) translateX(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+@keyframes pdfBookPageTurnOutForward {
+  0% {
+    opacity: 1;
+    transform: perspective(2400px) rotateY(0deg) translateX(0) scale(1);
+    filter: brightness(1);
+  }
+  38% {
+    opacity: 0.96;
+    transform: perspective(2400px) rotateY(-44deg) translateX(-18px) scale(0.998);
+    filter: brightness(0.98);
+  }
+  72% {
+    opacity: 0.6;
+    transform: perspective(2400px) rotateY(-92deg) translateX(-58px) scale(0.985);
+    filter: brightness(0.78);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(2400px) rotateY(-118deg) translateX(-96px) scale(0.975);
+    filter: brightness(0.68);
+  }
+}
+
+@keyframes pdfBookPageTurnOutBack {
+  0% {
+    opacity: 1;
+    transform: perspective(2400px) rotateY(0deg) translateX(0) scale(1);
+    filter: brightness(1);
+  }
+  38% {
+    opacity: 0.96;
+    transform: perspective(2400px) rotateY(44deg) translateX(18px) scale(0.998);
+    filter: brightness(0.98);
+  }
+  72% {
+    opacity: 0.6;
+    transform: perspective(2400px) rotateY(92deg) translateX(58px) scale(0.985);
+    filter: brightness(0.78);
+  }
+  100% {
+    opacity: 0;
+    transform: perspective(2400px) rotateY(118deg) translateX(96px) scale(0.975);
+    filter: brightness(0.68);
   }
 }
 
@@ -648,6 +926,16 @@ a {
     display: none;
   }
 
+  .pdf-viewer:fullscreen {
+    padding: 92px 12px 12px;
+  }
+
+  .pdf-viewer:fullscreen .pdf-fullscreen-controls {
+    top: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .reader-pdf-controls {
     font-size: 12px;
   }
@@ -671,6 +959,12 @@ a {
   .pdf-canvas.pdf-page-forward,
   .pdf-canvas.pdf-page-back,
   .pdf-canvas.pdf-page-zoom,
+  .pdf-canvas.pdf-page-turn-forward,
+  .pdf-canvas.pdf-page-turn-back,
+  .pdf-page-ghost-forward,
+  .pdf-page-ghost-back,
+  .pdf-page-ghost-turn-forward,
+  .pdf-page-ghost-turn-back,
   .pdf-stage.is-rendering::after {
     animation: none;
   }

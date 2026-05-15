@@ -3,6 +3,12 @@
 
 require_once '../config.php';
 
+if (isProductionEnvironment()) {
+    sendJson(['success' => false, 'error' => 'Not found'], 404);
+}
+
+requireAdminUser($conn);
+
 try {
     // Insert Books
     $books = [

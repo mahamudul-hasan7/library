@@ -3,21 +3,10 @@
 // POST /backend/api/upload-pdf.php
 
 header('Content-Type: application/json');
-session_start();
-
-// Check authentication
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
-    exit;
-}
-
-// Check if user is admin or has upload permission
-// For now, we'll allow authenticated users; adjust this based on your role system
-$user_id = $_SESSION['user_id'];
-
-// Database connection
 require_once '../config.php';
+startBrainrootSession();
+
+requireAdminUser($conn);
 
 $action = $_GET['action'] ?? $_POST['action'] ?? null;
 
@@ -80,7 +69,7 @@ if ($action === 'upload') {
 
     // Update database with PDF URL
     if ($bookId) {
-        $pdfUrl = '/BrainRoot/Assets/books/' . $filename;
+        $pdfUrl = buildAppPath('Assets/books/' . $filename);
         
         try {
             $stmt = $conn->prepare("UPDATE books SET file_url = ? WHERE id = ?");
@@ -99,7 +88,7 @@ if ($action === 'upload') {
         'success' => true,
         'message' => 'PDF uploaded successfully',
         'file' => $filename,
-        'url' => '/BrainRoot/Assets/books/' . $filename
+        'url' => buildAppPath('Assets/books/' . $filename)
     ]);
     exit;
 }

@@ -1,0 +1,8 @@
+{
+  "files.exclude": {
+    "**/.config": true,
+    "**/.git": true,
+    "**/.vscode": true,
+    "**/.github": true
+  }
+}

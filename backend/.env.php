@@ -20,10 +20,13 @@ if (file_exists($envFile)) {
             $key = trim($key);
             $value = trim($value);
             
-            // Remove quotes if present
-            if (($value[0] === '"' && $value[strlen($value) - 1] === '"') ||
-                ($value[0] === "'" && $value[strlen($value) - 1] === "'")) {
-                $value = substr($value, 1, -1);
+            // Remove quotes if present (check length first to avoid string-offset warnings)
+            if (strlen($value) > 0) {
+                $first = $value[0];
+                $last = $value[strlen($value) - 1];
+                if (($first === '"' && $last === '"') || ($first === "'" && $last === "'")) {
+                    $value = substr($value, 1, -1);
+                }
             }
             
             // Set environment variable
@@ -31,4 +34,4 @@ if (file_exists($envFile)) {
         }
     }
 }
-?>
+

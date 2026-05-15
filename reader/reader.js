@@ -20,7 +20,10 @@
   };
 
   let activeBook = null;
+  let activeBookFileUrlIsTrusted = false;
+  let activeBookHasFullAccess = false;
   let progressSaveTimer = null;
+  let remoteProgressSaveTimer = null;
   let restoreProgressAfterRender = false;
 
   function normalizeKey(value) {
@@ -70,7 +73,9 @@
 
   function mergeBookData(urlData, catalogBook) {
     const book = Object.assign({}, catalogBook || {});
+    const hasCatalogBook = Boolean(catalogBook && catalogBook.title);
     return {
+      id: book.id || book.book_id || null,
       title: book.title || urlData.title || "Selected Book",
       author: book.author || urlData.author || "BrainRoot Library",
       category: book.category || urlData.category || "General",
@@ -81,7 +86,8 @@
       sampleUrl: book.sample_url || book.sampleUrl || urlData.sampleUrl || "",
       publishedYear: book.published_year || book.publishedYear || "Unknown",
       pages: book.pages || "Unknown",
-      language: book.language || "English"
+      language: book.language || "English",
+      hasCatalogBook: hasCatalogBook
     };
   }
 
@@ -97,26 +103,60 @@
     return new URL("../", window.location.href).href;
   }
 
-  function resolveReaderFileUrl(fileUrl) {
+  function isSafeLocalReaderUrl(url) {
+    const appRoot = new URL(getAppRootUrl());
+    let path = "";
+
+    try {
+      path = decodeURIComponent(url.pathname).toLowerCase();
+    } catch (error) {
+      return false;
+    }
+
+    const appPath = appRoot.pathname.toLowerCase();
+    const hasReaderFileExtension = /\.(pdf|txt|epub)$/i.test(path);
+
+    return url.origin === window.location.origin &&
+      path.startsWith(appPath) &&
+      path.indexOf("/assets/books/") !== -1 &&
+      path.indexOf("..") === -1 &&
+      hasReaderFileExtension;
+  }
+
+  function resolveReaderFileUrl(fileUrl, isTrustedSource) {
     const value = String(fileUrl || "").trim();
 
     if (!value) {
       return "";
     }
 
-    if (/^(https?:)?\/\//i.test(value) || /^(data|blob):/i.test(value)) {
-      return value;
+    if (/^(data|blob):/i.test(value) || /^\/\//.test(value)) {
+      return "";
+    }
+
+    let resolvedUrl;
+
+    if (/^https?:\/\//i.test(value)) {
+      resolvedUrl = new URL(value);
+      return isTrustedSource || isSafeLocalReaderUrl(resolvedUrl) ? resolvedUrl.href : "";
     }
 
     if (value.startsWith("/")) {
-      return new URL(value, window.location.origin).href;
+      const appRoot = new URL(getAppRootUrl());
+      const normalizedPath = value.toLowerCase().startsWith(appRoot.pathname.toLowerCase())
+        ? value
+        : appRoot.pathname.replace(/\/$/, "") + value;
+      resolvedUrl = new URL(normalizedPath, window.location.origin);
+      return isTrustedSource || isSafeLocalReaderUrl(resolvedUrl) ? resolvedUrl.href : "";
     }
 
     if (value.startsWith("./") || value.startsWith("../")) {
-      return new URL(value, window.location.href).href;
+      resolvedUrl = new URL(value, window.location.href);
+      return isTrustedSource || isSafeLocalReaderUrl(resolvedUrl) ? resolvedUrl.href : "";
     }
 
-    return new URL(value, getAppRootUrl()).href;
+    resolvedUrl = new URL(value, getAppRootUrl());
+    return isTrustedSource || isSafeLocalReaderUrl(resolvedUrl) ? resolvedUrl.href : "";
   }
 
   function isPdfUrl(fileUrl) {
@@ -154,6 +194,7 @@
     frame.className = "reader-file-frame";
     frame.src = fileUrl;
     frame.title = book.title + " reading file";
+    frame.setAttribute("sandbox", "allow-same-origin");
 
     content.classList.add("reader-content--file");
     content.replaceChildren(frame);
@@ -196,7 +237,7 @@
 
   function openPdfFile(book, pdfUrl) {
     if (!pdfUrl) {
-      renderContent(book, canReadFullBook(book));
+      renderContent(book, activeBookHasFullAccess);
       return;
     }
 
@@ -208,7 +249,10 @@
         return;
       }
 
-      window.PDFViewer.loadPDF(pdfUrl).then(function (success) {
+      const progressRecord = getProgressRecord(book.title) || {};
+      window.PDFViewer.loadPDF(pdfUrl, {
+        initialPage: Number(progressRecord.pdfPage || 1)
+      }).then(function (success) {
         if (success) {
           setNotice("PDF loaded successfully. Use the controls to navigate.", true);
           return;
@@ -250,6 +294,59 @@
 
     store[key] = next;
     writeProgressStore(store);
+    scheduleRemoteProgressSave(next);
+  }
+
+  function mergeProgressRecord(title, remoteRecord) {
+    if (!title || !remoteRecord) {
+      return;
+    }
+
+    const store = getProgressStore();
+    const key = normalizeKey(title);
+    const current = store[key] && typeof store[key] === "object" ? store[key] : {};
+    store[key] = Object.assign({}, current, remoteRecord, {
+      title: title,
+      updatedAt: remoteRecord.updatedAt || remoteRecord.updated_at || current.updatedAt
+    });
+    writeProgressStore(store);
+  }
+
+  function scheduleRemoteProgressSave(record) {
+    if (!window.brainrootAPI || typeof window.brainrootAPI.saveReadingProgress !== "function" || !activeBook) {
+      return;
+    }
+
+    window.clearTimeout(remoteProgressSaveTimer);
+    remoteProgressSaveTimer = window.setTimeout(function () {
+      window.brainrootAPI.saveReadingProgress({
+        book_id: activeBook.id || activeBook.book_id || null,
+        title: activeBook.title,
+        progress: record.progress || 0,
+        scrollY: record.scrollY || 0,
+        pdfPage: record.pdfPage || null,
+        pdfPageCount: record.pdfPageCount || null,
+        bookmarkScrollY: record.bookmarkScrollY || null
+      });
+    }, 700);
+  }
+
+  async function loadRemoteReadingProgress(book) {
+    if (!window.brainrootAPI || typeof window.brainrootAPI.getReadingProgress !== "function" || !book || !book.title) {
+      return;
+    }
+
+    try {
+      const record = await window.brainrootAPI.getReadingProgress({
+        id: book.id || book.book_id || null,
+        title: book.title
+      });
+      if (record) {
+        mergeProgressRecord(book.title, record);
+      }
+    } catch (error) {
+      console.error("Reader progress sync failed:", error);
+    }
   }
 
   function getPrefs() {
@@ -264,7 +361,13 @@
   function applyPrefs() {
     const prefs = getPrefs();
     const fontSize = Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, Number(prefs.fontSize || 18)));
+    const lineHeight = 1.8 + (fontSize - 18) * 0.02; // Dynamic line-height based on font size
+    const letterSpacing = 0.3 + (fontSize - 18) * 0.02; // Dynamic letter-spacing
+
     document.documentElement.style.setProperty("--reader-font-size", fontSize + "px");
+    document.documentElement.style.setProperty("--reader-line-height", lineHeight);
+    document.documentElement.style.setProperty("--reader-letter-spacing", letterSpacing + "px");
+
     document.body.classList.toggle("reader-dark", prefs.theme === "dark");
     const themeBtn = document.getElementById("themeBtn");
     if (themeBtn) {
@@ -321,6 +424,10 @@
     return collections.some(function (item) {
       return normalizeKey(typeof item === "string" ? item : item && item.title) === key;
     });
+  }
+
+  function canUseCatalogFileUrl(book) {
+    return Boolean(book && book.hasCatalogBook);
   }
 
   function createReaderSections(book, fullAccess) {
@@ -389,8 +496,13 @@
 
     const sourceUrl = fullAccess ? book.fileUrl : (book.sampleUrl || "");
     if (sourceUrl) {
-      renderFileFrame(book, resolveReaderFileUrl(sourceUrl), "Reading file opened with the browser reader.");
-      return;
+      const resolvedUrl = resolveReaderFileUrl(sourceUrl, activeBookFileUrlIsTrusted);
+      if (resolvedUrl) {
+        renderFileFrame(book, resolvedUrl, "Reading file opened with the browser reader.");
+        return;
+      }
+
+      setNotice("This reading file could not be opened because its source is not trusted.", true);
     }
 
     resetPdfSurfaces();
@@ -419,15 +531,19 @@
     restoreProgressAfterRender = true;
   }
 
-  function renderBook(book) {
+  function renderBook(book, fullAccess) {
     activeBook = book;
-    const fullAccess = canReadFullBook(book);
+    activeBookHasFullAccess = Boolean(fullAccess);
+    activeBookFileUrlIsTrusted = canUseCatalogFileUrl(book);
 
     document.title = book.title + " - BrainRoot Reader";
     document.getElementById("readerTitle").textContent = book.title;
     document.getElementById("readerAuthor").textContent = book.author;
     document.getElementById("readerCategory").textContent = book.category + " - " + book.language;
     document.getElementById("readerAccessBadge").textContent = isPaidBook(book) ? (fullAccess ? "Paid Access" : "Paid Sample") : "Free Access";
+    document.getElementById("readerYear").textContent = book.publishedYear || "—";
+    document.getElementById("readerPages").textContent = book.pages || "—";
+    document.getElementById("readerLanguage").textContent = book.language || "English";
     setImage(document.getElementById("readerCover"), book.image, book.title + " cover");
 
     if (isPaidBook(book) && !fullAccess) {
@@ -437,14 +553,16 @@
     }
 
     const readerFileUrl = fullAccess ? book.fileUrl : (book.sampleUrl || "");
-    if (isPdfUrl(readerFileUrl)) {
-      openPdfFile(book, resolveReaderFileUrl(readerFileUrl));
+    const resolvedReaderFileUrl = resolveReaderFileUrl(readerFileUrl, activeBookFileUrlIsTrusted);
+    if (readerFileUrl && !resolvedReaderFileUrl) {
+      setNotice("This reading file could not be opened because its source is not trusted.", true);
+    } else if (isPdfUrl(readerFileUrl)) {
+      openPdfFile(book, resolvedReaderFileUrl);
       return;
     }
 
     // Fall back to text-based reader
     renderContent(book, fullAccess);
-    updateProgressDisplay();
     restoreProgressPosition();
   }
 
@@ -455,6 +573,9 @@
     document.getElementById("readerAuthor").textContent = book.author;
     document.getElementById("readerCategory").textContent = book.category + " - " + book.language;
     document.getElementById("readerAccessBadge").textContent = "Borrow Required";
+    document.getElementById("readerYear").textContent = book.publishedYear || "—";
+    document.getElementById("readerPages").textContent = book.pages || "—";
+    document.getElementById("readerLanguage").textContent = book.language || "English";
     setImage(document.getElementById("readerCover"), book.image, book.title + " cover");
     setNotice("Only borrowed books are readable. Borrow this book first, then open it from Collections.", true);
 
@@ -474,7 +595,6 @@
     link.textContent = "Find this book in Explore";
     action.appendChild(link);
     content.replaceChildren(heading, paragraph, action);
-    updateProgressDisplay();
   }
 
   function getScrollProgress() {
@@ -488,6 +608,15 @@
   }
 
   function updateProgressDisplay() {
+    const pdfProgress = window.PDFViewer && typeof window.PDFViewer.getCurrentPage === "function" && window.PDFViewer.getPageCount && window.PDFViewer.getPageCount();
+    if (pdfProgress) {
+      saveProgress({
+        pdfPage: window.PDFViewer.getCurrentPage(),
+        pdfPageCount: window.PDFViewer.getPageCount()
+      });
+      return;
+    }
+
     const progress = getScrollProgress();
     const valueEl = document.getElementById("readerProgressValue");
     const barEl = document.getElementById("readerProgressBar");
@@ -578,15 +707,23 @@
     const urlData = getUrlData();
     const catalogBook = await loadCatalogBook(urlData.title);
     const book = mergeBookData(urlData, catalogBook);
+    await loadRemoteReadingProgress(book);
     const canRead = await canOpenBorrowedReader(book);
+    const fullAccess = canReadFullBook(book) || (isPaidBook(book) && canRead);
 
     if (!canRead) {
       renderLockedReader(book);
       return;
     }
 
-    renderBook(book);
+    renderBook(book, fullAccess);
   }
+
+  window.BrainRootReader = Object.assign({}, window.BrainRootReader || {}, {
+    getProgressRecord: getProgressRecord,
+    saveProgress: saveProgress,
+    updateProgressDisplay: updateProgressDisplay
+  });
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initializeReader, { once: true });

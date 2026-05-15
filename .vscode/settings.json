@@ -1,3 +1,13 @@
 {
-    "editor.linkedEditing": true
+    "editor.linkedEditing": true,
+    "files.exclude": {
+        "**/.env": true,
+        "**/.env.example": true,
+        "**/.gitignore": true,
+        "**/.htaccess": true,
+        "**/.git": true,
+        "**/.github": true,
+        "**/database.sql": false,
+        "**/vercel.json": true
+    }
 }

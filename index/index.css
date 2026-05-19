@@ -81,12 +81,24 @@ body {
 }
 
 .topbar {
-	max-width: 1320px; 
-	margin: 0 auto; 
-	padding: 20px 28px; 
+	position: sticky;
+	top: 0;
+	z-index: 50;
+	max-width: none;
+	margin: 0;
+	padding: 20px 96px;
 	display: flex; 
 	justify-content: space-between; 
 	align-items: center; 
+	background: transparent;
+	border-bottom: 0;
+	transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.topbar.is-scroll-hidden {
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(-100%);
 }
 
 .brand {
@@ -98,7 +110,6 @@ nav a {
 	text-decoration: none; 
 	color: #747b82; 
 	font-size: 13px;
-	margin-left: 22px;
 }
 
 nav a.active {
@@ -303,6 +314,16 @@ nav a.active {
 	gap: 12px; 
 }
 
+.featured-empty {
+	grid-column: 1 / -1;
+	padding: 36px 24px;
+	border: 1px solid #d7d8db;
+	background: #f7f7f8;
+	color: #646d75;
+	font-size: 14px;
+	text-align: center;
+}
+
 .book img {
 	width: 100%; 
 	height: 240px; 
@@ -468,20 +489,23 @@ nav a.active {
 .topbar nav { 
 	display: flex; 
 	align-items: center; 
-	gap: 0; 
+	gap: 28px;
 }
 
 .topbar nav a { 
-	margin-left: 20px; 
+	margin-left: 0;
 	color: #667; 
 	text-decoration: none; 
 	font-size: 14px;
+	font-weight: 400;
 }
 
 .topbar nav a.active { 
 	color: #0b56b2; 
 	border-bottom: 2px solid #0b56b2; 
 	padding-bottom: 4px; 
+	font-weight: 400;
+	transform: none;
 }
 
 .topbar nav a.login-link {
@@ -504,7 +528,7 @@ nav a.active {
 	align-items: center; 
 	justify-content: center; 
 	overflow: hidden;
-	margin-left: 20px;
+	margin-left: 0;
 	padding: 0; 
 	border: 0;
 }
@@ -870,6 +894,7 @@ nav a.active {
 	.topbar { 
 		flex-wrap: wrap; 
 		gap: 10px;
+		padding: 16px;
 	}
 
 	
@@ -881,7 +906,7 @@ nav a.active {
 	
 	.topbar nav a { 
 		margin-left: 0; 
-		margin-right: 14px; 
+		margin-right: 0;
 	}
 
 	

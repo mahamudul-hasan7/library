@@ -292,9 +292,11 @@ function normalizeCatalogBook(book, index) {
     ratingAverage: ratingAverage,
     ratingCount: ratingCount,
     publishedYear: book.published_year || book.publishedYear || "",
+    createdAt: book.created_at || book.createdAt || "",
     language: book.language || "English",
     format: book.format || "Digital",
     pages: book.pages || "",
+    sortIndex: Number(book.id || index + 1) || index + 1,
     sectionName: normalizeCatalogSection(book.section_name || book.sectionName || book.section)
   };
 }
@@ -333,7 +335,9 @@ function setExploreBookLibraryFromCatalog(catalogBooks) {
 
 const allBooksState = {
   filter: "all",
-  sort: "newest"
+  sort: "newest",
+  visibleCount: 8,
+  pageSize: 8
 };
 
 const allBooksSortLabels = {
@@ -350,16 +354,17 @@ function renderAllBooksCollection() {
 }
 
 function getAllBooksSection() {
-  const allBooksHeading = Array.from(document.querySelectorAll("section h2")).find(function (heading) {
-    return String(heading.textContent || "").trim().toLowerCase() === "all books collection";
-  });
-
-  return allBooksHeading ? allBooksHeading.closest("section") : null;
+  return document.getElementById("allBooksSection");
 }
 
 function getAllBooksRowsContainer() {
   const section = getAllBooksSection();
   return section ? section.querySelector(".all-books-list") : null;
+}
+
+function getAllBooksLoadMoreButton() {
+  const section = getAllBooksSection();
+  return section ? section.querySelector("#allBooksLoadMoreBtn") : null;
 }
 
 function getFilteredAndSortedAllBooks() {
@@ -397,6 +402,8 @@ function getFilteredAndSortedAllBooks() {
     const rightRating = Number(right.ratingAverage) || 0;
     const leftSortIndex = Number(left.sortIndex) || 0;
     const rightSortIndex = Number(right.sortIndex) || 0;
+    const leftCreated = Date.parse(left.createdAt || "") || 0;
+    const rightCreated = Date.parse(right.createdAt || "") || 0;
 
     if (allBooksState.sort === "title-asc") {
       return leftTitle.localeCompare(rightTitle);
@@ -414,12 +421,16 @@ function getFilteredAndSortedAllBooks() {
       return rightRating - leftRating || rightSortIndex - leftSortIndex || rightTitle.localeCompare(leftTitle);
     }
 
-    if (leftYear !== rightYear) {
-      return allBooksState.sort === "oldest" ? leftYear - rightYear : rightYear - leftYear;
+    if (leftCreated !== rightCreated) {
+      return allBooksState.sort === "oldest" ? leftCreated - rightCreated : rightCreated - leftCreated;
     }
 
     if (leftSortIndex !== rightSortIndex) {
       return allBooksState.sort === "oldest" ? leftSortIndex - rightSortIndex : rightSortIndex - leftSortIndex;
+    }
+
+    if (leftYear !== rightYear) {
+      return allBooksState.sort === "oldest" ? leftYear - rightYear : rightYear - leftYear;
     }
 
     return allBooksState.sort === "oldest"
@@ -433,6 +444,7 @@ function getFilteredAndSortedAllBooks() {
 function updateAllBooksControlLabels() {
   const filterBtn = document.getElementById("allBooksFilterBtn");
   const sortBtn = document.getElementById("allBooksSortBtn");
+  const countText = document.getElementById("allBooksCount");
 
   if (filterBtn) {
     const labelMap = {
@@ -448,6 +460,14 @@ function updateAllBooksControlLabels() {
   if (sortBtn) {
     sortBtn.textContent = "Sort: " + (allBooksSortLabels[allBooksState.sort] || "Newest");
   }
+
+  if (countText) {
+    const count = getFilteredAndSortedAllBooks().length;
+    const visible = Math.min(allBooksState.visibleCount, count);
+    countText.textContent = "Showing " + visible + " of " + count + (count === 1 ? " book" : " books");
+  }
+
+  updateAllBooksLoadMore();
 }
 
 function closeAllBooksMenus() {
@@ -472,14 +492,57 @@ function closeAllBooksMenus() {
 
 function setAllBooksFilter(filterValue) {
   allBooksState.filter = filterValue || "all";
+  allBooksState.visibleCount = allBooksState.pageSize;
   updateAllBooksControlLabels();
   renderAllBooksCollection();
 }
 
 function setAllBooksSort(sortValue) {
   allBooksState.sort = sortValue || "newest";
+  allBooksState.visibleCount = allBooksState.pageSize;
   updateAllBooksControlLabels();
   renderAllBooksCollection();
+}
+
+function updateAllBooksLoadMore() {
+  const button = getAllBooksLoadMoreButton();
+  if (!button) return;
+
+  const wrapper = button.closest(".load-more-wrap");
+  const total = getFilteredAndSortedAllBooks().length;
+  const visible = Math.min(allBooksState.visibleCount, total);
+  const remaining = Math.max(0, total - visible);
+  const shouldHide = total === 0 || remaining === 0;
+
+  button.classList.remove("is-loading");
+  button.classList.toggle("is-hidden", shouldHide);
+  button.disabled = remaining === 0;
+  button.textContent = remaining > 0
+    ? "Load " + Math.min(allBooksState.pageSize, remaining) + " More From Archive"
+    : "All Books Loaded";
+
+  if (wrapper) {
+    wrapper.classList.toggle("is-hidden", shouldHide);
+  }
+}
+
+function loadMoreAllBooks() {
+  const button = getAllBooksLoadMoreButton();
+  const total = getFilteredAndSortedAllBooks().length;
+
+  if (!button || allBooksState.visibleCount >= total) {
+    updateAllBooksLoadMore();
+    return;
+  }
+
+  button.disabled = true;
+  button.classList.add("is-loading");
+  button.textContent = "Loading...";
+
+  window.setTimeout(function () {
+    allBooksState.visibleCount = Math.min(total, allBooksState.visibleCount + allBooksState.pageSize);
+    renderAllBooksCollection();
+  }, 160);
 }
 
 async function loadExploreBookLibraryFromDatabase() {
@@ -1105,7 +1168,13 @@ function initializeAllBooksControls() {
 
   if (!document.body.dataset.allBooksMenuBound) {
     document.body.dataset.allBooksMenuBound = "true";
-    document.addEventListener("click", function () {
+    document.addEventListener("click", function (event) {
+      const loadMoreTarget = event.target.closest("[data-all-books-action='load-more']");
+      if (loadMoreTarget) {
+        loadMoreAllBooks();
+        return;
+      }
+
       closeAllBooksMenus();
     });
   }
@@ -1190,7 +1259,7 @@ function syncAllBooksCollectionBadges() {
     return;
   }
 
-  collectionBooks.forEach(function (metadata) {
+  collectionBooks.slice(0, allBooksState.visibleCount).forEach(function (metadata) {
     const row = createClassedElement("div", "all-books-row");
     const rowContent = createClassedElement("div", "all-books-row-main");
     const imageWrap = createClassedElement("div", "all-books-cover-wrap");
@@ -1207,7 +1276,7 @@ function syncAllBooksCollectionBadges() {
     image.alt = metadata.coverAlt || metadata.title + " cover";
     imageRating.setAttribute("data-all-books-image-rating", "true");
     detailsButton.type = "button";
-    detailsButton.textContent = "Details";
+    detailsButton.textContent = "View Details";
 
     const coverUrl = getBookCoverUrl(metadata);
     const availability = getBookAvailability(metadata.status);
@@ -1239,7 +1308,7 @@ function syncAllBooksCollectionBadges() {
       imageUrl: coverUrl,
       category: metadata.category
     });
-    detailsButton.textContent = "Details";
+    detailsButton.textContent = "View Details";
 
     imageWrap.append(image, imageRating);
     titleWrap.append(title, author, categoryText);
@@ -1998,7 +2067,8 @@ function openBookModal(title, author, description, status, imageUrl) {
   // Check if already borrowed using API
   (async function() {
     try {
-      const alreadyBorrowed = await window.brainrootAPI.isBookBorrowed(title);
+      const canCheckBorrowed = window.brainrootAPI && typeof window.brainrootAPI.isBookBorrowed === "function";
+      const alreadyBorrowed = canCheckBorrowed ? await window.brainrootAPI.isBookBorrowed(title) : false;
       
       if (alreadyBorrowed || resolvedStatus === "Borrowed") {
         borrowBtn.textContent = "Already Borrowed";
@@ -2088,7 +2158,9 @@ async function borrowBook() {
   const title = bookPayload.title;
   
   try {
-    const isAlreadyBorrowed = await window.brainrootAPI.isBookBorrowed(title);
+    const canCheckBorrowed = window.brainrootAPI && typeof window.brainrootAPI.isBookBorrowed === "function";
+    const canBorrowBook = window.brainrootAPI && typeof window.brainrootAPI.borrowBook === "function";
+    const isAlreadyBorrowed = canCheckBorrowed ? await window.brainrootAPI.isBookBorrowed(title) : false;
     if (isAlreadyBorrowed) {
       showInlineExploreMessage("This book is already in your borrowed list.");
       const borrowBtn = document.getElementById("borrowBtn");
@@ -2102,6 +2174,11 @@ async function borrowBook() {
 
     if (getBookAccess(title) === "paid" && !isPaidSubscriber()) {
       showInlineExploreMessage("This is a paid book. Upgrade your plan from Profile to borrow it.");
+      return;
+    }
+
+    if (!canBorrowBook) {
+      showInlineExploreMessage("Borrow service is not available right now. Try again.");
       return;
     }
 
@@ -2133,9 +2210,16 @@ async function addToWishlist() {
   const bookPayload = getCurrentModalBookPayload();
 
   try {
-    const alreadyBorrowed = await window.brainrootAPI.isBookBorrowed(bookPayload.title);
+    const canCheckBorrowed = window.brainrootAPI && typeof window.brainrootAPI.isBookBorrowed === "function";
+    const canAddWishlist = window.brainrootAPI && typeof window.brainrootAPI.addToWishlist === "function";
+    const alreadyBorrowed = canCheckBorrowed ? await window.brainrootAPI.isBookBorrowed(bookPayload.title) : false;
     if (alreadyBorrowed) {
       showInlineExploreMessage("This book is already borrowed, so it cannot be added to wishlist.");
+      return;
+    }
+
+    if (!canAddWishlist) {
+      showInlineExploreMessage("Wishlist service is not available right now. Try again.");
       return;
     }
 

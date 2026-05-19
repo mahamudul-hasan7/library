@@ -103,6 +103,10 @@ h1 {
   gap: 16px;
 }
 
+.wishlist-loading-list article {
+  display: none;
+}
+
 .wish-list article {
   display: grid;
   grid-template-columns: 40px 170px 1fr;

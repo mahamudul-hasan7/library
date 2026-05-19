@@ -59,6 +59,276 @@
   color: rgba(45, 52, 53, 0.54);
 }
 
+.site-nav-search-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: min(420px, 92vw);
+  z-index: 999;
+  max-height: 360px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid rgba(172, 179, 180, 0.28);
+  box-shadow: 0 18px 40px rgba(20, 34, 48, 0.14);
+}
+
+.site-nav-search-panel.is-hidden {
+  display: none;
+}
+
+.site-nav-search-result {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 10px;
+  width: 100%;
+  padding: 8px;
+  border: 0;
+  background: #ffffff;
+  color: #2d3435;
+  text-align: left;
+  cursor: pointer;
+}
+
+.site-nav-search-result:hover,
+.site-nav-search-result:focus {
+  background: #f4f7fa;
+  outline: none;
+}
+
+.site-nav-search-result img {
+  width: 42px;
+  height: 56px;
+  object-fit: cover;
+  background: #dfe8ea;
+}
+
+.site-nav-search-result span {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+}
+
+.site-nav-search-result strong {
+  color: #2d3435;
+  font-size: 13px;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-nav-search-result span span {
+  display: block;
+  color: #596061;
+  font-size: 11px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-nav-search-empty {
+  padding: 12px;
+  color: #596061;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.site-nav-search-all {
+  display: block;
+  margin: 4px 8px 2px;
+  padding: 9px 0 2px;
+  border-top: 1px solid rgba(172, 179, 180, 0.24);
+  color: #005faf;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.is-nav-search-hidden {
+  display: none !important;
+}
+
+.shared-book-details-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: rgba(12, 15, 15, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.shared-book-details-overlay.show {
+  display: grid;
+}
+
+.shared-book-details-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 24px;
+  width: min(92vw, 680px);
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(172, 179, 180, 0.32);
+  box-shadow: 0 24px 70px rgba(12, 26, 43, 0.24);
+}
+
+.shared-book-details-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: #596061;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.shared-book-details-close:hover {
+  color: #2d3435;
+}
+
+.shared-book-details-image {
+  width: 180px;
+  height: 250px;
+  object-fit: cover;
+  background: #dfe8ea;
+}
+
+.shared-book-details-content {
+  min-width: 0;
+  padding-right: 28px;
+}
+
+.shared-book-details-category {
+  display: inline-flex;
+  margin: 0 0 12px;
+  padding: 5px 9px;
+  background: #d6e5ef;
+  color: #33414a;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.shared-book-details-content h2 {
+  margin: 0 0 8px;
+  color: #2d3435;
+  font-size: 30px;
+  line-height: 1.15;
+}
+
+.shared-book-details-author {
+  margin: 0 0 16px;
+  color: #596061;
+  font-size: 15px;
+  font-style: italic;
+}
+
+.shared-book-details-description {
+  margin: 0 0 18px;
+  color: #445057;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.shared-book-details-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shared-book-details-meta span {
+  padding: 6px 9px;
+  background: #f1f4f5;
+  color: #445057;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.shared-book-details-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.shared-book-details-action {
+  min-height: 38px;
+  padding: 9px 16px;
+  border: 1px solid rgba(0, 95, 175, 0.24);
+  background: #ffffff;
+  color: #005faf;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.shared-book-details-action-primary {
+  background: #005faf;
+  color: #ffffff;
+}
+
+.shared-book-details-action:hover {
+  background: rgba(0, 95, 175, 0.08);
+  border-color: rgba(0, 95, 175, 0.38);
+  transform: translateY(-1px);
+}
+
+.shared-book-details-action-primary:hover {
+  background: #00539a;
+  color: #ffffff;
+}
+
+.shared-book-details-action:disabled {
+  opacity: 0.72;
+  cursor: wait;
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .shared-book-details-card {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .shared-book-details-image {
+    width: 100%;
+    height: 220px;
+  }
+
+  .shared-book-details-content {
+    padding-right: 0;
+  }
+
+  .shared-book-details-content h2 {
+    font-size: 24px;
+  }
+
+  .shared-book-details-action {
+    flex: 1 1 100%;
+  }
+}
+
 .topbar .site-nav-search,
 .profile-nav .site-nav-search,
 .collections-nav .site-nav-search {
@@ -137,5 +407,303 @@
   .profile-page .profile-main,
   .topbar + .container {
     padding-top: 128px;
+  }
+}
+
+/* Shared navbar consistency for Explore, Profile, My Collection, Reader, and Wishlist. */
+.explore-page .top-nav,
+.profile-page .profile-nav,
+.collections-page .collections-nav,
+.reader-page .reader-nav,
+.wishlist-page .topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  min-height: 92px;
+  background: rgba(249, 249, 249, 0.96);
+  border-bottom: 1px solid rgba(220, 223, 225, 0.72);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.explore-page .top-nav-inner,
+.profile-page .profile-nav-inner,
+.collections-page .collections-nav-inner {
+  width: 100%;
+  max-width: none;
+  height: 92px;
+  padding: 0 96px;
+}
+
+.reader-page .reader-nav,
+.wishlist-page .topbar {
+  height: 92px;
+  padding: 0 96px;
+}
+
+.explore-page .top-nav-inner,
+.profile-page .profile-nav-inner,
+.collections-page .collections-nav-inner,
+.reader-page .reader-nav,
+.wishlist-page .topbar {
+  display: flex;
+  align-items: center;
+}
+
+.explore-page .brand-mark,
+.profile-page .profile-brand,
+.collections-page .collections-brand,
+.reader-page .reader-brand,
+.wishlist-page .brand {
+  flex: 0 0 auto;
+  color: #2d3435;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.wishlist-page .brand a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.explore-page .top-nav-left {
+  gap: 56px;
+}
+
+.explore-page .top-nav-right,
+.profile-page .profile-nav-right {
+  gap: 40px;
+  margin-left: auto;
+}
+
+.explore-page .nav-menu,
+.profile-page .profile-menu,
+.collections-page .collections-nav-menu,
+.reader-page .reader-menu,
+.wishlist-page .topbar nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: auto;
+  margin-left: auto;
+  color: rgba(45, 52, 53, 0.68);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.explore-page .top-nav-actions,
+.profile-page .profile-actions {
+  gap: 18px;
+}
+
+.wishlist-page .topbar nav a {
+  margin-left: 0;
+}
+
+.explore-page .nav-link,
+.explore-page .nav-link-active,
+.profile-page .profile-menu-link,
+.profile-page .profile-login-link,
+.collections-page .collections-nav-link,
+.collections-page .collections-login-link,
+.reader-page .reader-menu a,
+.wishlist-page .topbar nav a {
+  color: rgba(45, 52, 53, 0.68);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-decoration: none;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.explore-page .nav-link:hover,
+.profile-page .profile-menu-link:hover,
+.profile-page .profile-login-link:hover,
+.collections-page .collections-nav-link:hover,
+.collections-page .collections-login-link:hover,
+.reader-page .reader-menu a:hover,
+.wishlist-page .topbar nav a:hover {
+  color: #005faf;
+}
+
+.explore-page .nav-link-active,
+.collections-page .collections-nav-link-active,
+.wishlist-page .topbar nav a.active {
+  color: #005faf;
+  border-bottom: 2px solid #005faf;
+  padding-bottom: 8px;
+  font-size: 16px;
+  font-weight: 400;
+  transform: none;
+}
+
+.explore-page .site-nav-search,
+.profile-page .site-nav-search,
+.collections-page .site-nav-search,
+.reader-page .site-nav-search,
+.wishlist-page .site-nav-search {
+  flex: 0 1 336px;
+  width: 336px;
+  min-width: 260px;
+  max-width: 360px;
+  height: 48px;
+  margin-left: 56px;
+  margin-right: auto;
+  background: #ffffff;
+  border-color: rgba(172, 179, 180, 0.22);
+  box-shadow: 0 1px 2px rgba(20, 34, 48, 0.02);
+}
+
+.explore-page .top-nav-left .site-nav-search {
+  margin-left: 0;
+}
+
+.reader-page .reader-profile-icon,
+.collections-page .collections-profile-icon,
+.wishlist-page .profile-icon,
+.profile-page .profile-icon-button,
+.explore-page .profile-icon {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.reader-page .reader-profile-icon img,
+.collections-page .collections-profile-icon img,
+.wishlist-page .profile-icon img,
+.profile-page .profile-icon-image,
+.explore-page .profile-icon img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  opacity: 0.9;
+}
+
+.profile-page .profile-icon-button {
+  position: relative;
+  overflow: visible;
+}
+
+.profile-page .profile-icon-button::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 22px;
+  height: 2px;
+  background: #005faf;
+  border-radius: 999px;
+  transform: translateX(-50%);
+}
+
+.reader-page .reader-shell {
+  margin-top: 124px;
+}
+
+@media (max-width: 1100px) {
+  .explore-page .top-nav-inner,
+  .profile-page .profile-nav-inner,
+  .collections-page .collections-nav-inner,
+  .reader-page .reader-nav,
+  .wishlist-page .topbar {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+
+  .explore-page .nav-menu,
+  .profile-page .profile-menu,
+  .collections-page .collections-nav-menu,
+  .reader-page .reader-menu,
+  .wishlist-page .topbar nav {
+    gap: 18px;
+  }
+
+  .explore-page .site-nav-search,
+  .profile-page .site-nav-search,
+  .collections-page .site-nav-search,
+  .reader-page .site-nav-search,
+  .wishlist-page .site-nav-search {
+    flex-basis: 280px;
+    width: 280px;
+    min-width: 220px;
+    margin-left: 32px;
+  }
+}
+
+@media (max-width: 760px) {
+  .explore-page .top-nav,
+  .profile-page .profile-nav,
+  .collections-page .collections-nav,
+  .reader-page .reader-nav,
+  .wishlist-page .topbar {
+    min-height: 64px;
+    height: auto;
+  }
+
+  .explore-page .top-nav-inner,
+  .profile-page .profile-nav-inner,
+  .collections-page .collections-nav-inner,
+  .reader-page .reader-nav,
+  .wishlist-page .topbar {
+    height: auto;
+    min-height: 64px;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    padding: 10px 16px;
+  }
+
+  .explore-page .site-nav-search,
+  .profile-page .site-nav-search,
+  .collections-page .site-nav-search,
+  .reader-page .site-nav-search,
+  .wishlist-page .site-nav-search {
+    order: 3;
+    flex: 1 1 100%;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  .explore-page .top-nav-right,
+  .profile-page .profile-nav-right,
+  .collections-page .collections-nav-menu,
+  .reader-page .reader-menu,
+  .wishlist-page .topbar nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+    margin-left: 0;
+    overflow-x: auto;
+  }
+
+  .explore-page .nav-menu,
+  .profile-page .profile-menu {
+    display: flex;
+    gap: 18px;
+  }
+
+  .explore-page .nav-link,
+  .explore-page .nav-link-active,
+  .profile-page .profile-menu-link,
+  .profile-page .profile-login-link,
+  .collections-page .collections-nav-link,
+  .collections-page .collections-login-link,
+  .reader-page .reader-menu a,
+  .wishlist-page .topbar nav a {
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .reader-page .reader-shell {
+    margin-top: 150px;
   }
 }

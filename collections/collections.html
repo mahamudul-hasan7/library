@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>BrainRoot | Collections</title>
+  <title>BrainRoot | My Collection</title>
   <link href="./collections.css" rel="stylesheet"/>
   <link href="../shared-search.css" rel="stylesheet"/>
 </head>
@@ -23,7 +23,7 @@
         <a class="collections-nav-link" href="../index/index.html">Home</a>
         <a class="collections-nav-link" href="../explore/explore.html">Explore</a>
         <a class="collections-nav-link" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
-        <a class="collections-nav-link collections-nav-link-active" href="../collections/collections.html" data-auth="private">Collections</a>
+        <a class="collections-nav-link collections-nav-link-active" href="../collections/collections.html" data-auth="private">My Collection</a>
         <a href="../login/login.html" data-auth="login" data-auth-login-slot="true" class="collections-login-link" title="Login">Login</a>
         <a href="../profile/profile.html" data-auth="profile" class="collections-profile-icon auth-profile-link" title="Profile">
           <img src="../Assets/profile icon.png" alt="Profile"/>
@@ -39,7 +39,8 @@
     <div class="collections-left">
       <header class="collections-header">
         <span class="collections-kicker">Curated Collections</span>
-        <h1>My Collections</h1>
+        <h1>My Collection</h1>
+        <p class="collections-sub">Borrowed records and saved reading paths inside your personal research library.</p>
       </header>
       <div class="collections-viewbar" aria-label="Collection views">
         <button class="collections-view-btn is-active" type="button" data-collection-view="active">Current</button>
@@ -86,6 +87,7 @@
   <script src="../backend-storage.js"></script>
   <script src="../api-client.js"></script>
   <script src="../auth.js"></script>
+  <script src="../shared-search.js?v=3"></script>
   <script src="./collections.js"></script>
 </body>
 </html>

@@ -113,7 +113,8 @@ $query = "
         file_url,
         sample_url,
         section_name,
-        status
+        status,
+        created_at
     FROM books
     ORDER BY
         FIELD(section_name, 'trending', 'topReading', 'mostLiked', 'collection'),

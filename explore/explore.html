@@ -37,7 +37,7 @@
             <a class="nav-link" href="../index/index.html" data-auth="public">Home</a>
             <a class="nav-link-active" href="../explore/explore.html" data-auth="public">Explore</a>
             <a class="nav-link" href="../wishlist/wishlist.html" data-auth="private">Wishlist</a>
-            <a class="nav-link" href="../collections/collections.html" data-auth="private">Collections</a>
+            <a class="nav-link" href="../collections/collections.html" data-auth="private">My Collection</a>
           </div>
           <div class="top-nav-actions">
           <a
@@ -136,11 +136,12 @@
         </section>
       </div>
 
-      <section class="all-books-section">
+      <section id="allBooksSection" class="all-books-section">
         <div class="all-books-header">
           <div>
             <h2 class="all-books-title">All Books Collection</h2>
             <p class="all-books-subtitle">Browse our entire curated archive by metadata.</p>
+            <p id="allBooksCount" class="all-books-count">Showing 0 books</p>
           </div>
           <div class="all-books-actions">
             <div class="control-dropdown">
@@ -168,7 +169,7 @@
         </div>
         <div class="all-books-list"></div>
         <div class="load-more-wrap">
-          <button class="load-more-btn" type="button">Load More From Archive</button>
+          <button id="allBooksLoadMoreBtn" class="load-more-btn" type="button" data-all-books-action="load-more">Load More From Archive</button>
         </div>
       </section>
     </main>
@@ -259,6 +260,6 @@
     <script src="../backend-storage.js"></script>
     <script src="../api-client.js"></script>
     <script src="../auth.js"></script>
-    <script src="./explore.js?v=2"></script>
+    <script src="./explore.js?v=4"></script>
   </body>
 </html>

@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   const api = window.brainrootAPI;
   const modal = document.getElementById("bookModal");
+  const topbar = document.querySelector(".topbar");
   let currentModalBook = null;
   let indexAllBooks = []; // Store all books from database
   const fallbackBookImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='1000' viewBox='0 0 700 1000'%3E%3Crect width='700' height='1000' fill='%23dfe8ea'/%3E%3Crect x='70' y='80' width='560' height='840' rx='24' fill='%23ffffff'/%3E%3Ctext x='350' y='470' font-family='Segoe UI, Arial' font-size='54' font-weight='700' text-anchor='middle' fill='%232d3435'%3EBrainRoot%3C/text%3E%3Ctext x='350' y='540' font-family='Segoe UI, Arial' font-size='30' text-anchor='middle' fill='%23596061'%3EBook Cover%3C/text%3E%3C/svg%3E";
@@ -45,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (modal) {
     modal.addEventListener("click", function(e) {
-      if (e.target === modal) {
+      if (e.target === modal || e.target.classList.contains("modal-backdrop")) {
         modal.classList.add("hidden");
       }
     });
@@ -111,6 +112,14 @@ document.addEventListener("DOMContentLoaded", function () {
     return article;
   }
 
+  function renderFeaturedEmptyState(grid) {
+    if (!grid) return;
+    const empty = document.createElement("div");
+    empty.className = "featured-empty";
+    empty.textContent = "Featured books are loading from the archive.";
+    grid.replaceChildren(empty);
+  }
+
   function uniqueBooksById(books) {
     const seen = new Set();
     const uniqueBooks = [];
@@ -143,8 +152,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function renderFeaturedBooksFromDatabase() {
+    const grid = document.querySelector(".featured .grid");
+    if (!grid) {
+      return;
+    }
+
+    renderFeaturedEmptyState(grid);
+
     if (!api || typeof api.getFeaturedBooks !== "function") {
-      bindFeaturedBookClickHandlers();
       return;
     }
 
@@ -156,10 +171,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const featuredBooks = uniqueBooksById(featuredResults.flat()).slice(0, 12);
     const booksToRender = featuredBooks.length ? featuredBooks : allBooks.slice(0, 12);
-    const grid = document.querySelector(".featured .grid");
-
-    if (!grid) {
-      bindFeaturedBookClickHandlers();
+    if (!booksToRender.length) {
+      renderFeaturedEmptyState(grid);
       return;
     }
 
@@ -172,6 +185,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   bindFeaturedBookClickHandlers();
   renderFeaturedBooksFromDatabase();
+
+  if (topbar) {
+    let lastScrollY = window.scrollY;
+    const toggleIndexNav = function () {
+      const currentScrollY = window.scrollY;
+      const isScrollingDown = currentScrollY > lastScrollY;
+      topbar.classList.toggle("is-scroll-hidden", isScrollingDown && currentScrollY > 80);
+      lastScrollY = currentScrollY;
+    };
+    toggleIndexNav();
+    window.addEventListener("scroll", toggleIndexNav, { passive: true });
+  }
 
   // ===== Index Page Search Implementation =====
   let indexSearchIndex = null;
@@ -285,7 +310,8 @@ document.addEventListener("DOMContentLoaded", function () {
       title: item.title,
       author: item.author,
       image: item.imageUrl,
-      category: "General",
+      category: item.category || "General",
+      access: item.access || "free",
       description: item.description
     });
     hideIndexSearchPanel();
@@ -410,18 +436,32 @@ document.addEventListener("DOMContentLoaded", function () {
   if (addToCollectionBtn) {
     addToCollectionBtn.addEventListener("click", async function() {
       const title = document.getElementById("modalBookTitle").textContent;
-      if (window.brainrootAuth && !window.brainrootAuth.requireLogin("Please login to add books.")) {
-        return;
+      if (window.brainrootAuth) {
+        const canAddToCollection = typeof window.brainrootAuth.requireBackendLogin === "function"
+          ? await window.brainrootAuth.requireBackendLogin("Please login to add books.")
+          : window.brainrootAuth.requireLogin("Please login to add books.");
+
+        if (!canAddToCollection) {
+          return;
+        }
       }
       
       try {
+        if (!api || typeof api.addToCollection !== "function") {
+          alert("Collection service is not available right now.");
+          return;
+        }
+
         const success = await api.addToCollection(Object.assign({}, currentModalBook || {}, { title: title }));
         if (success) {
           alert(`"${title}" added to your collection!`);
           modal?.classList.add("hidden");
+        } else {
+          alert(api.lastError || "Could not add this book to your collection.");
         }
       } catch (error) {
         console.error("Error adding to collection:", error);
+        alert("Error adding book to collection. Try again.");
       }
     });
   }

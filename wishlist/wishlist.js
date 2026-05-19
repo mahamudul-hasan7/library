@@ -265,6 +265,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   async function renderWishlist() {
+    wishlistContainer.classList.remove("wishlist-loading-list");
     wishlistContainer.replaceChildren();
     const wishlistItems = await api.getWishlist();
 

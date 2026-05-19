@@ -129,6 +129,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     return "";
   }
 
+  function normalizeTitle(value) {
+    return String(value || "").trim().toLowerCase();
+  }
+
   async function borrowRecommendedBook(book) {
     if (window.brainrootAuth) {
       const canBorrow = typeof window.brainrootAuth.requireBackendLogin === "function"
@@ -532,6 +536,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       article.setAttribute("data-book-title", book.title);
 
+      const number = document.createElement("b");
+      number.className = "collection-number";
+      number.textContent = String(index + 1).padStart(2, "0");
+
       const cover = document.createElement("div");
       cover.className = "collection-cover";
       const image = document.createElement("img");
@@ -568,7 +576,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       const summary = document.createElement("p");
       summary.className = "collection-copy";
-      summary.textContent = book.description || book.summary || "A book in your collection.";
+      summary.textContent = book.author || "Unknown Author";
 
       const meta = document.createElement("div");
       meta.className = "collection-meta";
@@ -625,7 +633,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         returnButton.type = "button";
         returnButton.dataset.collectionAction = "return";
         returnButton.className = "collection-action collection-action--ghost";
-        returnButton.textContent = "Return";
+        returnButton.textContent = "Return Book";
         actions.appendChild(readButton);
         actions.appendChild(returnButton);
       } else {
@@ -644,6 +652,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       body.appendChild(progress);
       body.appendChild(actions);
+      article.appendChild(number);
       article.appendChild(cover);
       article.appendChild(body);
       collectionsList.appendChild(article);
@@ -656,38 +665,69 @@ document.addEventListener("DOMContentLoaded", async function () {
         return [];
       }
 
-      // Get all available books
       const allBooks = await api.getBooks();
       if (!Array.isArray(allBooks)) {
         return [];
       }
 
-      // Get user's current collections and active borrows so expired books are not suggested again.
-      let borrowedTitles = new Set();
+      let collectionBooks = [];
+      let borrowedBooks = [];
       try {
-        const [collections, borrowedBooks] = await Promise.all([
+        const [collectionsResult, borrowedResult] = await Promise.all([
           api.getCollections(),
           typeof api.getBorrowedBooks === "function" ? api.getBorrowedBooks() : Promise.resolve([])
         ]);
-        if (Array.isArray(collections)) {
-          collections.forEach(function(book) {
-            borrowedTitles.add(String(book.title || "").trim().toLowerCase());
-          });
-        }
-        if (Array.isArray(borrowedBooks)) {
-          borrowedBooks.forEach(function(book) {
-            borrowedTitles.add(String(book.title || "").trim().toLowerCase());
-          });
-        }
+        collectionBooks = Array.isArray(collectionsResult) ? collectionsResult : [];
+        borrowedBooks = Array.isArray(borrowedResult) ? borrowedResult : [];
       } catch (err) {
         console.warn("Could not fetch borrowed titles:", err);
       }
 
-      // Filter out already borrowed books and return fresh recommendations
-      const recommendations = allBooks.filter(function(book) {
-        const bookTitle = String(book.title || "").trim().toLowerCase();
-        return !borrowedTitles.has(bookTitle);
-      }).slice(0, 6);
+      const seedBooks = borrowedBooks.length ? borrowedBooks : collectionBooks.filter(function (book) {
+        return Number(book.is_borrowed) === 1 || book.due_at;
+      });
+
+      if (seedBooks.length === 0) {
+        return [];
+      }
+
+      const borrowedTitles = new Set();
+      collectionBooks.concat(borrowedBooks).forEach(function (book) {
+        const title = normalizeTitle(book.title);
+        if (title) borrowedTitles.add(title);
+      });
+
+      const preferredCategories = new Set(seedBooks.map(function (book) {
+        return String(book.category || "").trim().toLowerCase();
+      }).filter(Boolean));
+      const preferredAuthors = new Set(seedBooks.map(function (book) {
+        return String(book.author || "").trim().toLowerCase();
+      }).filter(Boolean));
+
+      const availableBooks = allBooks.filter(function (book) {
+        const title = normalizeTitle(book.title);
+        return title && !borrowedTitles.has(title);
+      });
+
+      const recommendations = availableBooks
+        .map(function (book, index) {
+          const category = String(book.category || "").trim().toLowerCase();
+          const author = String(book.author || "").trim().toLowerCase();
+          let score = 0;
+          if (preferredCategories.has(category)) score += 100;
+          if (preferredAuthors.has(author)) score += 25;
+          score += Math.min(10, Number(book.rating || 0));
+          score += Math.min(10, Number(book.likes || book.like_count || 0) / 20);
+          return { book: book, score: score, index: index };
+        })
+        .sort(function (first, second) {
+          if (second.score !== first.score) return second.score - first.score;
+          return first.index - second.index;
+        })
+        .slice(0, 5)
+        .map(function (entry) {
+          return entry.book;
+        });
 
       return recommendations;
     } catch (error) {
@@ -697,18 +737,22 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   async function getRecommendedBooks() {
-    // Try to get from API first (if logged in)
-    const apiRecommendations = await getRecommendationsFromAPI();
-    if (apiRecommendations.length > 0) {
-      return apiRecommendations;
-    }
+    return getRecommendationsFromAPI();
+  }
 
-    // Fallback to default recommendations
-    return [
-      { title: "Atomic Habits", author: "James Clear", category: "Productivity", image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=700&q=80" },
-      { title: "The Kite Runner", author: "Khaled Hosseini", category: "Drama", image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=700&q=80" },
-      { title: "Dune", author: "Frank Herbert", category: "Sci-Fi", image: "https://images.unsplash.com/photo-1495640388908-05fa85288e61?auto=format&fit=crop&w=700&q=80" }
-    ];
+  function renderRecommendationPrompt() {
+    if (!recommendationsList) return;
+    const note = document.createElement("div");
+    note.className = "recommendations-note";
+    const title = document.createElement("h3");
+    title.textContent = "Borrow a book first";
+    const copy = document.createElement("p");
+    copy.textContent = "Your recommendations will appear here after you borrow a book. BrainRoot will match five related books from the archive.";
+    const link = document.createElement("a");
+    link.href = "../explore/explore.html";
+    link.textContent = "Explore Books";
+    note.append(title, copy, link);
+    recommendationsList.replaceChildren(note);
   }
 
   async function renderRecommendations() {
@@ -717,7 +761,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     const allRecommendations = await getRecommendedBooks();
     
     recommendationsList.replaceChildren();
-    const visibleCount = recommendationsExpanded ? allRecommendations.length : 3;
+    if (!allRecommendations.length) {
+      renderRecommendationPrompt();
+      return;
+    }
+
+    const visibleCount = recommendationsExpanded ? allRecommendations.length : 5;
     allRecommendations.slice(0, visibleCount).forEach(function (book) {
       const article = document.createElement("article");
       article.className = "recommendation-card";
